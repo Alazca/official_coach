@@ -52,7 +52,7 @@ Follow these steps to set up the project locally:
 1.  **Clone the repository:**
 
     ```bash
-    git clone ADD
+    git clone https://github.com/Alazca/official_coach.git
     cd official_coach
     ```
 
