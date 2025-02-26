@@ -52,8 +52,8 @@ Follow these steps to set up the project locally:
 1.  **Clone the repository:**
 
     ```bash
-    git clone <repository_url>
-    cd strength_conditioning_app
+    git clone ADD
+    cd official_coach
     ```
 
 2.  **Create a virtual environment:**
@@ -61,44 +61,18 @@ Follow these steps to set up the project locally:
     *   **Using `venv` (if not using Poetry or PDM):**
 
         ```bash
-        python3 -m venv venv
-        source venv/bin/activate  # Linux/macOS
+        python3 -m venv coach
+        source coach/bin/activate  # Linux/macOS
         # OR
-        venv\Scripts\activate  # Windows
-        ```
-
-    *   **Using Poetry:**
-
-        ```bash
-        poetry install
-        poetry shell
-        ```
-
-    *   **Using PDM:**
-
-        ```bash
-        pdm install
-        pdm shell
+        coach\Scripts\activate  # Windows
         ```
 
 3.  **Install dependencies:**
 
-    *   **Using `venv`:**
+    *   **Using the `venv`:**
 
         ```bash
         pip install -r requirements.txt
-        ```
-
-    *   **Using Poetry:**
-
-        ```bash
-        poetry install
-        ```
-
-    *   **Using PDM:**
-
-        ```bash
-        pdm install
         ```
 
 4.  **Configure the application:**
