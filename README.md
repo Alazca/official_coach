@@ -24,8 +24,6 @@ This project is a web application that provides personalized strength and condit
     *   [List any other backend libraries]
 *   **Frontend:**
     *   JavaScript
-    *   [Choose one: React, Angular, Vue.js] (JavaScript framework)
-    *   [Choose one: Bootstrap, Tailwind CSS, Materialize] (CSS framework)
     *   HTML
     *   CSS
     *   [List any other frontend libraries]
@@ -43,7 +41,6 @@ Before you begin, ensure you have met the following requirements:
 
 *   Python 3.9 or higher is installed.
 *   [If using PostgreSQL] PostgreSQL is installed and running.
-*   [If using Poetry or PDM] Poetry or PDM is installed.
 
 ## Installation
 
