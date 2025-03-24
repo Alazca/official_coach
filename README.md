@@ -20,27 +20,21 @@ This project is a web application that provides personalized strength and condit
     *   Python
     *   Flask (web framework)
     *   SQLAlchemy (ORM)
-    *   PostgreSQL (database)
-    *   [List any other backend libraries]
 *   **Frontend:**
     *   JavaScript
     *   HTML
     *   CSS
-    *   [List any other frontend libraries]
 *   **AI:**
-    *   [Describe your AI model: e.g., Machine learning model trained on a dataset of workout plans]
-    *   [List any AI-related libraries: e.g., scikit-learn, TensorFlow, PyTorch]
+    *   OpenAI API
 *   **Deployment:**
     *   Gunicorn (WSGI server)
-    *   Nginx (reverse proxy)
-    *   [Choose one: AWS, Google Cloud, Azure] (cloud platform)
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 
-*   Python 3.9 or higher is installed.
-*   [If using PostgreSQL] PostgreSQL is installed and running.
+*   Python 3.0+
+*   SQLite
 
 ## Installation
 
@@ -55,7 +49,7 @@ Follow these steps to set up the project locally:
 
 2.  **Create a virtual environment:**
 
-    *   **Using `venv` (if not using Poetry or PDM):**
+    *   **Using `venv`:**
 
         ```bash
         python3 -m venv coach
@@ -75,16 +69,8 @@ Follow these steps to set up the project locally:
 4.  **Configure the application:**
 
     *   Create a `.env` file in the root directory of the project.
-    *   Add the following environment variables to the `.env` file:
-
-        ```
-        FLASK_APP=app.py
-        FLASK_ENV=development  # Or production
-        SECRET_KEY=<your_secret_key>  # Generate a random secret key
-        DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database_name>  # PostgreSQL connection string
-        # Add any other environment variables required by your application
-        ```
-
+    *   After database is selected, WIP
+   
     *   **Important:** Replace the placeholder values with your actual values.  *Never* commit your `.env` file to version control.
 
 5.  **Initialize the database:**
@@ -103,12 +89,6 @@ Follow these steps to set up the project locally:
 
     ```bash
     flask run
-    ```
-
-    Or, if using Gunicorn:
-
-    ```bash
-    gunicorn --bind 0.0.0.0:5000 app:app
     ```
 
 2.  **Access the web app:**
