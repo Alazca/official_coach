@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualize My Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <nav class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
+        <h1 class="text-2xl font-bold text-white">Data Dashboard</h1>
+        <div class="flex gap-4">
+            <button onclick="window.location.href='index.html'" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg">Home</button>
+        </div>
+    </nav>
+    
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Filters -->
+        <div class="mb-8 bg-gray-800 p-4 rounded-lg border border-red-800">
+            <div class="flex gap-4">
+                <select id="timeRange" class="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 3 Months</option>
+                </select>
+                <button onclick="refreshCharts()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                    Update Charts
+                </button>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Workout Volume Chart -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+                <h3 class="text-xl font-bold mb-4">Workout Volume Trends</h3>
+                <canvas id="volumeChart"></canvas>
+            </div>
+
+            <!-- Nutrition Chart -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+                <h3 class="text-xl font-bold mb-4">Calorie & Macro Tracking</h3>
+                <canvas id="nutritionChart"></canvas>
+            </div>
+
+            <!-- Body Metrics -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+                <h3 class="text-xl font-bold mb-4">Body Metrics</h3>
+                <canvas id="weightChart"></canvas>
+            </div>
+
+            <!-- Exercise Distribution -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+                <h3 class="text-xl font-bold mb-4">Exercise Distribution</h3>
+                <canvas id="exerciseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+                <h4 class="text-sm text-gray-400">Total Volume</h4>
+                <div id="totalVolume" class="text-2xl font-bold text-red-500">0 kg</div>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+                <h4 class="text-sm text-gray-400">Avg. Daily Calories</h4>
+                <div id="avgCalories" class="text-2xl font-bold text-red-500">0</div>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+                <h4 class="text-sm text-gray-400">Weight Change</h4>
+                <div id="weightChange" class="text-2xl font-bold text-red-500">0 kg</div>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+                <h4 class="text-sm text-gray-400">Workouts Completed</h4>
+                <div id="workoutCount" class="text-2xl font-bold text-red-500">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

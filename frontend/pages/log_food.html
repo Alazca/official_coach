@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Food</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .calendar-day {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;  /* Changed from border-radius: 50% to 4px */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            background: #374151;
+            color: #f3f4f6;
+            border: 1px solid #4B5563;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .calendar-day:hover {
+            background: #4B5563;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .calendar-day::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 4px;  /* Changed to match new square style */
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease-out;
+        }
+
+        .calendar-day:hover::before {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .calendar-day.selected {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #ffffff;
+            border-color: #ef4444;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px -1px rgb(59 130 246 / 0.5);
+            border-radius: 4px;  /* Changed to match new square style */
+        }
+
+        .calendar-header {
+            color: #9CA3AF;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.5rem 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #calendarDays > div {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        #calendarDays > div:nth-child(n) {
+            animation-delay: calc(0.05s * var(--animation-order, 0));
+        }
+
+        /* Style calendar navigation */
+        #prevMonth, #nextMonth {
+            color: #f3f4f6;
+            transition: color 0.3s;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+        }
+
+        /* Style month display */
+        #currentMonth {
+            color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <!-- Navigation -->
+    <nav class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
+        <h1 class="text-2xl font-bold text-white">Food Logger</h1>
+        <button onclick="window.location.href='index.html'" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg">Home</button>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Calendar Section -->
+        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+            <div class="flex justify-between items-center mb-4">
+                <button id="prevMonth" class="text-gray-400 hover:text-white text-2xl">←</button>
+                <h2 id="currentMonth" class="text-xl font-bold"></h2>
+                <button id="nextMonth" class="text-gray-400 hover:text-white text-2xl">→</button>
+            </div>
+            <div class="grid grid-cols-7 gap-2 text-center">
+                <div class="calendar-header">S</div>
+                <div class="calendar-header">M</div>
+                <div class="calendar-header">T</div>
+                <div class="calendar-header">W</div>
+                <div class="calendar-header">T</div>
+                <div class="calendar-header">F</div>
+                <div class="calendar-header">S</div>
+            </div>
+            <div id="calendarDays" class="grid grid-cols-7 gap-2 mt-2">
+                <!-- Calendar days will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Food Logging Section -->
+        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">Meals for <span id="selectedDate"></span></h3>
+                <button onclick="resetDayMeals()" class="bg-red-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700">
+                    Reset Day
+                </button>
+            </div>
+            <button onclick="NutritionModule.generateMealSuggestion()" 
+                class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mb-4">
+                Generate Meal Suggestions
+            </button>
+            <div id="foodList" class="space-y-4">
+                <!-- Meals will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Summary -->
+    <div class="max-w-6xl mx-auto mt-6 p-4">
+        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+            <h3 class="text-lg font-bold mb-4">Daily Nutrition Summary</h3>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <div class="text-sm text-gray-400">Calories</div>
+                    <div id="totalCalories" class="text-2xl font-bold text-red-500">0</div>
+                    <div class="text-xs text-gray-400">Target: <span id="calorieTarget">2000</span></div>
+                    <div class="text-xs text-green-500">Remaining: <span id="caloriesRemaining">2000</span></div>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <div class="text-sm text-gray-400">Protein</div>
+                    <div id="totalProtein" class="text-2xl font-bold text-red-500">0g</div>
+                    <div class="text-xs text-gray-400">Target: <span id="proteinTarget">150g</span></div>
+                    <div class="text-xs text-green-500">Remaining: <span id="proteinRemaining">150g</span></div>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <div class="text-sm text-gray-400">Carbs</div>
+                    <div id="totalCarbs" class="text-2xl font-bold text-red-500">0g</div>
+                    <div class="text-xs text-gray-400">Target: <span id="carbsTarget">250g</span></div>
+                    <div class="text-xs text-green-500">Remaining: <span id="carbsRemaining">250g</span></div>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <div class="text-sm text-gray-400">Fats</div>
+                    <div id="totalFats" class="text-2xl font-bold text-red-500">0g</div>
+                    <div class="text-xs text-gray-400">Target: <span id="fatsTarget">55g</span></div>
+                    <div class="text-xs text-green-500">Remaining: <span id="fatsRemaining">55g</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load scripts in correct order -->
+    <script>console.log('Starting script load...');</script>
+    <script src="storage.js"></script>
+    <script>console.log('Storage loaded');</script>
+    <script src="ui.js"></script>
+    <script>console.log('UI loaded');</script>
+    <script src="calendar.js"></script>
+    <script>console.log('Calendar loaded');</script>
+    <script src="nutrition.js"></script>
+    <script>console.log('Nutrition loaded');</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            if (typeof NutritionModule !== 'undefined') {
+                console.log('NutritionModule found, initializing...');
+                CalendarModule.initializeCalendar();
+                NutritionModule.displayAllMeals();
+            } else {
+                console.error('NutritionModule not found!');
+            }
+        });
+    </script>
+</body>
+</html>
