@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 // Create database directory if it doesn't exist
-const dbDir = path.join(__dirname, '..', 'database');
+const dbDir = path.join(__dirname, '..', 'app', 'database');
 const fs = require('fs');
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
