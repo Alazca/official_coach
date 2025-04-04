@@ -86,9 +86,9 @@ CREATE TABLE meals (
     meal_date DATE,
     meal_name VARCHAR(100),
     calories INT,
-    protein DECIMAL(6,2),
-    carbs DECIMAL(6,2),
-    fats DECIMAL(6,2),
+    protein INT,
+    carbs INT,
+    fats INT, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
