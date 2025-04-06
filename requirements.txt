@@ -13,3 +13,5 @@ typing_extensions==4.13.0
 Werkzeug==3.0.1
 python-dotenv
 pytest
+numpy
+scikit-learn
