@@ -4,7 +4,7 @@ import datetime
 from numpy import array, dot
 from typing import Optional
 from numpy.linalg import norm
-from config import Config
+from config.config import Config
 
 # Database connection utility
 def create_conn():

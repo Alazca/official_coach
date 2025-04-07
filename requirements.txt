@@ -27,3 +27,5 @@ SQLAlchemy==2.0.40
 typing-inspection==0.4.0
 typing_extensions==4.13.0
 Werkzeug==3.0.1
+numpy==2.2.4
+
