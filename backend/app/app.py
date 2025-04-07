@@ -17,8 +17,6 @@ jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 
 
-
-
 @app.route('/api/register', methods=['POST'])
 def register():
     try:
@@ -68,7 +66,6 @@ def login_user():
         access_token = create_access_token(identity=str(data['id']),
                                            additional_claims=additional_claims
                                            )
-
 
 
         return jsonify({"message": "Login successful", "access token": access_token}), 200
@@ -130,8 +127,6 @@ def workout_history():
         return jsonify({"workouts": workouts}), 200
     if isinstance(workouts, str):
         return jsonify({"Database error": workouts}), 400
-
-
 
 
 if __name__ == '__main__':
