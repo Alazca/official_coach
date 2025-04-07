@@ -168,9 +168,9 @@ def generate_recommendation(goal_alignment, overtraining_risk):
 def user_exists(email):
     try:
         conn = create_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (email,))
-        data = cur.fetchone()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (email,))
+        data = cursor.fetchone()
         
         if data:
             return dict(data)
@@ -178,7 +178,7 @@ def user_exists(email):
     except Exception as e:
         return e
     finally:
-        if cur:
+        if cursor:
             cur.close()
         if conn:
             conn.close()
