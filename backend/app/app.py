@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session,render_template
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -10,7 +10,11 @@ import os
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder='../../frontend',
+            template_folder='../../frontend/pages'
+)
+
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=7)
 jwt = JWTManager(app)
@@ -127,7 +131,6 @@ def workout_history():
         return jsonify({"workouts": workouts}), 200
     if isinstance(workouts, str):
         return jsonify({"Database error": workouts}), 400
-
 
 if __name__ == '__main__':
     with app.app_context():

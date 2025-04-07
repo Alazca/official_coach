@@ -2,14 +2,15 @@ import sqlite3
 import os
 import datetime
 from numpy import array, dot
+from typing import Optional
 from numpy.linalg import norm
 from config import Config
 
 # Database connection utility
 def create_conn():
     """Create and return a database connection using configuration settings."""
-    con = Config()
-    db_path = con.get_database_path()
+    config = Config()
+    db_path = config.get_database_path()
     # Connect to the database
     connection = sqlite3.connect(db_path)
     
@@ -38,7 +39,7 @@ def weighted_similarity(user_vector, target_vector, factors):
     
     return dot_product / magnitude
 
-def evaluate_vectors(user_input: dict, user_id: int, factors: list = None) -> dict:
+def evaluate_vectors(user_input: dict, user_id: Optional[int], factors: list = None) -> dict:
     """
     Evaluate a user's input vector against goal and overtraining vectors.
     
@@ -52,6 +53,8 @@ def evaluate_vectors(user_input: dict, user_id: int, factors: list = None) -> di
     """
     # Default factors if none provided
     factors = array(factors or [1, 1, 1, 1, 1, 1, 1, 1])
+    conn = None
+    cursor = None
     
     try:
         conn = create_conn()
@@ -166,6 +169,10 @@ def generate_recommendation(goal_alignment, overtraining_risk):
 
 # User data functions from the original file
 def user_exists(email):
+    
+    conn = None
+    cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
@@ -179,14 +186,18 @@ def user_exists(email):
         return e
     finally:
         if cursor:
-            cur.close()
+            cursor.close()
         if conn:
             conn.close()
 
 def get_all_checkins(user_id, start_date=None, end_date=None):
+
+    cursor = None
+    conn = None
+    
     try:
-        connection = create_conn()
-        cursor = connection.cursor()
+        conn = create_conn()
+        cursor = conn.cursor()
         
         if end_date and start_date:
             cursor.execute("""
@@ -208,13 +219,17 @@ def get_all_checkins(user_id, start_date=None, end_date=None):
     finally:
         if cursor:
             cursor.close()
-        if connection:
-            connection.close()
+        if conn:
+            conn.close()
 
 def get_workout_history(user_id=None, startdate=None, enddate=None):
+    
+    cursor = None
+    conn = None
+    
     try:
-        connection = create_conn()
-        cursor = connection.cursor()
+        conn = create_conn()
+        cursor = conn.cursor()
         
         if not user_id:
             return []
@@ -242,10 +257,14 @@ def get_workout_history(user_id=None, startdate=None, enddate=None):
     finally:
         if cursor:
             cursor.close()
-        if connection:
-            connection.close()
+        if conn:
+            conn.close()
 
 def register_user(email, password_hash, name, gender, dob, height, weight, activity_level):
+    
+    conn = None
+    cursor = None
+    
     try:
         conn = create_conn()
         cursor = conn.cursor()
@@ -317,6 +336,10 @@ def initialize_user_goals(conn, user_id, activity_level):
     cursor.close()
 
 def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
+    
+    conn = None
+    cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
