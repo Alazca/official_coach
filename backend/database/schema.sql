@@ -19,7 +19,6 @@ CREATE TABLE daily_checkins (
     stress_level INTEGER,
     energy_level INTEGER,
     soreness_level INTEGER,
-    readiness_score INTEGER NULL,
     check_in_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -36,7 +35,7 @@ CREATE TABLE Goals (
 );
 
 CREATE TABLE workouts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    workout_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     workout_date TEXT,
     workout_type TEXT CHECK(workout_type IN ('Strength', 'Cardio', 'Mobility', 'Recovery')),
@@ -75,3 +74,17 @@ CREATE TABLE Progress_Log (
     BMI REAL CHECK (BMI >= 0),
     notes TEXT,
 );
+
+CREATE TABLE readiness_scores (
+    readiness_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    readiness_score INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
+    contributing_factors TEXT, 
+    readiness_date DATE NOT NULL,
+    source TEXT CHECK(source IN ('manual', 'auto', 'coach')),
+    alignment_score REAL,
+    overtraining_score REAL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+

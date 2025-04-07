@@ -1,5 +1,6 @@
 import sqlite3
 from config.config import Config
+from engines.alignment_matrix import evaluate_vectors
 import datetime
 
 def create_conn():
@@ -133,9 +134,25 @@ def register_user(email, password_hash, name, gender, dob, height, weight, activ
 
 
 def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
+    
+    conn = None
+    cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
+
+        user_input = {
+        "weight": weight,
+        "sleep_quality": sleep,
+        "stress_level" : stress,
+        "energy_level" : energy,
+        "soreness_level": soreness
+        }
+
+        result = evaluate_vectors(user_input, user_id)
+        readiness_score = result.get("readiness_score") or 0
+
         cursor.execute("""
         INSERT INTO daily_checkins(
         user_id,
