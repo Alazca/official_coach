@@ -1,6 +1,7 @@
 import sqlite3
 from config import Config
 import datetime
+
 def create_conn():
     con = Config()
     db_path = con.get_database_path()
