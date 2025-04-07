@@ -130,8 +130,12 @@ def register_user(email, password_hash, name, gender, dob, height, weight, activ
 
         user_id = cursor.lastrowid
         conn.commit()
+        
+        if user_id is None:
+            raise ValueError("No User ID found!")
 
-        return int(user_id)
+        return user_id
+
     except Exception as e:
         error_message = str(e)
         return error_message
@@ -177,7 +181,12 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
 
         rowid = cursor.lastrowid
         conn.commit()
-        return int(rowid)
+        
+        if rowid is None:
+            raise ValueError("No ID found!")
+
+        return rowid
+
     except Exception as e:
         return str(e)
 

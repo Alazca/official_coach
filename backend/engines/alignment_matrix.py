@@ -445,12 +445,15 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
             }
             
             result = evaluate_vectors(user_input, user_id)
-        
+        if rowid is None:
+            raise ValueError("Check-in Failed: No Row ID Returned!")
+
         return {
-            "checkin_id": int(rowid),
+            "checkin_id": rowid,
             "readiness_score": readiness,
             "analysis": result
         }
+
     except Exception as e:
         return {"error": str(e)}
     finally:
@@ -504,18 +507,3 @@ def validate_date(date_string):
     except ValueError:
         return False
 
-if __name__ == "__main__":
-    # Example usage
-    user_input = {
-        "protein": 120,
-        "calories": 2200,
-        "carbs": 250,
-        "fats": 60,
-        "sleep_quality": 7,
-        "stress_level": 4,
-        "soreness": 3,
-        "readiness": 8
-    }
-    
-    result = evaluate_vectors(user_input, 3)
-    print(result)
