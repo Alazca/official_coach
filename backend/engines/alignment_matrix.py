@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import datetime
-from numpy import array, dot
+from numpy import array, dot, ndarray
 from typing import Optional
 from numpy.linalg import norm
 from config.config import Config
@@ -19,6 +19,74 @@ def create_conn():
     
     return connection
 
+
+def determine_influence_factors(user_input=None, user_id=None) -> ndarray:
+    """
+    Pull user's goal type from the DB and return a weighting vector.
+    """
+    conn = None   
+    cursor = None
+    
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT goalType FROM Goals
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (user_id,))
+        
+        result = cursor.fetchone()
+        if not result:
+            raise ValueError(f"No goals found for user {user_id}")
+
+        goal_type = result[0]
+
+        # Base weights for 8 metrics (match vector order!)
+        factors = {
+            "protein": 1,
+            "calories": 1,
+            "carbs": 1,
+            "fats": 1,
+            "sleep_quality": 1,
+            "stress_level": 1,
+            "soreness": 1,
+            "readiness": 1
+        }
+
+        # Apply boosts based on goal type
+        if goal_type == "Strength":
+            factors["protein"] += 1
+            factors["soreness"] += 1
+        elif goal_type == "Endurance":
+            factors["sleep_quality"] += 1
+            factors["readiness"] += 1
+        elif goal_type == "Weight-Loss":
+            factors["calories"] += 1
+            factors["carbs"] -= 1
+        elif goal_type == "Performance":  # Assuming this is not a typo
+            factors["readiness"] += 1
+            factors["stress_level"] += 1
+
+        return array([
+            factors["protein"],
+            factors["calories"],
+            factors["carbs"],
+            factors["fats"],
+            factors["sleep_quality"],
+            factors["stress_level"],
+            factors["soreness"],
+            factors["readiness"]
+        ])
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
 # Vector calculation functions
 def normalize(data):
     """Normalize a vector using its norm."""
@@ -39,27 +107,20 @@ def weighted_similarity(user_vector, target_vector, factors):
     
     return dot_product / magnitude
 
-def evaluate_vectors(user_input: dict, user_id: Optional[int], factors: list = None) -> dict:
-    """
-    Evaluate a user's input vector against goal and overtraining vectors.
-    
-    Args:
-        user_input: Dictionary containing user's current metrics
-        user_id: The user's ID in the database
-        factors: Optional weighting factors for vector components
-    
-    Returns:
-        Dictionary with goal alignment, overtraining risk, and recommendation
-    """
-    # Default factors if none provided
-    factors = array(factors or [1, 1, 1, 1, 1, 1, 1, 1])
-    conn = None
+def evaluate_vectors(user_input, user_id, factors= None) -> dict:
+
+    conn = None   
     cursor = None
     
     try:
         conn = create_conn()
         cursor = conn.cursor()
-        
+       
+        if factors is None:
+            factors = determine_influence_factors(user_id)
+        else:
+            factors = array(factors)
+
         # Get goal vector for user
         cursor.execute("""
             SELECT protein, calories, carbs, fats, sleep_quality, stress_level, soreness, readiness
@@ -288,7 +349,10 @@ def register_user(email, password_hash, name, gender, dob, height, weight, activ
         # Initialize goal vector for new user
         initialize_user_goals(conn, user_id, activity_level)
         
-        return int(user_id)
+        if user_id is None:
+            raise ValueError("Failed to retrieve user ID after insertion")
+        return user_id
+
     except Exception as e:
         return str(e)
     finally:
