@@ -1,19 +1,9 @@
 import sqlite3
-import re
-import os
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-jdbc_url = f"jdbc:sqlite:{os.path.join(base_dir, '../database/coach.db')}"
-
+from config import Config
+import datetime
 def create_conn():
-    # The pattern matches everything after "jdbc:sqlite:"
-    match = re.match(r'jdbc:sqlite:(.*)', jdbc_url)
-
-    if not match:
-        raise ValueError("Invalid SQLite JDBC URL format")
-
-    db_path = match.group(1)
-
+    con = Config()
+    db_path = con.get_database_path()
     # Connect to the database
     connection = sqlite3.connect(db_path)
 
@@ -23,28 +13,47 @@ def create_conn():
     return connection
 
 
-def get_all_checkins(user_id, date):
+def user_exists(email):
+    try:
+        conn = create_conn()
+        cur = conn.cursor()
+        cur.execute(f"""SELECT id, email, password_hash FROM users WHERE email = '{email}'""")
+        data = cur.fetchone()
+        data = dict(data)
+        if data:
+            return data
+        if not data:
+            return False
+    except Exception as e:
+        return e
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
+
+def get_all_checkins(user_id, start_date=None, end_date=None):
     try:
         connection = create_conn()
         cursor = connection.cursor()
-        if date:
-            cursor.execute(f"""SELECT * FROM daily_checkins
-            WHERE user_id = {user_id} AND check_in_date = '{date}' 
-            ORDER BY check_in_date DESC""")
-            data = cursor.fetchall()
-            data = [dict(row) for row in data]
-            print(data)
-            return data
+        if end_date and start_date:
+            cursor.execute("""
+                SELECT * FROM daily_checkins
+                WHERE user_id = ? AND check_in_date BETWEEN ? AND ? 
+                ORDER BY check_in_date DESC
+                """, (user_id, start_date, end_date))
         else:
-            cursor.execute(f"""SELECT * FROM daily_checkin
-            WHERE user_id = {user_id}""")
-            data = cursor.fetchall()
-            data = [dict(row) for row in data]
-            print(data)
-            return data
+            cursor.execute("""
+                SELECT * FROM daily_checkins
+                WHERE user_id = ?
+                """, (user_id,))
+
+        data = cursor.fetchall()
+        data = [dict(row) for row in data]
+        return data
     except Exception as e:
-        print(f"Error {e}")
+        return e  # Consider returning a message instead of the exception object
     finally:
         if cursor:
             cursor.close()
@@ -60,17 +69,20 @@ def get_workout_history(user_id=None, startdate=None, enddate=None):
         if not user_id:
             return []
         if startdate and enddate:
-            cursor.execute(f"""
-            SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = {user_id}
-             AND workout_date >= '{startdate}' AND workout_date <= '{enddate}'""")
+            cursor.execute("""
+            SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?
+             AND workout_date >= ? AND workout_date <= ?""", (user_id, startdate, enddate))
         elif startdate:
-            cursor.execute(f"""
-                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = {user_id}
-                         AND workout_date >= '{startdate}' """)
+            cursor.execute("""
+                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?
+                         AND workout_date >= ? """, (user_id, startdate))
         elif enddate:
+            cursor.execute("""
+                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ? AND
+                         workout_date <= ?""", (user_id, enddate))
+        else:
             cursor.execute(f"""
-                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = {user_id}
-                         AND workout_date >= '{startdate}' AND workout_date <= '{enddate}'""")
+                    SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = {user_id}""")
 
         data = cursor.fetchall()
         data = [dict(d) for d in data]
@@ -116,6 +128,9 @@ def register_user(email, password_hash, name, gender, dob, height, weight, activ
         if conn:
             conn.close()
 
+
+
+
 def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
     try:
         conn = create_conn()
@@ -147,6 +162,13 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
         if conn:
             conn.close()
 
+def validate_date(date_string):
+
+    try:
+        datetime.datetime.strptime(date_string, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
-    get_all_checkins(1, "2025-04-02")
+    print(get_all_checkins(3, start_date='2025-04-03', end_date='2025-04-08'))

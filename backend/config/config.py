@@ -1,34 +1,32 @@
 import os
-import datetime
-from dotenv import load_dotenv
-
-#  Load environments
-BASEDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-load_dotenv(os.path.join(BASEDIR,'.env'))
 
 class Config:
+    def __init__(self):
+        # Get the absolute path of the config.py file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# General settings
-    SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
-    FLASK_ENV = os.getenv('FLASK_ENV', 'development')
+        # Navigate to the parent directory (backend)
+        backend_dir = os.path.dirname(current_dir)
 
-    # Database settings
-    DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '3306')
-    DB_NAME = os.getenv('DB_NAME', 'coach_db')
+        # Build the path to the database file
+        self.db_path = os.path.join(backend_dir, 'database', 'coach.db')
 
-# Ensure database directory exists
-    db_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database')
-    os.makedirs(db_dir, exist_ok=True)
+        # Convert to SQLite connection string if needed
+        self.db_url = f"sqlite:///{self.db_path}"
+        # For JDBC style URL:
+        self.jdbc_url = f"jdbc:sqlite:{self.db_path}"
 
-# Configure SQLite database
-    db_path = os.path.join(db_dir, 'coach.db')
-    SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    def get_database_path(self):
+        """Return the absolute path to the database file"""
+        return self.db_path
 
-    # Flask settings
-    SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(24).hex()
-    SESSION_TYPE = 'filesystem'
-    PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=7)
+    def get_database_url(self):
+        """Return the SQLite URL for the database"""
+        return self.db_url
+
+    def get_jdbc_url(self):
+        """Return the JDBC style URL for the database"""
+        return self.jdbc_url
+
+if __name__ == '__main__':
+    print(Config().get_database_url())
