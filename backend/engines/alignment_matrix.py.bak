@@ -20,7 +20,7 @@ def create_conn():
     return connection
 
 
-def determine_influence_factors(user_input=None, user_id=None) -> ndarray:
+def determine_influence_factors(user_id=None) -> ndarray:
     """
     Pull user's goal type from the DB and return a weighting vector.
     """
@@ -445,6 +445,7 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
             }
             
             result = evaluate_vectors(user_input, user_id)
+        
         if rowid is None:
             raise ValueError("Check-in Failed: No Row ID Returned!")
 

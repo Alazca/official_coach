@@ -37,7 +37,6 @@ def user_exists(email):
         if conn:
             conn.close()
 
-
 def get_all_checkins(user_id, start_date=None, end_date=None):
     cursor = None
     conn = None
