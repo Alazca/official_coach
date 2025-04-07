@@ -67,7 +67,7 @@ def login_user():
             "role": "user"
         }
 
-        access_token = create_access_token(identity=str(data['id']),
+        access_token = create_access_token(identity=str(data['user_id']),
                                            additional_claims=additional_claims
                                            )
 

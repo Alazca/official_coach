@@ -72,7 +72,7 @@ CREATE TABLE Progress_Log (
     log_date TEXT,
     logged_weight INTEGER,
     BMI REAL CHECK (BMI >= 0),
-    notes TEXT,
+    notes TEXT
 );
 
 CREATE TABLE readiness_scores (

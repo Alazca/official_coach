@@ -22,7 +22,7 @@ def user_exists(email):
     try:
         conn = create_conn()
         cur = conn.cursor()
-        cur.execute(f"""SELECT id, email, password_hash FROM users WHERE email = '{email}'""")
+        cur.execute(f"""SELECT user_id, email, password_hash FROM users WHERE email = '{email}'""")
         data = cur.fetchone()
         data = dict(data)
         if data:
