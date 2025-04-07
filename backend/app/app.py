@@ -46,6 +46,9 @@ def register():
     except ValueError as ve:
         return jsonify({"Validation error": f"{str(ve)}"}), 400
 
+    except Exception as e:
+        return jsonify({"Unexpected error": str(e)}), 500
+    return jsonify({"error": "Unknown error occurred"}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login_user():
