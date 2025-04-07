@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from enum import Enum
 import re
 from datetime import date
+
 class Gender(str, Enum):
     MALE = 'Male'
     FEMALE = 'Female'

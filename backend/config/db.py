@@ -1,5 +1,5 @@
 import sqlite3
-from config import Config
+from config.config import Config
 import datetime
 
 def create_conn():

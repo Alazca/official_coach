@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
-from dbfunc import get_all_checkins, get_workout_history, register_user, insert_check_in, user_exists, validate_date
-from models import UserRegistration, DailyCheckIn
+from config.db import get_all_checkins, get_workout_history, register_user, insert_check_in, user_exists, validate_date
+from models.models import UserRegistration, DailyCheckIn
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from dotenv import load_dotenv
 import os
