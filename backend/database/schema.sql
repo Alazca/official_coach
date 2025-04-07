@@ -1,5 +1,3 @@
--- SQLite doesn't use CREATE DATABASE or USE statements
--- It uses files directly, so these lines can be removed
 
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,29 +75,4 @@ CREATE TABLE Progress_Log (
     logged_weight INTEGER,
     BMI REAL CHECK (BMI >= 0),
     notes TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE meals (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    meal_date TEXT,
-    meal_name TEXT,
-    calories INTEGER,
-    protein INTEGER,
-    carbs INTEGER,
-    fats INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE AI_Feedback (
-    feedback_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    workout_id INTEGER,
-    feedback_text TEXT,
-    score INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (workout_id) REFERENCES workouts(id)
 );
