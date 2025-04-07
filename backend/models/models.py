@@ -15,6 +15,11 @@ class ActivityLevel(str, Enum):
     ACTIVE = "Active"
     INTENSE = "Intense"
 
+class Source(str, Enum):
+    MANUAL = "Manual"
+    AUTO = "Auto"
+    COACH = "Coach"
+
 class DailyCheckIn(BaseModel):
     weight: int
     sleep: int

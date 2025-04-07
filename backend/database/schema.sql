@@ -81,7 +81,7 @@ CREATE TABLE readiness_scores (
     readiness_score INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
     contributing_factors TEXT, 
     readiness_date DATE NOT NULL,
-    source TEXT CHECK(source IN ('manual', 'auto', 'coach')),
+    source TEXT CHECK(source IN ('Manual', 'Auto', 'Coach')),
     alignment_score REAL,
     overtraining_score REAL
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
