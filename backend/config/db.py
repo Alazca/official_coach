@@ -171,12 +171,10 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
         stress_level,
         energy_level,
         soreness_level,
-        readiness_score,
         check_in_date
          
-        
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (user_id, weight, sleep, stress, energy, soreness, None, check_in_date))
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (user_id, weight, sleep, stress, energy, soreness, check_in_date))
 
         rowid = cursor.lastrowid
         conn.commit()
