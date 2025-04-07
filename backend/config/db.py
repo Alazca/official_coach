@@ -16,6 +16,9 @@ def create_conn():
 
 
 def user_exists(email):
+    cur = None
+    conn = None
+    
     try:
         conn = create_conn()
         cur = conn.cursor()
@@ -36,9 +39,12 @@ def user_exists(email):
 
 
 def get_all_checkins(user_id, start_date=None, end_date=None):
+    cursor = None
+    conn = None
+
     try:
-        connection = create_conn()
-        cursor = connection.cursor()
+        conn = create_conn()
+        cursor = conn.cursor()
         if end_date and start_date:
             cursor.execute("""
                 SELECT * FROM daily_checkins
@@ -59,15 +65,17 @@ def get_all_checkins(user_id, start_date=None, end_date=None):
     finally:
         if cursor:
             cursor.close()
-        if connection:
-            connection.close()
+        if conn:
+            conn.close()
 
 #still have to test
 def get_workout_history(user_id=None, startdate=None, enddate=None):
+    cursor = None
+    conn = None
 
     try:
-        connection = create_conn()
-        cursor = connection.cursor()
+        conn = create_conn()
+        cursor = conn.cursor()
         if not user_id:
             return []
         if startdate and enddate:
@@ -95,11 +103,14 @@ def get_workout_history(user_id=None, startdate=None, enddate=None):
     finally:
         if cursor:
             cursor.close()
-        if connection:
-            connection.close()
+        if conn:
+            conn.close()
 
 
 def register_user(email, password_hash, name, gender, dob, height, weight, activity_level):
+    conn = None
+    cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
@@ -130,11 +141,7 @@ def register_user(email, password_hash, name, gender, dob, height, weight, activ
         if conn:
             conn.close()
 
-
-
-
 def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
-    
     conn = None
     cursor = None
 

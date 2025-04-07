@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     name TEXT,
@@ -12,7 +12,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE daily_checkins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    checkin_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     weight REAL,
     sleep_quality INTEGER,
@@ -25,7 +25,7 @@ CREATE TABLE daily_checkins (
 );
 
 CREATE TABLE Goals (
-    goalId INTEGER PRIMARY KEY AUTOINCREMENT,
+    goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     goalType TEXT CHECK(goalType IN ('Strength', 'Endurance', 'Weight-Loss', 'Performace')),
     description TEXT,
