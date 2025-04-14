@@ -19,6 +19,7 @@ CREATE TABLE daily_checkins (
     stress_level INTEGER,
     energy_level INTEGER,
     soreness_level INTEGER,
+    readiness_id INTEGER,
     check_in_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -85,6 +86,6 @@ CREATE TABLE readiness_scores (
     alignment_score REAL,
     overtraining_score REAL
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

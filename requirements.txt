@@ -29,3 +29,4 @@ typing_extensions==4.13.0
 Werkzeug==3.0.1
 numpy==2.2.4
 pytest==7.4.0
+openai
