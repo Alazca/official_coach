@@ -1,7 +1,9 @@
 # conditioning_engine.py
 
 import numpy as np
-from engine.base_vector_engine import normalize, weighted_similarity, load_target_profile
+from .base_engine_vector import (
+    normalize, weighted_similarity, load_target_profile,
+    generate_feedback)
 
 def evaluate_conditioning(user_input: dict, weights: list = None) -> dict:
     """
