@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>COACH Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 gradient-text">Welcome to COACH</h1>
+    <p class="mb-4 text-lg text-gray-700">Click a date to view readiness data.</p>
+
+    <div id="calendar" class="grid grid-cols-7 gap-2 mb-6"></div>
+    <div id="readiness-output" class="bg-white p-4 rounded shadow text-gray-800"></div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+</body>
+</html>
