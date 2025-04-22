@@ -254,6 +254,7 @@ def get_workout_history(
 
 # @db_operation
 def register_user(
+    cursor,
     email, 
     password_hash, 
     name, 
@@ -262,7 +263,7 @@ def register_user(
     height, 
     weight, 
     activity_level
-):
+) -> Union[int, DBError]:
     """
     Register a new user in the database.
     
@@ -280,13 +281,7 @@ def register_user(
     Returns:
         New user ID or error message
     """
-    conn = None
-    cursor = None
-    
-    try:
-        conn = db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
+    cursor.execute('''
             INSERT INTO users (
                 email, 
                 password_hash, 
@@ -299,21 +294,12 @@ def register_user(
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (email, password_hash, name, gender, dob, height, weight, activity_level))
 
-        user_id = cursor.lastrowid
-        conn.commit()
+    user_id = cursor.lastrowid
 
-        if not user_id:
-            raise ValueError("Failed to create user - no ID returned")
+    if not user_id:
+        raise ValueError("Failed to create user - no ID returned")
     
-        return user_id
-    except Exception as e:
-        error_message = str(e)
-        return error_message
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    return user_id
 
 @db_operation
 def insert_check_in(

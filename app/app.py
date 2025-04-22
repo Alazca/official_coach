@@ -113,7 +113,6 @@ def register():
             return jsonify({"Database error": f"{user_id}"}), 400
 
     except ValueError as ve:
-        print(ve.json())
         return jsonify({"Validation error": f"{str(ve)}"}), 400
 
     except Exception as e:
