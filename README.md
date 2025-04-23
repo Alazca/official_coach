@@ -49,13 +49,13 @@ Follow these steps to set up the project locally:
 
 2.  **Create a virtual environment:**
 
-    *   **Using `venv`:**
+    **Using `venv`:**
 
-        ```bash
-        python3 -m venv .venv
-        source .venv/bin/activate  # Linux/macOS
-        # OR
-        .venv\Scripts\activate  # Windows
+    ```bash
+       python3 -m venv .venv
+       source .venv/bin/activate  # Linux/macOS
+         # OR
+       .venv\Scripts\activate  # Windows
         ```
 
 3.  **Install dependencies:**
