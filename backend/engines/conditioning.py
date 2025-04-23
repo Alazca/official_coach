@@ -14,14 +14,9 @@ from backend.engines.base_vector import (
     normalize, 
     weighted_similarity,
     generate_vector_feedback,
-    vector_diff,
-    vector_distance,
-    interpolate_vectors
 )
+
 from backend.database.db import (
-    get_latest_checkin,
-    save_readiness_score,
-    update_checkin_with_readiness,
     get_target_profile
 )
 
@@ -57,7 +52,6 @@ def evaluate_conditioning(user_input: Dict[str, float],
         "similarity_score": round(similarity_score, 4),
         "feedback": feedback
     }
-
 
 def classify_strength_level(similarity_score: float) -> str:
     """
@@ -101,7 +95,6 @@ def classify_conditioning_level(similarity_score: float) -> str:
         return "Novice"
     else:
         return "Beginner"
-
 
 def calculate_dimension_scores(
     user_vec: np.ndarray,

@@ -90,7 +90,6 @@ CREATE TABLE readiness_scores (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Analysis results table
 CREATE TABLE fitness_analyses (
     analysis_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -104,7 +103,6 @@ CREATE TABLE fitness_analyses (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- Workout plans table
 CREATE TABLE workout_plans (
     plan_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,

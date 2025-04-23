@@ -20,6 +20,22 @@ class Source(str, Enum):
     AUTO = "Auto"
     COACH = "Coach"
 
+class StrengthDimension(str, Enum):
+    MAXIMAL_STRENGTH = "Maximal_strength"
+    RELATIVE_STRENGTH = "Relative_strength"
+    EXPLOSIVE_STRENGTH = "Explosive_strength"
+    STRENGTH_ENDURANCE = "Strength_endurance"
+    AGILE_STRENGTH = "Agile_strength"
+    SPEED_STRENGTH = "Speed_strength"
+    STARTING_STRENGTH = "Starting_strength"
+
+class ConditioningDimension(str, Enum):
+    CARDIOVASCULAR_ENDURANCE = "cardiovascular_endurance"
+    MUSCLE_STRENGTH = "Muscle_strength"
+    MUSCLE_ENDURANCE = "Muscle_endurance"
+    FLEXIBILITY = "Flexibility"
+    BODY_COMPOSITION = "Body_composition"
+    
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -124,3 +140,6 @@ class UserRegistration(BaseModel):
             raise ValueError("Weight must be positive")
         return v
 
+class DimensionScore(BaseModel):
+    dimension: str
+    score: float
