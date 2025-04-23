@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeChatControls();
     initializeEventListeners();
 });
-
 /**
  * Initialize readiness chart with user data
  * Displays a line chart showing readiness scores over time

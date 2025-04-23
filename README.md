@@ -60,11 +60,11 @@ Follow these steps to set up the project locally:
 
 3.  **Install dependencies:**
 
-    *   **Using the `venv`:**
+    **Using the `venv`:**
 
-        ```bash
-        pip install -r requirements.txt
-        ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4.  **Configure the application:**
 
@@ -109,11 +109,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-*   [Acknowledge any libraries, frameworks, or resources that you used in the project]
 *   Acknowledge the following people for their support and aid:
-    - Chimmy, SJSU Student : Provided expertise in proper database deployment
-    - Yohan / Jin, SJSU Students : Comedic support and mad jokes about backshots
     - Dr. Daphne Chen : Professor and mentor to students
+    - "Chimmy", SJSU Student : Provided expertise in proper database deployment
+    - COACH Team for all their hardwork and late nights
+    
 
 ## Future Enhancements
 
