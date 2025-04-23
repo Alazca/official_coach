@@ -6,6 +6,8 @@ to produce a readiness score and training recommendations.
 """
 import sqlite3
 import datetime
+from typing import Dict, List, Any, Tuple
+
 from backend.config.config import Config
 
 def evaluate_vectors(user_input, user_id):
@@ -80,13 +82,7 @@ def get_recovery_adjustment(user_id):
     Returns:
         float: Adjustment value for readiness score (-10 to +10)
     """
-    try:
-        # In a real implementation, this would analyze:
-        # 1. Recent workout intensity from workout history
-        # 2. Sleep debt accumulation
-        # 3. Stress trends
-        # 4. Recovery metrics over time
-        
+    try:  
         # For now, return a neutral adjustment
         return 0
         
@@ -167,3 +163,72 @@ def get_user_baseline(user_id):
     except Exception as e:
         print(f"Error in get_user_baseline: {str(e)}")
         return {}
+    
+def prepare_visualization_data(
+    strength_evaluation: Dict[str, Any],
+    conditioning_evaluation: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Prepare data for visualization in frontend.
+    
+    Parameters:
+        strength_evaluation (Dict[str, Any]): Strength evaluation results
+        conditioning_evaluation (Dict[str, Any]): Conditioning evaluation results
+        
+    Returns:
+        Dict[str, Any]: Data structured for visualization
+    """
+    # Extract vector comparisons
+    strength_comparison = strength_evaluation["vector_comparison"]
+    conditioning_comparison = conditioning_evaluation["vector_comparison"]
+    
+    # Radar chart data for strength profile
+    strength_chart_data = {
+        "dimensions": strength_comparison["dimensions"],
+        "user_values": strength_comparison["user"],
+        "target_values": strength_comparison["target"]
+    }
+    
+    # Radar chart data for conditioning profile
+    conditioning_chart_data = {
+        "dimensions": conditioning_comparison["dimensions"],
+        "user_values": conditioning_comparison["user"],
+        "target_values": conditioning_comparison["target"]
+    }
+    
+    # Combined chart data with both profiles
+    combined_chart_data = {
+        "dimensions": strength_comparison["dimensions"] + conditioning_comparison["dimensions"],
+        "user_values": strength_comparison["user"] + conditioning_comparison["user"],
+        "target_values": strength_comparison["target"] + conditioning_comparison["target"]
+    }
+    
+    # Progress data for bar charts
+    progress_data = []
+    
+    # Add strength dimension scores
+    for score in strength_evaluation["dimension_scores"]:
+        progress_data.append({
+            "dimension": score["dimension"],
+            "category": "strength",
+            "percentage": score["percentage"]
+        })
+    
+    # Add conditioning dimension scores
+    for score in conditioning_evaluation["dimension_scores"]:
+        progress_data.append({
+            "dimension": score["dimension"],
+            "category": "conditioning",
+            "percentage": score["percentage"]
+        })
+    
+    return {
+        "strength_chart": strength_chart_data,
+        "conditioning_chart": conditioning_chart_data,
+        "combined_chart": combined_chart_data,
+        "progress_data": progress_data,
+        "overall_scores": {
+            "strength": strength_evaluation["similarity_score"],
+            "conditioning": conditioning_evaluation["similarity_score"]
+        }
+    }

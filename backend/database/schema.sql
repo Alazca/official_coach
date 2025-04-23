@@ -117,3 +117,9 @@ CREATE TABLE workout_plans (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE target_profiles (
+    profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    dimensions TEXT NOT NULL, 
+    vector TEXT NOT NULL  
+)

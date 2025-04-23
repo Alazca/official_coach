@@ -7,40 +7,56 @@ and provides personalized feedback for improvement and visualization.
 
 import numpy as np
 import datetime
-from typing import Dict, List, Union, Any, Tuple, Optional
+
+from typing import Dict, List, Any, Tuple
+
 from backend.engines.base_vector import (
     normalize, 
-    weighted_similarity, 
-    load_target_profile,
+    weighted_similarity,
     generate_vector_feedback,
     vector_diff,
     vector_distance,
     interpolate_vectors
 )
-from backend.database.db_utils import (
+from backend.database.db import (
     get_latest_checkin,
     save_readiness_score,
-    update_checkin_with_readiness
+    update_checkin_with_readiness,
+    get_target_profile
 )
 
-# Define dimension labels for strength and conditioning vectors
-STRENGTH_DIMENSIONS = [
-    "maximal_strength",      # Highest weight lifted in a single effort
-    "relative_strength",     # Strength in relation to body weight
-    "explosive_strength",    # Maximum force in short period
-    "strength_endurance",    # Sustain muscular effort over time
-    "agile_strength",        # Strength while moving quickly
-    "speed_strength",        # Generate strength quickly while moving
-    "starting_strength"      # Ability to initiate movement with force
-]
+from backend.engines.exercise_recommendation import generate_exercise_recommendations
 
-CONDITIONING_DIMENSIONS = [
-    "cardiovascular_endurance",  # Oxygen delivery during sustained activity
-    "muscle_strength",           # Muscle's ability to exert force for short period
-    "muscle_endurance",          # Muscle's ability to contract repeatedly over time
-    "flexibility",               # Range of motion in joints
-    "body_composition"           # Ratio of muscle, bone, and fat
-]
+def evaluate_conditioning(user_input: Dict[str, float],
+                          profile_name: str = "default") -> Dict[str, Any]:
+    """
+    Evaluate user conditioning and return feedback + similarity score.
+
+    Parameters:
+        user_input (dict): e.g. {"sleep_quality": 7, "stress_level": 3, ...}
+
+    Returns:
+        dict: Similarity score, raw vector, normalized, feedback
+    """
+    dimensions, target_vector = get_target_profile(profile_name)
+
+    # Convert input to ordered vector
+    user_vec = np.array([user_input[dim] for dim in dimensions])
+    user_vec_norm = normalize(user_vec)
+    target_norm = normalize(target_vector)
+
+    # Compute similarity
+    similarity_score = weighted_similarity(user_vec_norm, target_norm)
+    
+    # Generate feedback
+    feedback = generate_vector_feedback(user_vec, target_vector, dimensions)
+
+    return {
+        "raw_vector": user_vec.tolist(),
+        "normalized_vector": user_vec_norm.tolist(),
+        "similarity_score": round(similarity_score, 4),
+        "feedback": feedback
+    }
 
 
 def classify_strength_level(similarity_score: float) -> str:
@@ -247,116 +263,6 @@ def generate_balanced_program(
     program["recommended_exercises"] = generate_exercise_recommendations(program["priority_areas"])
     
     return program
-
-
-def generate_exercise_recommendations(priority_areas: List[Dict[str, Any]]) -> Dict[str, List[str]]:
-    """
-    Generate exercise recommendations based on priority areas.
-    
-    Parameters:
-        priority_areas (List[Dict]): Priority areas for improvement
-        
-    Returns:
-        Dict[str, List[str]]: Recommended exercises by dimension
-    """
-    # Exercise recommendations by dimension
-    exercise_map = {
-        # Strength dimensions
-        "squat_strength": ["Back Squats", "Front Squats", "Bulgarian Split Squats"],
-        "bench_strength": ["Bench Press", "Incline Press", "Dumbbell Press"],
-        "deadlift_strength": ["Conventional Deadlift", "Romanian Deadlift", "Trap Bar Deadlift"],
-        "overhead_press": ["Military Press", "Push Press", "Dumbbell Shoulder Press"],
-        "pull_up_capacity": ["Pull-ups", "Chin-ups", "Lat Pulldowns"],
-        "core_strength": ["Planks", "Ab Rollouts", "Hanging Leg Raises"],
-        
-        # Conditioning dimensions
-        "aerobic_capacity": ["Zone 2 Running", "Cycling", "Swimming"],
-        "anaerobic_capacity": ["HIIT Sprints", "Tabata Intervals", "Battle Ropes"],
-        "muscular_endurance": ["Circuit Training", "EMOM Workouts", "High-Rep Sets"],
-        "recovery_rate": ["Active Recovery Sessions", "Mobility Work", "Light Cardio"],
-        "work_capacity": ["CrossFit-style WODs", "Complex Barbell Circuits", "Supersets"],
-        "movement_efficiency": ["Olympic Lifting Technique", "Plyometrics", "Agility Drills"]
-    }
-    
-    recommendations = {}
-    
-    # Generate recommendations for each priority area
-    for area in priority_areas:
-        dimension = area["dimension"]
-        if dimension in exercise_map:
-            recommendations[dimension] = exercise_map[dimension]
-    
-    return recommendations
-
-
-def prepare_visualization_data(
-    strength_evaluation: Dict[str, Any],
-    conditioning_evaluation: Dict[str, Any]
-) -> Dict[str, Any]:
-    """
-    Prepare data for visualization in frontend.
-    
-    Parameters:
-        strength_evaluation (Dict[str, Any]): Strength evaluation results
-        conditioning_evaluation (Dict[str, Any]): Conditioning evaluation results
-        
-    Returns:
-        Dict[str, Any]: Data structured for visualization
-    """
-    # Extract vector comparisons
-    strength_comparison = strength_evaluation["vector_comparison"]
-    conditioning_comparison = conditioning_evaluation["vector_comparison"]
-    
-    # Radar chart data for strength profile
-    strength_chart_data = {
-        "dimensions": strength_comparison["dimensions"],
-        "user_values": strength_comparison["user"],
-        "target_values": strength_comparison["target"]
-    }
-    
-    # Radar chart data for conditioning profile
-    conditioning_chart_data = {
-        "dimensions": conditioning_comparison["dimensions"],
-        "user_values": conditioning_comparison["user"],
-        "target_values": conditioning_comparison["target"]
-    }
-    
-    # Combined chart data with both profiles
-    combined_chart_data = {
-        "dimensions": strength_comparison["dimensions"] + conditioning_comparison["dimensions"],
-        "user_values": strength_comparison["user"] + conditioning_comparison["user"],
-        "target_values": strength_comparison["target"] + conditioning_comparison["target"]
-    }
-    
-    # Progress data for bar charts
-    progress_data = []
-    
-    # Add strength dimension scores
-    for score in strength_evaluation["dimension_scores"]:
-        progress_data.append({
-            "dimension": score["dimension"],
-            "category": "strength",
-            "percentage": score["percentage"]
-        })
-    
-    # Add conditioning dimension scores
-    for score in conditioning_evaluation["dimension_scores"]:
-        progress_data.append({
-            "dimension": score["dimension"],
-            "category": "conditioning",
-            "percentage": score["percentage"]
-        })
-    
-    return {
-        "strength_chart": strength_chart_data,
-        "conditioning_chart": conditioning_chart_data,
-        "combined_chart": combined_chart_data,
-        "progress_data": progress_data,
-        "overall_scores": {
-            "strength": strength_evaluation["similarity_score"],
-            "conditioning": conditioning_evaluation["similarity_score"]
-        }
-    }
 
 
 def classify_overall_fitness(overall_score: float) -> str:

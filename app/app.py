@@ -60,7 +60,6 @@ def initialize_database(schema_path: str = "backend/database/schema.sql") -> Non
 
 initialize_database("backend/database/schema.sql")
 
-
 @app.route('/')
 def index():
     """Serve the frontpage of the application"""

@@ -196,7 +196,7 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
 def validate_date(date_string):
 
     try:
-        datetime.datetime.strptime(date_string, '%Y-%m-%d')
+        datetime.datetime.strptime(date_string, '%d-%m-%Y')
         return True
     except ValueError:
         return False
@@ -311,7 +311,7 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
         cursor = conn.cursor()
         
         # Query to get workout types count
-        workout_type_query = """
+        query = """
         SELECT workout_type, COUNT(*) as count
         FROM workouts
         WHERE user_id = ?
@@ -320,18 +320,18 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
         params = [user_id]
         
         if start_date and end_date:
-            workout_type_query += " AND workout_date BETWEEN ? AND ?"
+            query += " AND workout_date BETWEEN ? AND ?"
             params.extend([start_date, end_date])
         elif start_date:
-            workout_type_query += " AND workout_date >= ?"
+            query += " AND workout_date >= ?"
             params.append(start_date)
         elif end_date:
-            workout_type_query += " AND workout_date <= ?"
+            query += " AND workout_date <= ?"
             params.append(end_date)
             
-        workout_type_query += " GROUP BY workout_type"
+        query += " GROUP BY workout_type"
         
-        cursor.execute(workout_type_query, params)
+        cursor.execute(query, params)
         workout_types = cursor.fetchall()
         workout_types = [dict(row) for row in workout_types]
         
@@ -395,6 +395,7 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
             "exercise_categories": exercise_categories,
             "muscle_groups": muscle_groups
         }
+    
     except Exception as e:
         return str(e)
     finally:
@@ -402,6 +403,68 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
             cursor.close()
         if conn:
             conn.close()
+
+def get_target_profile(user_id, start_date=None, end_date=None):
+    """
+    Get the user's target profile for use.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+
+        # Query to get target profile dimensions and vector
+        query = """
+        SELECT dimensions, vector
+        FROM target_profiles
+        WHERE user_id = ?
+        """
+
+        params = [user_id]
+
+        if start_date and end_date:
+            query += " AND created_at BETWEEN ? AND ?"
+            params.extend([start_date, end_date])
+        elif start_date:
+            query += " AND created_at >= ?"
+            params.append(start_date)
+        elif end_date:
+            query += " AND created_at <= ?"
+            params.append(end_date)
+
+        # Order by latest first in case of multiple entries
+        query += " ORDER BY created_at DESC LIMIT 1"
+
+        cursor.execute(query, params)
+        row = cursor.fetchone()
+
+        if not row:
+            return {
+                "dimensions": [],
+                "vector": []
+            }
+        
+        # Parse the dimensions from the database
+        dimensions = row["dimensions"].split(",")
+        vector = row["vector"].split(",")
+        
+        vector = [float(val) for val in vector]
+        
+        return {
+            "dimensions": dimensions,
+            "vector": vector
+        }
+    
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 if __name__ == "__main__":
     print(get_all_checkins(3, start_date='2025-04-03', end_date='2025-04-08'))
