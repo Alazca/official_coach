@@ -32,6 +32,7 @@ idna==3.10
 # Environment & Configuration
 python-dotenv==1.1.0
 dotenv==0.9.9
+requests
 
 # Numerical & Data Processing
 numpy==2.2.4

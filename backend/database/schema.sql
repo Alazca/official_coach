@@ -22,17 +22,17 @@ CREATE TABLE daily_checkins (
     readiness_id INTEGER,
     check_in_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE Goals (
+CREATE TABLE goals (
     goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     goalType TEXT CHECK(goalType IN ('Strength', 'Endurance', 'Weight-Loss', 'Performace')),
     description TEXT,
     target_date TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE workouts (
@@ -42,10 +42,10 @@ CREATE TABLE workouts (
     workout_type TEXT CHECK(workout_type IN ('Strength', 'Cardio', 'Mobility', 'Recovery')),
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE Exercises (
+CREATE TABLE exercises (
     exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     category TEXT CHECK(category IN ('Compound', 'Isolation', 'Cardio', 'Mobility', 'Olympic-Style')),
@@ -63,11 +63,11 @@ CREATE TABLE workout_sets (
     duration INTEGER,
     rest_per_set INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (workout_id) REFERENCES workouts(id),
+    FOREIGN KEY (workout_id) REFERENCES workouts(workout_id),
     FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id)
 );
 
-CREATE TABLE Progress_Log (
+CREATE TABLE progress_Log (
     log_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     log_date TEXT,

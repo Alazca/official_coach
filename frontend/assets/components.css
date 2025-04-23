@@ -1,0 +1,48 @@
+/* Chart container styles */
+.chart-container {
+    position: relative;
+    margin: 20px 0;
+    height: 300px;
+}
+
+/* Make charts responsive on different screen sizes */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Chart card styling */
+.chart-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.chart-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+/* Chart grid layout */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+}
