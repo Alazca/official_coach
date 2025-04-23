@@ -1,3 +1,5 @@
+from typing import Dict, List, Any, Tuple
+
 def generate_exercise_recommendations(priority_areas: List[Dict[str, Any]]) -> Dict[str, List[str]]:
     """
     Generate exercise recommendations based on priority areas.
