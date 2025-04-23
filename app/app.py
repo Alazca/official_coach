@@ -139,3 +139,7 @@ def login_user():
         return jsonify({"message": "Login successful", "access token": access_token}), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401
+
+if __name__ == '__main__':
+    with app.app_context():
+        app.run(debug=True)
