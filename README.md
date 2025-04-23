@@ -52,11 +52,11 @@ Follow these steps to set up the project locally:
     **Using `venv`:**
 
     ```bash
-       python3 -m venv .venv
-       source .venv/bin/activate  # Linux/macOS
+    python3 -m venv .venv
+    source .venv/bin/activate  # Linux/macOS
          # OR
-       .venv\Scripts\activate  # Windows
-        ```
+    .venv\Scripts\activate  # Windows
+    ```
 
 3.  **Install dependencies:**
 
