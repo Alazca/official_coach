@@ -452,10 +452,7 @@ def get_target_profile(user_id, start_date=None, end_date=None):
         
         vector = [float(val) for val in vector]
         
-        return {
-            "dimensions": dimensions,
-            "vector": vector
-        }
+        return dimensions,vector
     
     except Exception as e:
         return str(e)
