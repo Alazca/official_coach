@@ -9,7 +9,8 @@ from backend.engines.workout_engine import evaluate_workout_effectiveness
 from backend.database.db import (
     save_readiness_score,
     update_checkin_with_readiness,
-    save_fitness_analysis
+    save_fitness_analysis,
+    get_latest_checkin
 )
 import numpy as np
 import datetime

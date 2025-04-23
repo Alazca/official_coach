@@ -8,6 +8,7 @@ CREATE TABLE users (
     height REAL,
     weight REAL,
     initialActivityLevel TEXT CHECK(initialActivityLevel IN ('Sedentary', 'Casual', 'Moderate', 'Active', 'Intense')),
+    currentActivityLevel TEXT CHECK(currentActivityLevel IN ('Sedentary', 'Casual', 'Moderate', 'Active', 'Intense')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

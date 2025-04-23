@@ -465,6 +465,218 @@ def get_target_profile(user_id, start_date=None, end_date=None):
         if conn:
             conn.close()
 
+def get_latest_checkin_id(user_id: int) -> int:
+    """
+    Get the latest check-in ID for a specific user.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT checkin_id
+            FROM daily_checkins
+            WHERE user_id = ?
+            ORDER BY check_in_date DESC, created_at DESC
+            LIMIT 1
+        """, (user_id,))
+        
+        row = cursor.fetchone()
+        return row["checkin_id"] if row else None
+
+    except Exception as e:
+        return str(e)
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def save_readiness_score(data: dict) -> int:
+    """
+    Insert a readiness score into the database.
+    Returns the inserted readiness_id.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO readiness_scores (
+                user_id,
+                readiness_score,
+                contributing_factors,
+                readiness_date,
+                source,
+                alignment_score,
+                overtraining_score
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data["user_id"],
+            data["readiness_score"],
+            data["contributing_factors"],
+            data["readiness_date"],
+            data["source"],
+            data.get("alignment_score"),
+            data.get("overtraining_score")
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def save_fitness_analysis(data: dict) -> int:
+    """
+    Save a fitness analysis record.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO fitness_analyses (
+                user_id,
+                analysis_date,
+                strength_score,
+                conditioning_score,
+                overall_score,
+                fitness_level,
+                analysis_data
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data["user_id"],
+            data["analysis_date"],
+            data["strength_score"],
+            data["conditioning_score"],
+            data["overall_score"],
+            data["fitness_level"],
+            str(data["analysis_data"])
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def get_active_workout_plan(user_id: int) -> dict:
+    """
+    Get the user's active workout plan.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT *
+            FROM workout_plans
+            WHERE user_id = ? AND active = 1
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (user_id,))
+
+        row = cursor.fetchone()
+        return dict(row) if row else {}
+
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def get_user_goals(user_id: int) -> list:
+    """
+    Retrieve all goals for a user.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM goals
+            WHERE user_id = ?
+            ORDER BY target_date
+        """, (user_id,))
+
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def get_progress_logs(user_id: int, start_date=None, end_date=None) -> list:
+    """
+    Get progress logs (weight + BMI) for a user.
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT *
+            FROM progress_log
+            WHERE user_id = ?
+        """
+        params = [user_id]
+
+        if start_date and end_date:
+            query += " AND log_date BETWEEN ? AND ?"
+            params.extend([start_date, end_date])
+        elif start_date:
+            query += " AND log_date >= ?"
+            params.append(start_date)
+        elif end_date:
+            query += " AND log_date <= ?"
+            params.append(end_date)
+
+        query += " ORDER BY log_date"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    except Exception as e:
+        return str(e)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 if __name__ == "__main__":
     print(get_all_checkins(3, start_date='2025-04-03', end_date='2025-04-08'))

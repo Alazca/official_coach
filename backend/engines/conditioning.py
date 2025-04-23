@@ -92,15 +92,15 @@ def classify_conditioning_level(similarity_score: float) -> str:
         str: Conditioning level classification
     """
     if similarity_score >= 0.9:
-        return "Optimal"
+        return "Elite"
     elif similarity_score >= 0.75:
-        return "Good"
+        return "Advanced"
     elif similarity_score >= 0.6:
-        return "Adequate"
+        return "Intermediate"
     elif similarity_score >= 0.4:
-        return "Suboptimal"
+        return "Novice"
     else:
-        return "Poor"
+        return "Beginner"
 
 
 def calculate_dimension_scores(
