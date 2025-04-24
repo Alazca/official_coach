@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
 /**
  * Initialize buttons that need to send POST requests and redirect
  */
+
 function initializePostAndRedirectButtons() {
     // Check if CoachUtils exists
     if (!window.CoachUtils) {
@@ -142,6 +143,7 @@ function initializeReadinessChart() {
  * Helper function to collect exercise data from the form
  * @returns {Array} Array of exercise objects
  */
+
 function collectExerciseData() {
     const exercises = [];
     const exerciseRows = document.querySelectorAll('.exercise-row');
@@ -169,6 +171,7 @@ function collectExerciseData() {
  * Helper function to collect food items from the form
  * @returns {Array} Array of food item objects
  */
+
 function collectFoodItems() {
     const foodItems = [];
     const foodRows = document.querySelectorAll('.food-item-row');
@@ -194,6 +197,7 @@ function collectFoodItems() {
  * Helper function to calculate total calories
  * @returns {number} Total calories
  */
+
 function calculateTotalCalories() {
     let total = 0;
     const caloriesInputs = document.querySelectorAll('.food-calories');
