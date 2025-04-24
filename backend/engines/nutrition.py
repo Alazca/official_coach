@@ -1,5 +1,5 @@
 # nutrition_engine.py
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import numpy as np
 from backend.engines.base_vector import weighted_similarity, generate_vector_feedback, normalize
 from backend.database.db import get_target_profile
@@ -24,7 +24,7 @@ def evaluate_nutrition_input(user_input: Dict[str, float],
             "feedback": {...}
         }
     """
-    # Fetch profile dims + vector just like conditioning does
+
     dimensions, target_vector = get_target_profile(profile_name)
 
     # Build input vector in the same order

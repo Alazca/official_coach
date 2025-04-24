@@ -128,7 +128,7 @@ def vector_to_percentile(vec: np.ndarray, reference_matrix: np.ndarray) -> np.nd
 def generate_vector_feedback(
     user_vec: np.ndarray, 
     target_vec: np.ndarray, 
-    dimension_labels: Dict[str, float],
+    dimension_labels: List[str],
     threshold: float = 0.2
 ) -> List[Dict[str, Any]]:
     """
@@ -145,7 +145,7 @@ def generate_vector_feedback(
                               difference magnitude, and actionable suggestion
     """
     feedback = []
-    dimensions = list(dimension_labels.keys())
+    dimensions = dimension_labels
 
     for i, label in enumerate(dimensions):
         diff = target_vec[i] - user_vec[i]

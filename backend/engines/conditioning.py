@@ -42,7 +42,7 @@ def evaluate_conditioning(user_input: Dict[str, float],
 
     # Compute similarity
     similarity_score = weighted_similarity(user_vec_norm, target_norm)
-    
+     
     # Generate feedback
     feedback = generate_vector_feedback(user_vec, target_vector, dimensions)
 

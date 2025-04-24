@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from backend.config.config import Config
 import datetime
 
@@ -485,7 +485,7 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
         if conn:
             conn.close()
 
-def get_target_profile(user_id, start_date=None, end_date=None):
+def get_target_profile(user_id, start_date=None, end_date=None) -> Tuple[List[str], List[float]]:
     """
     Get the user's target profile for use.
     """
@@ -522,10 +522,7 @@ def get_target_profile(user_id, start_date=None, end_date=None):
         row = cursor.fetchone()
 
         if not row:
-            return {
-                "dimensions": [],
-                "vector": []
-            }
+            return [], []
         
         # Parse the dimensions from the database
         dimensions = row["dimensions"].split(",")
@@ -536,7 +533,8 @@ def get_target_profile(user_id, start_date=None, end_date=None):
         return dimensions,vector
     
     except Exception as e:
-        return str(e)
+        print(f"[ERROR] get_target_profile failed: {e}")
+        return [], []  
     finally:
         if cursor:
             cursor.close()
