@@ -82,6 +82,63 @@ function initializePostAndRedirectButtons() {
 }
 
 /**
+ * Render the readiness chart if present
+ */
+
+function initializeReadinessChart() {
+    const ctx = document.getElementById("readinessChart");
+    if (!ctx || typeof Chart === "undefined") return;
+
+    const checkIns = JSON.parse(localStorage.getItem("checkIns") || "[]");
+    const last7Days = checkIns
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(-7);
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: last7Days.map(day => new Date(day.date).toLocaleDateString("en-US", { weekday: "short" })),
+            datasets: [{
+                label: "Readiness Score",
+                data: last7Days.map(day => day.readiness || 0),
+                borderColor: "#ef4444",
+                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: "#9CA3AF" }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: "rgba(255, 255, 255, 0.1)"
+                    },
+                    ticks: {
+                        color: "#9CA3AF",
+                        callback: value => `${value}%`
+                    }
+                },
+                x: {
+                    grid: {
+                        color: "rgba(255, 255, 255, 0.1)"
+                    },
+                    ticks: { color: "#9CA3AF" }
+                }
+            }
+        }
+    });
+}
+
+/**
  * Helper function to collect exercise data from the form
  * @returns {Array} Array of exercise objects
  */

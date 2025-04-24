@@ -61,9 +61,13 @@ def initialize_database(schema_path: str = "backend/database/schema.sql") -> Non
 initialize_database("backend/database/schema.sql")
 
 @app.route('/')
-def index():
+def home():
     """Serve the frontpage of the application"""
     return render_template('frontpage.html')
+
+@app.route('/')
+def index():
+    return render_template("index.html")
 
 @app.route('/signup')
 def signup_page():
