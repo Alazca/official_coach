@@ -782,4 +782,3 @@ def analyze_progression(user_id, time_frame: str = "month"):
         result["recommendations"].append("Try again later or contact support if the issue persists.")
         return result
 
-
