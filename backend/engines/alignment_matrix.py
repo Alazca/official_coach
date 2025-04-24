@@ -6,9 +6,9 @@ to produce a readiness score and training recommendations.
 """
 import sqlite3
 import datetime
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any
 
-from backend.config.config import Config
+from backend.database.db import get_all_checkins
 
 def evaluate_vectors(user_input, user_id):
     """
@@ -72,7 +72,7 @@ def evaluate_vectors(user_input, user_id):
         result["recommendations"] = ["Unable to generate specific recommendations due to an error."]
         return result
 
-def get_recovery_adjustment(user_id):
+def get_recovery_adjustment(user_id:int) -> float:
     """
     Analyzes recent activity and recovery patterns to adjust the readiness score.
     
@@ -83,12 +83,37 @@ def get_recovery_adjustment(user_id):
         float: Adjustment value for readiness score (-10 to +10)
     """
     try:  
-        # For now, return a neutral adjustment
-        return 0
         
+        checkins = get_all_checkins(user_id)
+        if not checkins or len(checkins) < 3:
+            return 0  
+
+        # 3 check-in limit 
+        recent = checkins[-3:]
+
+        # Normalize recovery-related factors: sleep, stress, soreness
+        scores = []
+        for entry in recent:
+            sleep = entry.get('sleep_quality', 5)
+            stress = entry.get('stress_level', 5)
+            soreness = entry.get('soreness_level', 5)
+
+            # Scale stress and soreness negatively
+            recovery_score = sleep - ((stress + soreness) / 2)
+            scores.append(recovery_score)
+
+        # Average recent recovery scores
+        avg_score = sum(scores) / len(scores)
+
+        # Normalize to an adjustment range (-10 to +10)
+        # Assuming: perfect recovery ~ +10, poor recovery ~ -10
+        adjustment = max(-10, min(10, (avg_score - 5) * 2))  # center at 0, scale
+        
+        return round(adjustment, 1)
+
     except Exception as e:
         print(f"Error in get_recovery_adjustment: {str(e)}")
-        return 0  # Neutral adjustment in case of error
+        return 0  # Neutral fallback
 
 def generate_recommendations(readiness_score, user_input):
     """

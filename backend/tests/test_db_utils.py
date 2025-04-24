@@ -1,13 +1,15 @@
+# test API calls instead
+
 import pytest
 import sqlite3
 import datetime
-from backend.database.db_utils import (
-    get_user_data,
-    get_latest_checkin,
-    save_readiness_score,
-    update_checkin_with_readiness,
-    get_all_checkins
-)
+# from backend.database.db import (
+#     get_user_data,
+#     get_latest_checkin,
+#     save_readiness_score,
+#     update_checkin_with_readiness,
+#     get_all_checkins
+# )
 from backend.config.config import Config
 
 

@@ -59,9 +59,10 @@ def get_all_checkins(user_id, start_date=None, end_date=None):
         data = cursor.fetchall()
         data = [dict(row) for row in data]
         return data
+    
     except Exception as e:
         print(f"Error: Get all Checkins Failed due to {e}")
-        return {"Error: Failed to retrieve check-in data. Please resolve and try again. "}  
+        return []
     finally:
         if cursor:
             cursor.close()
