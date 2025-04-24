@@ -8,6 +8,7 @@ import sqlite3
 import datetime
 import numpy as np
 from backend.config.config import Config
+from backend.database.db import create_conn, get_workout_history
 
 def analyze_progression(user_id, time_frame="month"):
     """
@@ -81,60 +82,20 @@ def analyze_progression(user_id, time_frame="month"):
         result["recommendations"].append("Try again later or contact support if the issue persists.")
         return result
 
-def get_workout_history(user_id, time_frame):
-    """
-    Retrieves workout history for a specified time frame.
-    
-    Args:
-        user_id (int): The user's ID
-        time_frame (str): The period for analysis: 'week', 'month', 'quarter', or 'year'
-        
-    Returns:
-        list: List of workout records
-    """
-    try:
-        conn = Config().get_connection()
-        cursor = conn.cursor()
-        
-        # Calculate date range based on time_frame
-        today = datetime.datetime.now().date()
-        if time_frame == "week":
-            start_date = today - datetime.timedelta(days=7)
-        elif time_frame == "month":
-            start_date = today - datetime.timedelta(days=30)
-        elif time_frame == "quarter":
-            start_date = today - datetime.timedelta(days=90)
-        elif time_frame == "year":
-            start_date = today - datetime.timedelta(days=365)
-        else:
-            start_date = today - datetime.timedelta(days=30)  # Default to month
-        
-        # Query workout data from database
-        query = """
-        SELECT * FROM workouts 
-        WHERE user_id = ? AND workout_date >= ?
-        ORDER BY workout_date DESC
-        """
-        cursor.execute(query, (user_id, start_date))
-        workout_history = cursor.fetchall()
-        
-        return workout_history
-        
-    except Exception as e:
-        print(f"Error in get_workout_history: {str(e)}")
-        return []
-
-def calculate_volume_progression(workout_history):
+def calculate_volume_progression(user_id: int, time_frame: str = "month") -> float:
     """
     Calculates the progression in workout volume (sets * reps * weight).
     
     Args:
-        workout_history (list): List of workout records
+        user_id (int): User ID
+        time_frame (str): 'week', 'month', 'quarter', or 'year'
         
     Returns:
         float: Volume progression score (0-100)
     """
     try:
+        workout_history = get_workout_history(user_id, time_frame)
+
         if not workout_history or len(workout_history) < 2:
             return 50  # Neutral score for insufficient data
         
@@ -185,17 +146,23 @@ def calculate_volume_progression(workout_history):
         print(f"Error in calculate_volume_progression: {str(e)}")
         return 50  # Neutral score in case of error
 
-def calculate_intensity_progression(workout_history):
+def calculate_intensity_progression(user_id: int, time_frame: str = "month"):
     """
-    Calculates the progression in workout intensity.
-    
+    Evaluates how workout intensity has progressed over time.
+
+    Derives a trend from intensity metrics such as heart rate, RPE, or weight %.
+
     Args:
-        workout_history (list): List of workout records
-        
+        user_id (int): ID of the user
+        time_frame (str): Analysis window
+
     Returns:
         float: Intensity progression score (0-100)
     """
+    
     try:
+        workout_history = get_workout_history(user_id, time_frame)
+
         if not workout_history or len(workout_history) < 2:
             return 50  # Neutral score for insufficient data
         
@@ -244,23 +211,31 @@ def calculate_intensity_progression(workout_history):
         print(f"Error in calculate_intensity_progression: {str(e)}")
         return 50  # Neutral score in case of error
 
-def calculate_consistency_score(workout_history, time_frame):
+def calculate_consistency_score(user_id: int, time_frame: str = "month") -> float:
     """
-    Calculates workout consistency score based on adherence to planned schedule.
-    
+    Calculates how consistent the user has been with their planned workouts.
+
+    Pulls user workout history and compares actual sessions vs expected frequency.
+
     Args:
-        workout_history (list): List of workout records
-        time_frame (str): Time period for analysis
-        
+        user_id (int): ID of the user
+        time_frame (str): Period for analysis
+
     Returns:
-        float: Consistency score (0-100)
+        float: Consistency score from 0 to 100
     """
+   
+    conn = None
+    cursor = None
+
     try:
+
+        workout_history = get_workout_history(user_id, time_frame)
         if not workout_history:
             return 0  # No workouts = no consistency
             
         # Determine expected workout frequency
-        conn = Config().get_connection()
+        conn = create_conn()
         cursor = conn.cursor()
         
         # Get user's planned workout days per week
@@ -293,18 +268,19 @@ def calculate_consistency_score(workout_history, time_frame):
         print(f"Error in calculate_consistency_score: {str(e)}")
         return 50  # Neutral score in case of error
 
-def calculate_workout_frequency(workout_history, time_frame):
+def calculate_workout_frequency(user_id:int, time_frame: str = "month"):
     """
     Calculates average workout frequency.
     
     Args:
-        workout_history (list): List of workout records
+        user_id: ID of user 
         time_frame (str): Time period for analysis
         
     Returns:
         float: Average workouts per week
     """
     try:
+        workout_history = get_workout_history(user_id, time_frame)
         if not workout_history:
             return 0
             
@@ -324,7 +300,7 @@ def calculate_workout_frequency(workout_history, time_frame):
         print(f"Error in calculate_workout_frequency: {str(e)}")
         return 0
 
-def calculate_strength_progression(workout_history):
+def calculate_strength_progression(user_id:int, time_frame: str = "month"):
     """
     Calculates strength progression from key lifts.
     
@@ -335,6 +311,7 @@ def calculate_strength_progression(workout_history):
         dict: Strength progression by exercise
     """
     try:
+        workout_history = get_workout_history(user_id, time_frame)
         if not workout_history:
             return {}
             
@@ -374,7 +351,7 @@ def calculate_strength_progression(workout_history):
         print(f"Error in calculate_strength_progression: {str(e)}")
         return {}
 
-def calculate_endurance_progression(workout_history):
+def calculate_endurance_progression(user_id:int, time_frame: str = "month"):
     """
     Calculates endurance progression from cardio workouts.
     
@@ -385,6 +362,7 @@ def calculate_endurance_progression(workout_history):
         dict: Endurance progression metrics
     """
     try:
+        workout_history = get_workout_history(user_id, time_frame)
         if not workout_history:
             return {}
             
@@ -589,7 +567,7 @@ def suggest_progression_plan(user_id, target_goal):
             fitness_level = "beginner"
         else:
             # Analyze workout data to determine level
-            workout_frequency = calculate_workout_frequency(workout_history, "month")
+            workout_frequency = calculate_workout_frequency(user_id, "month")
             if workout_frequency >= 3.5:
                 fitness_level = "advanced"
             elif workout_frequency >= 2:

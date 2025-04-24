@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Optional
+from typing import Optional, List
 from backend.config.config import Config
 import datetime
 
@@ -68,36 +68,66 @@ def get_all_checkins(user_id, start_date=None, end_date=None):
         if conn:
             conn.close()
 
-def get_workout_history(user_id=None, startdate=None, enddate=None):
-    cursor = None
+def get_workout_history(user_id: int, 
+                        time_frame: Optional[str] = None, 
+                        startdate: Optional[str] = None, 
+                        enddate: Optional[str] = None) -> List[dict]:
+    """
+    Retrieves workout history for a user using a time frame or explicit date range.
+
+    Args:
+        user_id (int): The user's ID
+        time_frame (str, optional): 'week', 'month', 'quarter', or 'year'
+        startdate (str, optional): Start date in 'YYYY-MM-DD'
+        enddate (str, optional): End date in 'YYYY-MM-DD'
+
+    Returns:
+        list of dict: Workout records
+    """
     conn = None
+    cursor = None
 
     try:
         conn = create_conn()
         cursor = conn.cursor()
+
         if not user_id:
             return []
-        if startdate and enddate:
-            cursor.execute("""
-            SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?
-             AND workout_date >= ? AND workout_date <= ?""", (user_id, startdate, enddate))
-        elif startdate:
-            cursor.execute("""
-                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?
-                         AND workout_date >= ? """, (user_id, startdate))
-        elif enddate:
-            cursor.execute("""
-                        SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ? AND
-                         workout_date <= ?""", (user_id, enddate))
-        else:
-            cursor.execute(f"""
-                    SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = {user_id}""")
 
-        data = cursor.fetchall()
-        data = [dict(d) for d in data]
-        return data
+        # If no explicit dates, calculate startdate using time_frame
+        if not startdate:
+            today = datetime.date.today()
+            if time_frame == "week":
+                startdate = today - datetime.timedelta(days=7)
+            elif time_frame == "month":
+                startdate = today - datetime.timedelta(days=30)
+            elif time_frame == "quarter":
+                startdate = today - datetime.timedelta(days=90)
+            elif time_frame == "year":
+                startdate = today - datetime.timedelta(days=365)
+            else:
+                startdate = None  # allow full history if no time_frame
+
+        # Build dynamic query
+        query = "SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?"
+        params = [user_id]
+
+        if startdate:
+            query += " AND workout_date >= ?"
+            params.append(startdate)
+        if enddate:
+            query += " AND workout_date <= ?"
+            params.append(enddate)
+
+        query += " ORDER BY workout_date DESC"
+
+        cursor.execute(query, tuple(params))
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+
     except Exception as e:
-        return str(e)
+        print(f"Error in get_workout_history: {e}")
+        return []
 
     finally:
         if cursor:

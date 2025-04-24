@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
 def generate_exercise_recommendations(priority_areas: List[Dict[str, Any]]) -> Dict[str, List[str]]:
     """
