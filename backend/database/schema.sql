@@ -1,56 +1,124 @@
-CREATE DATABASE IF NOT EXISTS coach_db;
-USE coach_db;
-
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    name TEXT,
+    gender TEXT CHECK(gender IN ('Male', 'Female', 'Other')),
+    dateOfBirth DATE,
+    height REAL,
+    weight REAL,
+    initialActivityLevel TEXT CHECK(initialActivityLevel IN ('Sedentary', 'Casual', 'Moderate', 'Active', 'Intense')),
+    currentActivityLevel TEXT CHECK(currentActivityLevel IN ('Sedentary', 'Casual', 'Moderate', 'Active', 'Intense')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE daily_checkins (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    weight DECIMAL(5,2),
-    sleep_quality INT,
-    stress_level INT,
-    energy_level INT,
-    soreness_level INT,
-    readiness_score INT,
+    checkin_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    weight REAL,
+    sleep_quality INTEGER,
+    stress_level INTEGER,
+    energy_level INTEGER,
+    soreness_level INTEGER,
+    readiness_id INTEGER,
     check_in_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE goals (
+    goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    goalType TEXT CHECK(goalType IN ('Strength', 'Endurance', 'Weight-Loss', 'Performace')),
+    description TEXT,
+    target_date TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE workouts (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    workout_date DATE,
-    workout_type VARCHAR(50),
+    workout_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    workout_date TEXT,
+    workout_type TEXT CHECK(workout_type IN ('Strength', 'Cardio', 'Mobility', 'Recovery')),
+    notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE exercises (
+    exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    category TEXT CHECK(category IN ('Compound', 'Isolation', 'Cardio', 'Mobility', 'Olympic-Style')),
+    muscle_group TEXT,
+    difficulty TEXT CHECK(difficulty IN ('Beginner', 'Intermediate', 'Advanced', 'Professional'))
 );
 
 CREATE TABLE workout_sets (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    workout_id INT,
-    exercise_name VARCHAR(100),
-    weight DECIMAL(6,2),
-    reps INT,
-    rpe INT,
+    workout_exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    workout_id INTEGER,
+    exercise_id INTEGER,
+    lifting_weight REAL,
+    sets INTEGER,
+    reps INTEGER,
+    duration INTEGER,
+    rest_per_set INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (workout_id) REFERENCES workouts(id)
+    FOREIGN KEY (workout_id) REFERENCES workouts(workout_id),
+    FOREIGN KEY (exercise_id) REFERENCES Exercises(exercise_id)
 );
 
-CREATE TABLE meals (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    meal_date DATE,
-    meal_name VARCHAR(100),
-    calories INT,
-    protein DECIMAL(6,2),
-    carbs DECIMAL(6,2),
-    fats DECIMAL(6,2),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+CREATE TABLE progress_Log (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    log_date TEXT,
+    logged_weight INTEGER,
+    BMI REAL CHECK (BMI >= 0),
+    notes TEXT
 );
+
+CREATE TABLE readiness_scores (
+    readiness_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    readiness_score INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
+    contributing_factors TEXT, 
+    readiness_date DATE NOT NULL,
+    source TEXT CHECK(source IN ('Manual', 'Auto', 'Coach')),
+    alignment_score REAL,
+    overtraining_score REAL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE fitness_analyses (
+    analysis_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    analysis_date DATE NOT NULL,
+    strength_score REAL,
+    conditioning_score REAL,
+    overall_score REAL,
+    fitness_level TEXT,
+    analysis_data TEXT, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE workout_plans (
+    plan_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    duration_weeks INTEGER NOT NULL,
+    sessions_per_week INTEGER NOT NULL,
+    strength_ratio REAL NOT NULL,
+    conditioning_ratio REAL NOT NULL,
+    created_at TIMESTAMP,
+    plan_data TEXT,
+    active BOOLEAN DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE target_profiles (
+    profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    dimensions TEXT NOT NULL, 
+    vector TEXT NOT NULL  
+)

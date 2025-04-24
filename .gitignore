@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Environment
+.env
+venv/
+.coach
+.env.*
+
+# Byte-compiled / cache
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# Flask / Gunicorn
+instance/
+*.egg-info/
+*.egg
+dist/
+build/
+
+# MySQL dump files
+*.sql
+*.dump
+
+# VS Code / IDE stuff
+.vscode/
+.idea/
+*.swp
+
+# Node.js / Frontend (if using React, Vue, etc.)
+node_modules/
+dist/
+build/
+.env.local
+.env.development.local
+.env.production.local
+
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+
+# MacOS / Windows
+.DS_Store
+Thumbs.db
+

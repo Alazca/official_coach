@@ -19,7 +19,7 @@ This project is a web application that provides personalized strength and condit
 *   **Backend:**
     *   Python
     *   Flask (web framework)
-    *   SQLAlchemy (ORM)
+    *   SQLite3
 *   **Frontend:**
     *   JavaScript
     *   HTML
@@ -34,7 +34,7 @@ This project is a web application that provides personalized strength and condit
 Before you begin, ensure you have met the following requirements:
 
 *   Python 3.0+
-*   SQLite
+*   SQLite3
 
 ## Installation
 
@@ -49,22 +49,22 @@ Follow these steps to set up the project locally:
 
 2.  **Create a virtual environment:**
 
-    *   **Using `venv`:**
+    **Using `venv`:**
 
-        ```bash
-        python3 -m venv coach
-        source coach/bin/activate  # Linux/macOS
-        # OR
-        coach\Scripts\activate  # Windows
-        ```
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate  # Linux/macOS
+         # OR
+    .venv\Scripts\activate  # Windows
+    ```
 
 3.  **Install dependencies:**
 
-    *   **Using the `venv`:**
+    **Using the `venv`:**
 
-        ```bash
-        pip install -r requirements.txt
-        ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4.  **Configure the application:**
 
@@ -74,14 +74,6 @@ Follow these steps to set up the project locally:
     *   **Important:** Replace the placeholder values with your actual values.  *Never* commit your `.env` file to version control.
 
 5.  **Initialize the database:**
-
-    ```bash
-    # Assuming you're using Flask-SQLAlchemy
-    python
-    >>> from app import db
-    >>> db.create_all()
-    >>> exit()
-    ```
 
 ## Usage
 
@@ -95,24 +87,6 @@ Follow these steps to set up the project locally:
 
     Open your web browser and navigate to `http://127.0.0.1:5000/` (or the address and port where your application is running).
 
-## AI Model Training (if applicable)
-
-If your application uses a machine learning model, describe how to train the model:
-
-1.  **Prepare the training data:**
-
-    *   [Describe the format of the training data]
-    *   [Provide instructions on how to obtain or generate the training data]
-
-2.  **Train the model:**
-
-    ```bash
-    python ai_logic/train_model.py  # Example script
-    ```
-
-3.  **Update the model in the application:**
-
-    *   [Describe how to update the AI model in the application (e.g., by replacing the model file)]
 
 ## Contributing
 
@@ -125,7 +99,6 @@ We welcome contributions to this project! To contribute, please follow these ste
 
 Please adhere to the following guidelines:
 
-*   Follow the code style conventions used in the project (e.g., PEP 8 for Python).
 *   Write unit tests for your code.
 *   Document your code clearly.
 *   Ensure that your changes do not break existing functionality.
@@ -134,17 +107,14 @@ Please adhere to the following guidelines:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-## WIP
-
 ## Acknowledgments
 
-*   [Acknowledge any libraries, frameworks, or resources that you used in the project]
-*   [Acknowledge any contributors or collaborators]
+*   Acknowledge the following people for their support and aid:
+    - Dr. Daphne Chen : Professor and mentor to students
+    - "Chimmy", SJSU Student : Provided expertise in proper database deployment
+    - COACH Team for all their hardwork and late nights
+    
 
 ## Future Enhancements
 
-*   [List any planned future enhancements or features]
-*   [Example: Integration with wearable devices]
-*   [Example: More advanced AI algorithms for workout generation]
+*   WIP
