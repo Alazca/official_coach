@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 
-from flask import Flask, request, jsonify, session, render_template
+from flask import Flask, request, jsonify, render_template 
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -21,6 +21,7 @@ from backend.database.db import (
 from backend.models.models import UserRegistration, DailyCheckIn 
 
 load_dotenv()
+
 
 app = Flask(__name__,
             static_folder='../frontend',

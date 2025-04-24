@@ -8,6 +8,7 @@ import sqlite3
 import datetime
 import random
 from backend.config.config import Config
+from backend.database.db import get_workout_history
 
 def generate_workout(user_data, user_id):
     """
@@ -1085,3 +1086,75 @@ def create_default_workout(fitness_level="beginner"):
                 "muscle_group": "cardio"
             }
         ]
+
+
+def evaluate_workout_effectiveness(user_id: int, days: int = 1) -> dict:
+    """
+    Evaluates how effective the user's most recent workout was.
+
+    Args:
+        user_id (int): The user's ID
+        days (int): How many recent days of workouts to consider
+
+    Returns:
+        dict: Effectiveness score and supporting metrics
+    """
+    try:
+        today = datetime.date.today()
+        start_date = (today - datetime.timedelta(days=days)).isoformat()
+        end_date = today.isoformat()
+
+        history = get_workout_history(user_id, startdate=start_date, enddate=end_date)
+
+        if not history:
+            return {
+                "effectiveness_score": 50.0,
+                "message": "No recent workout found.",
+                "workout_summary": {}
+            }
+
+        # Evaluate the most recent workout
+        recent = history[0]
+        plan = recent.get("plan", [])  # Assume you store a serialized plan
+        if not plan:
+            return {
+                "effectiveness_score": 50.0,
+                "message": "No detailed workout plan found.",
+                "workout_summary": {}
+            }
+
+        duration = estimate_duration(plan)
+        intensity = calculate_intensity_level(plan, fitness_level="intermediate")
+
+        # Map intensity to a numeric score
+        intensity_map = {
+            "none": 20,
+            "light": 40,
+            "moderate": 60,
+            "intense": 80,
+            "very intense": 100
+        }
+        score = intensity_map.get(intensity, 50)
+
+        # Penalize if workout is too short (< 20 min)
+        if duration < 20:
+            score -= 10
+
+        return {
+            "effectiveness_score": round(np.clip(score, 0, 100), 1),
+            "message": "Workout analyzed successfully.",
+            "workout_summary": {
+                "duration": duration,
+                "intensity_label": intensity,
+                "date": recent.get("workout_date"),
+                "notes": recent.get("notes", "")
+            }
+        }
+
+    except Exception as e:
+        print(f"[ERROR] evaluate_workout_effectiveness: {e}")
+        return {
+            "effectiveness_score": 50.0,
+            "message": "Error evaluating workout effectiveness.",
+            "workout_summary": {}
+        }

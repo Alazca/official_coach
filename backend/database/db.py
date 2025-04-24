@@ -541,7 +541,7 @@ def get_target_profile(user_id, start_date=None, end_date=None) -> Tuple[List[st
         if conn:
             conn.close()
 
-def get_latest_checkin_id(user_id: int) -> Optional[int]:
+def get_latest_checkin(user_id: int) -> Optional[int]:
     """
     Get the latest check-in ID for a specific user.
     """
@@ -757,6 +757,9 @@ def get_user_baseline(user_id):
     Returns:
         dict: Dictionary of baseline metrics
     """
+    conn = None
+    cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
@@ -790,6 +793,28 @@ def get_user_baseline(user_id):
         return {}
 
 
+def update_checkin_with_readiness(checkin_id: int, readiness_id: int) -> bool:
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE daily_checkins
+            SET readiness_id = ?
+            WHERE checkin_id = ?
+        """, (readiness_id, checkin_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except Exception as e:
+        print(f"Failed to update readiness_id: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 if __name__ == "__main__":
     print(get_all_checkins(3, start_date='2025-04-03', end_date='2025-04-08'))
