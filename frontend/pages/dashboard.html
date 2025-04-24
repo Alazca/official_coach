@@ -5,6 +5,7 @@
         <title>Interactive Calendar Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="../assets/style.css">
         <style>
             .dropdown-menu {
             display: none;
@@ -19,9 +20,10 @@
         <header class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
             <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
             <div class="flex gap-4 items-center flex-wrap">
-                <button class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Daily-Checkin</button>
-                <button class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Get Workout</button>
-                <button class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Log Food</button>
+                <button onclick="window.location.href='../../index.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Home</button>
+                <button onclick="window.location.href='workout_of_the_day.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Get Workout</button>
+                <button onclick="window.location.href='log_food.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Log Food</button>
+                <button onclick="window.location.href='visualize_data.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Metrics</button>
             </div>
         </header>
         <!-- Main Dashboard -->
@@ -96,6 +98,6 @@
             </aside>
         </div>
         <!-- JS Link -->
-        <script src="dashboard.js"></script>
+        <script src="../js/dashboard.js"></script>
     </body>
 </html>

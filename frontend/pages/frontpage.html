@@ -19,7 +19,7 @@
                     <a href="#features" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Features</a>
                     <a href="#meet-the-team" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Meet The Team</a>
                     <a href="../../index.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Dashboard</a>
-                    <button onclick="window.location.href='/signup'" class="bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95">Sign Up</button>
+                    <button onclick="window.location.href='sign-up.html'" class="bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95">Sign Up</button>
                 </div>
             </div>
         </div>
@@ -280,57 +280,8 @@
         }
     </style>
 
-    <script>
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Parallax effect for hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            document.querySelector('.hero-content')?.style.transform = `translateY(${scrolled * 0.5}px)`;
-        });
-
-        // Intersection Observer for fade-in animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('opacity-100');
-                    entry.target.classList.remove('opacity-0');
-                }
-            });
-        });
-
-        document.querySelectorAll('section').forEach((section) => {
-            section.classList.add('opacity-0', 'transition-opacity', 'duration-1000');
-            observer.observe(section);
-        });
-
-        // Add animation to team cards when they come into view
-        const teamObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    // Add staggered animation delay
-                    setTimeout(() => {
-                        entry.target.classList.add('opacity-100', 'translate-y-0');
-                        entry.target.classList.remove('opacity-0', 'translate-y-10');
-                    }, index * 150);
-                }
-            });
-        }, { threshold: 0.2 });
-
-        document.querySelectorAll('.team-card').forEach((card) => {
-            card.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
-            teamObserver.observe(card);
-        });
-    </script>
-    <script src="/assets/js/signup.js"></script>
+    <!-- Scripts -->
+    <script src="../js/frontend.js"></script>
 
 </body>
 </html>
