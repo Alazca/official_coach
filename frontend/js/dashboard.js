@@ -4,7 +4,6 @@
  */
 
 // dashboard.js
-
 let currentDate = new Date();
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -20,14 +19,17 @@ document.addEventListener("DOMContentLoaded", () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar(currentDate);
   };
-   document.getElementById("todayBtn").onclick = () => {
+
+  document.getElementById("todayBtn").onclick = () => {
     currentDate = new Date();
     renderCalendar(currentDate);
   };
 });
 
 function setupMonthYearPickers() {
-  const months = [...Array(12).keys()].map(m => new Date(0, m).toLocaleString('default', { month: 'long' }));
+  const months = [...Array(12).keys()].map(m =>
+    new Date(0, m).toLocaleString('default', { month: 'long' })
+  );
   const monthList = document.querySelector("#monthDropdown ul");
   const monthBtn = document.getElementById("monthBtn");
   const dropdown = document.getElementById("monthDropdown");
@@ -102,11 +104,35 @@ function createEmptyCell() {
 
 function createDayCell(day) {
   const div = document.createElement("div");
-  div.className = "bg-gray-900 border border-gray-700 p-2 flex flex-col justify-between text-sm";
-  div.innerHTML = `
-    <div class="text-gray-400 font-semibold">${day}</div>
-    <div class="text-xs text-gray-500 italic">No events</div>
+  div.className = `
+    bg-gray-900 border border-gray-700 p-2 text-sm
+    transition-all duration-300 ease-in-out
+    hover:scale-110 hover:z-20 hover:bg-gray-800
+    hover:shadow-[0_0_20px_rgba(255,0,0,0.35)]
+    rounded-lg cursor-pointer flex flex-col justify-between
   `;
+
+  div.innerHTML = `
+    <div class="text-gray-400 font-semibold text-base">${day}</div>
+    <div class="text-xs text-gray-500 italic">Hover to view</div>
+  `;
+
+  div.addEventListener("mouseenter", () => {
+    div.innerHTML = `
+      <div class="text-white font-bold text-lg mb-1">${day}</div>
+      <div class="text-xs text-gray-300">Sleep: 7.5h</div>
+      <div class="text-xs text-gray-300">Energy: Good</div>
+      <div class="text-xs text-gray-300">Workout: ✔</div>
+    `;
+  });
+
+  div.addEventListener("mouseleave", () => {
+    div.innerHTML = `
+      <div class="text-gray-400 font-semibold text-base">${day}</div>
+      <div class="text-xs text-gray-500 italic">Hover to view</div>
+    `;
+  });
+
   return div;
 }
 
