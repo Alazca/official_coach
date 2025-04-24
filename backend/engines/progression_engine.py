@@ -10,77 +10,6 @@ import numpy as np
 from backend.config.config import Config
 from backend.database.db import create_conn, get_workout_history
 
-def analyze_progression(user_id, time_frame="month"):
-    """
-    Analyzes the user's workout progression over a specified time frame.
-    
-    Args:
-        user_id (int): The user's ID to retrieve workout history
-        time_frame (str): The period for analysis: 'week', 'month', 'quarter', or 'year'
-            
-    Returns:
-        dict: A dictionary containing progression metrics and insights
-    """
-    # Initialize the result dictionary
-    result = {
-        "progression_score": 0,
-        "metrics": {},
-        "insights": [],
-        "recommendations": []
-    }
-    
-    try:
-        # Get historical workout data
-        workout_history = get_workout_history(user_id, time_frame)
-        
-        if not workout_history:
-            result["insights"].append("Insufficient workout data for progression analysis.")
-            result["recommendations"].append("Complete more workouts to enable progression tracking.")
-            return result
-        
-        # Calculate progression metrics
-        volume_progression = calculate_volume_progression(workout_history)
-        intensity_progression = calculate_intensity_progression(workout_history)
-        consistency_score = calculate_consistency_score(workout_history, time_frame)
-        
-        # Calculate overall progression score (0-100)
-        progression_score = (
-            (volume_progression * 0.35) +       # 35% weight for volume progression
-            (intensity_progression * 0.35) +     # 35% weight for intensity progression
-            (consistency_score * 0.3)            # 30% weight for consistency
-        )
-        
-        # Ensure score is within bounds (0-100)
-        progression_score = max(0, min(100, progression_score))
-        
-        # Generate insights and recommendations
-        insights = generate_progression_insights(workout_history, volume_progression, intensity_progression, consistency_score)
-        recommendations = generate_progression_recommendations(progression_score, workout_history)
-        
-        # Compile metrics for detailed analysis
-        metrics = {
-            "volume_progression": volume_progression,
-            "intensity_progression": intensity_progression,
-            "consistency_score": consistency_score,
-            "workout_frequency": calculate_workout_frequency(workout_history, time_frame),
-            "strength_gains": calculate_strength_progression(workout_history),
-            "endurance_gains": calculate_endurance_progression(workout_history)
-        }
-        
-        # Update result dictionary
-        result["progression_score"] = round(progression_score, 1)
-        result["metrics"] = metrics
-        result["insights"] = insights
-        result["recommendations"] = recommendations
-        
-        return result
-        
-    except Exception as e:
-        # Log error and return minimal result with default value
-        print(f"Error in analyze_progression: {str(e)}")
-        result["insights"].append("Error analyzing workout progression.")
-        result["recommendations"].append("Try again later or contact support if the issue persists.")
-        return result
 
 def calculate_volume_progression(user_id: int, time_frame: str = "month") -> float:
     """
@@ -210,6 +139,30 @@ def calculate_intensity_progression(user_id: int, time_frame: str = "month"):
     except Exception as e:
         print(f"Error in calculate_intensity_progression: {str(e)}")
         return 50  # Neutral score in case of error
+
+def get_fitness_level(user_id: int, time_frame: str = "month") -> str:
+    """
+    Determines the user's fitness level based on workout frequency.
+
+    Args:
+        user_id (int): The user's ID
+        time_frame (str): Time period to evaluate
+
+    Returns:
+        str: 'beginner', 'intermediate', or 'advanced'
+    """
+    try:
+        
+        frequency = calculate_workout_frequency(user_id, time_frame)
+        if frequency >= 3.5:
+            return "advanced"
+        elif frequency >= 2:
+            return "intermediate"
+        else:
+            return "beginner"
+    except Exception as e:
+        print(f"Error in get_fitness_level: {e}")
+        return "beginner"  # Default fallback
 
 def calculate_consistency_score(user_id: int, time_frame: str = "month") -> float:
     """
@@ -538,14 +491,15 @@ def generate_progression_recommendations(progression_score, workout_history):
     
     return recommendations
 
-def suggest_progression_plan(user_id, target_goal):
+
+def suggest_progression_plan(user_id: int, target_goal: str) -> dict:
     """
     Suggests a progression plan based on user's history and target goal.
-    
+
     Args:
         user_id (int): The user's ID
         target_goal (str): The user's target goal (e.g., 'strength', 'hypertrophy', 'endurance')
-        
+
     Returns:
         dict: A structured progression plan
     """
@@ -558,15 +512,15 @@ def suggest_progression_plan(user_id, target_goal):
             "weekly_targets": [],
             "success_metrics": []
         }
-        
-        # Get user's current fitness level and workout history
+
+        # Get workout history
         workout_history = get_workout_history(user_id, "month")
-        
+
         # Determine starting point based on history
         if not workout_history:
             fitness_level = "beginner"
         else:
-            # Analyze workout data to determine level
+            # Get workout frequency using user_id (history is fetched inside)
             workout_frequency = calculate_workout_frequency(user_id, "month")
             if workout_frequency >= 3.5:
                 fitness_level = "advanced"
@@ -574,29 +528,29 @@ def suggest_progression_plan(user_id, target_goal):
                 fitness_level = "intermediate"
             else:
                 fitness_level = "beginner"
-        
+
         # Create phased approach based on goal and fitness level
         if target_goal == "strength":
             result["phases"] = create_strength_phases(fitness_level)
             result["success_metrics"] = ["1RM increases in compound lifts", "Volume progression", "Technical proficiency"]
-            
+
         elif target_goal == "hypertrophy":
             result["phases"] = create_hypertrophy_phases(fitness_level)
             result["success_metrics"] = ["Muscle measurements", "Progressive overload in target rep ranges", "Mind-muscle connection"]
-            
+
         elif target_goal == "endurance":
             result["phases"] = create_endurance_phases(fitness_level)
             result["success_metrics"] = ["Distance covered", "Heart rate recovery time", "Perceived exertion decreases"]
-            
+
         elif target_goal == "fat_loss":
             result["phases"] = create_fat_loss_phases(fitness_level)
             result["success_metrics"] = ["Body composition changes", "Work capacity improvements", "Resting heart rate"]
-        
+
         # Generate weekly targets
         result["weekly_targets"] = generate_weekly_targets(target_goal, fitness_level, result["duration_weeks"])
-        
+
         return result
-        
+
     except Exception as e:
         print(f"Error in suggest_progression_plan: {str(e)}")
         return {
@@ -606,6 +560,7 @@ def suggest_progression_plan(user_id, target_goal):
             "weekly_targets": ["Complete all scheduled workouts"],
             "success_metrics": ["Workout adherence"]
         }
+
 
 def create_strength_phases(fitness_level):
     """Helper function to create strength training phases"""
@@ -754,3 +709,77 @@ def generate_weekly_targets(goal, fitness_level, duration_weeks):
                 weekly_targets.append(f"Week {week}: Increase workout density by {percentage}% from baseline")
     
     return weekly_targets
+
+def analyze_progression(user_id, time_frame: str = "month"):
+    """
+    Analyzes the user's workout progression over a specified time frame.
+    
+    Args:
+        user_id (int): The user's ID to retrieve workout history
+        time_frame (str): The period for analysis: 'week', 'month', 'quarter', or 'year'
+            
+    Returns:
+        dict: A dictionary containing progression metrics and insights
+    """
+    # Initialize the result dictionary
+    result = {
+        "progression_score": 0,
+        "metrics": {},
+        "insights": [],
+        "recommendations": []
+    }
+    
+    try:
+        # Get historical workout data
+        workout_history = get_workout_history(user_id, time_frame)
+        
+        if not workout_history:
+            result["insights"].append("Insufficient workout data for progression analysis.")
+            result["recommendations"].append("Complete more workouts to enable progression tracking.")
+            return result
+        
+        # Calculate progression metrics
+        volume_progression = calculate_volume_progression(user_id, time_frame)
+        intensity_progression = calculate_intensity_progression(user_id, time_frame)
+        consistency_score = calculate_consistency_score(user_id, time_frame)
+        
+        # Calculate overall progression score (0-100)
+        progression_score = (
+            (volume_progression * 0.35) +       # 35% weight for volume progression
+            (intensity_progression * 0.35) +     # 35% weight for intensity progression
+            (consistency_score * 0.3)            # 30% weight for consistency
+        )
+        
+        # Ensure score is within bounds (0-100)
+        progression_score = max(0, min(100, progression_score))
+        
+        # Generate insights and recommendations
+        insights = generate_progression_insights(workout_history, volume_progression, intensity_progression, consistency_score)
+        recommendations = generate_progression_recommendations(progression_score, workout_history)
+        
+        # Compile metrics for detailed analysis
+        metrics = {
+            "volume_progression": volume_progression,
+            "intensity_progression": intensity_progression,
+            "consistency_score": consistency_score,
+            "workout_frequency": calculate_workout_frequency(user_id, time_frame),
+            "strength_gains": calculate_strength_progression(user_id, time_frame),
+            "endurance_gains": calculate_endurance_progression(user_id, time_frame)
+        }
+        
+        # Update result dictionary
+        result["progression_score"] = round(progression_score, 1)
+        result["metrics"] = metrics
+        result["insights"] = insights
+        result["recommendations"] = recommendations
+        
+        return result
+        
+    except Exception as e:
+        # Log error and return minimal result with default value
+        print(f"Error in analyze_progression: {str(e)}")
+        result["insights"].append("Error analyzing workout progression.")
+        result["recommendations"].append("Try again later or contact support if the issue persists.")
+        return result
+
+
