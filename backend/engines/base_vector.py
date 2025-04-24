@@ -10,19 +10,7 @@ import numpy as np
 import json
 import os
 from typing import List, Dict, Union, Tuple, Any
-from backend.config import Config
 
-# Database connection utility
-def create_conn():
-    """Create and return a database connection using configuration settings."""
-    config = Config()
-    db_path = config.get_database_path()
-    
-    # Connect to the database
-    connection = sqlite3.connect(db_path)
-    connection.row_factory = sqlite3.Row
-    
-    return connection
 
 def normalize(vector: np.ndarray) -> np.ndarray:
     """

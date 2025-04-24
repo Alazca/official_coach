@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Optional
 from backend.config.config import Config
 from backend.engines.alignment_matrix import evaluate_vectors
 import datetime
@@ -60,14 +61,14 @@ def get_all_checkins(user_id, start_date=None, end_date=None):
         data = [dict(row) for row in data]
         return data
     except Exception as e:
-        return e  # Consider returning a message instead of the exception object
+        print(f"Error: Get all Checkins Failed due to {e}")
+        return {"Error: Failed to retrieve check-in data. Please resolve and try again. "}  
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
 
-#still have to test
 def get_workout_history(user_id=None, startdate=None, enddate=None):
     cursor = None
     conn = None
@@ -159,10 +160,7 @@ def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_d
         "energy_level" : energy,
         "soreness_level": soreness
         }
-
-        result = evaluate_vectors(user_input, user_id)
-        readiness_score = result.get("readiness_score") or 0
-
+        
         cursor.execute("""
         INSERT INTO daily_checkins(
         user_id,
@@ -462,7 +460,7 @@ def get_target_profile(user_id, start_date=None, end_date=None):
         if conn:
             conn.close()
 
-def get_latest_checkin_id(user_id: int) -> int:
+def get_latest_checkin_id(user_id: int) -> Optional[int]:
     """
     Get the latest check-in ID for a specific user.
     """
@@ -484,7 +482,8 @@ def get_latest_checkin_id(user_id: int) -> int:
         return row["checkin_id"] if row else None
 
     except Exception as e:
-        return str(e)
+        print(f"Error in get_latest_checkin_id: {e}")
+        return None
 
     finally:
         if cursor:
@@ -492,50 +491,37 @@ def get_latest_checkin_id(user_id: int) -> int:
         if conn:
             conn.close()
 
-def save_readiness_score(data: dict) -> int:
-    """
-    Insert a readiness score into the database.
-    Returns the inserted readiness_id.
-    """
+from typing import Optional, Union
+
+def save_readiness_score(data: dict) -> Optional[int]:
     conn = None
     cursor = None
 
     try:
         conn = create_conn()
         cursor = conn.cursor()
-
         cursor.execute("""
             INSERT INTO readiness_scores (
-                user_id,
-                readiness_score,
-                contributing_factors,
-                readiness_date,
-                source,
-                alignment_score,
-                overtraining_score
+                user_id, readiness_score, contributing_factors,
+                readiness_date, source, alignment_score, overtraining_score
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
-            data["user_id"],
-            data["readiness_score"],
-            data["contributing_factors"],
-            data["readiness_date"],
-            data["source"],
-            data.get("alignment_score"),
-            data.get("overtraining_score")
+            data["user_id"], data["readiness_score"], data["contributing_factors"],
+            data["readiness_date"], data["source"],
+            data.get("alignment_score"), data.get("overtraining_score")
         ))
-
         conn.commit()
         return cursor.lastrowid
-
     except Exception as e:
-        return str(e)
+        print(f"save_readiness_score failed: {e}")
+        return None
     finally:
-        if cursor:
+        if cursor: 
             cursor.close()
-        if conn:
+        if conn: 
             conn.close()
 
-def save_fitness_analysis(data: dict) -> int:
+def save_fitness_analysis(data: dict) -> Optional[int]:
     """
     Save a fitness analysis record.
     """
@@ -569,7 +555,9 @@ def save_fitness_analysis(data: dict) -> int:
         return cursor.lastrowid
 
     except Exception as e:
-        return str(e)
+        print(f"save_fitness_analysis failed: {e}")
+        return None
+
     finally:
         if cursor:
             cursor.close()
@@ -598,7 +586,9 @@ def get_active_workout_plan(user_id: int) -> dict:
         return dict(row) if row else {}
 
     except Exception as e:
-        return str(e)
+        print(f"get_active_workout_plan failed: {e}")
+        return {}
+
     finally:
         if cursor:
             cursor.close()
@@ -625,7 +615,9 @@ def get_user_goals(user_id: int) -> list:
         return [dict(row) for row in rows]
 
     except Exception as e:
-        return str(e)
+        print(f"get_user_goals failed: {e}")
+        return []
+
     finally:
         if cursor:
             cursor.close()
@@ -667,7 +659,9 @@ def get_progress_logs(user_id: int, start_date=None, end_date=None) -> list:
         return [dict(row) for row in rows]
 
     except Exception as e:
-        return str(e)
+        print(f"get_progress_logs failed: {e}")
+        return []
+
     finally:
         if cursor:
             cursor.close()

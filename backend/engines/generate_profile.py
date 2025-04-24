@@ -1,4 +1,3 @@
-from backend.config.config import Config
 from backend.database.db import create_conn
 
 def get_user_baseline(user_id):

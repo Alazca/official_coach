@@ -80,7 +80,7 @@ CREATE TABLE progress_Log (
 CREATE TABLE readiness_scores (
     readiness_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    readiness_score INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
+    readiness_level INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
     contributing_factors TEXT, 
     readiness_date DATE NOT NULL,
     source TEXT CHECK(source IN ('Manual', 'Auto', 'Coach')),
