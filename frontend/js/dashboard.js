@@ -3,180 +3,57 @@
  * Handles dashboard initialization, chart rendering, and UI interactions
  */
 
-// Document ready handler
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Dashboard scripts loaded');
-    
-    // Initialize dashboard components
-    initializeReadinessChart();
-    initializeChatControls();
-    initializeEventListeners();
+// dashboard.js
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderCalendar(new Date());
 });
-/**
- * Initialize readiness chart with user data
- * Displays a line chart showing readiness scores over time
- */
-function initializeReadinessChart() {
-    // Get the chart canvas element
-    const ctx = document.getElementById('readinessChart');
-    if (!ctx) return;
 
-    // Get stored check-in data
-    const checkIns = JSON.parse(localStorage.getItem('checkIns') || '[]');
-    
-    // Get the last 7 days of data
-    const last7Days = checkIns
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .slice(-7);
+function renderCalendar(date) {
+  const calendarGrid = document.getElementById("calendar-grid");
+  const calendarTitle = document.getElementById("calendarTitle");
 
-    // Create the chart
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: last7Days.map(day => new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })),
-            datasets: [{
-                label: 'Readiness Score',
-                data: last7Days.map(day => day.readiness || 0),
-                borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    labels: { color: '#9CA3AF' }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: { 
-                        color: '#9CA3AF',
-                        callback: value => `${value}%`
-                    }
-                },
-                x: {
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: { color: '#9CA3AF' }
-                }
-            }
-        }
-    });
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-indexed
+  const monthName = date.toLocaleString('default', { month: 'long' });
+
+  // Update header
+  calendarTitle.textContent = `${monthName} ${year}`;
+  calendarGrid.innerHTML = ""; // Clear previous
+
+  // Get start day and number of days
+  const firstDay = new Date(year, month, 1).getDay(); // 0 = Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const totalCells = firstDay + daysInMonth;
+  const rows = Math.ceil(totalCells / 7);
+
+  // Set grid rows dynamically
+  calendarGrid.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
+
+  // Fill leading empty cells
+  for (let i = 0; i < firstDay; i++) {
+    calendarGrid.appendChild(createEmptyCell());
+  }
+
+  // Fill actual days
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarGrid.appendChild(createDayCell(day));
+  }
 }
 
-/**
- * Initialize chat interface controls
- * Handles minimizing/maximizing the chat window
- */
-function initializeChatControls() {
-    const trainerChat = document.getElementById('trainerChat');
-    const chatContent = document.getElementById('chatContent');
-    const chatBubble = document.getElementById('chatBubble');
-    const minimizeButton = document.getElementById('minimizeChat');
-
-    // No operation if elements don't exist
-    if (!trainerChat || !chatContent || !chatBubble || !minimizeButton) {
-        return;
-    }
-
-    // Save chat state in localStorage
-    const saveState = (isMinimized) => {
-        localStorage.setItem('chat_minimized', isMinimized);
-    };
-
-    // Load saved state
-    const loadState = () => {
-        return localStorage.getItem('chat_minimized') === 'true';
-    };
-
-    // Function to minimize the chat
-    const minimizeChat = () => {
-        chatContent.style.display = 'none';
-        trainerChat.style.display = 'none';
-        chatBubble.classList.remove('hidden');
-        saveState(true);
-    };
-
-    // Function to maximize the chat
-    const maximizeChat = () => {
-        trainerChat.style.display = 'block';
-        chatContent.style.display = 'block';
-        chatBubble.classList.add('hidden');
-        saveState(false);
-    };
-
-    // Set initial state based on localStorage
-    if (loadState()) {
-        minimizeChat();
-    }
-
-    // Add event listeners
-    minimizeButton.addEventListener('click', minimizeChat);
-    chatBubble.addEventListener('click', maximizeChat);
+function createEmptyCell() {
+  const div = document.createElement("div");
+  div.className = "bg-gray-900 border border-gray-700";
+  return div;
 }
 
-/**
- * Initialize event listeners for dashboard elements
- */
-function initializeEventListeners() {
-    // Sign Up button
-    const signUpButton = document.getElementById('signUpButton');
-    if (signUpButton) {
-        signUpButton.addEventListener('click', function() {
-            // Navigate to signup page or show signup modal
-            // This would be integrated with your authentication system
-            console.log('Sign Up clicked');
-            // Example: window.location.href = 'signup.html';
-        });
-    }
-
-    // Check-in button
-    const checkInButton = document.getElementById('checkInButton');
-    if (checkInButton) {
-        checkInButton.addEventListener('click', function() {
-            console.log('Daily Check-In clicked');
-            // Navigate to check-in page or open check-in modal
-            // Example: window.location.href = 'checkin.html';
-        });
-    }
-
-    // Workout tile
-    const workoutTile = document.getElementById('workoutTile');
-    if (workoutTile) {
-        workoutTile.addEventListener('click', function() {
-            console.log('Workout of the Day clicked');
-            // Navigate to workout page
-            // Example: window.location.href = 'workout.html';
-        });
-    }
-
-    // Visualize data tile
-    const visualizeTile = document.getElementById('visualizeTile');
-    if (visualizeTile) {
-        visualizeTile.addEventListener('click', function() {
-            console.log('Visualize Data clicked');
-            // Navigate to data visualization page
-            // Example: window.location.href = 'visualize.html';
-        });
-    }
-
-    // Log food tile
-    const logFoodTile = document.getElementById('logFoodTile');
-    if (logFoodTile) {
-        logFoodTile.addEventListener('click', function() {
-            console.log('Log Food clicked');
-            // Navigate to food logging page
-            // Example: window.location.href = 'nutrition.html';
-        });
-    }
+function createDayCell(day) {
+  const div = document.createElement("div");
+  div.className = "bg-gray-900 border border-gray-700 p-2 flex flex-col justify-between text-sm";
+  div.innerHTML = `
+    <div class="text-gray-400 font-semibold">${day}</div>
+    <div class="text-xs text-gray-500 italic">No events</div>
+  `;
+  return div;
 }
+
