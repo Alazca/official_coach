@@ -14,6 +14,106 @@ def create_conn():
 
     return connection
 
+def register_user(email, password_hash, name, gender, dob, height, weight, activity_level):
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            INSERT INTO users (
+                email, 
+                password_hash, 
+                name, 
+                gender, 
+                dateOfBirth, 
+                height, 
+                weight, 
+                initialActivityLevel
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (email, password_hash, name, gender, dob, height, weight, activity_level))
+
+        user_id = cursor.lastrowid
+        conn.commit()
+        
+        if user_id is None:
+            raise ValueError("No User ID found!")
+
+        return user_id
+
+    except Exception as e:
+        error_message = str(e)
+        return error_message
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
+    conn = None
+    cursor = None
+
+    try:
+        conn = create_conn()
+        cursor = conn.cursor()
+
+        user_input = {
+        "weight": weight,
+        "sleep_quality": sleep,
+        "stress_level" : stress,
+        "energy_level" : energy,
+        "soreness_level": soreness
+        }
+        
+        cursor.execute("""
+        INSERT INTO daily_checkins(
+        user_id,
+        weight,
+        sleep_quality,
+        stress_level,
+        energy_level,
+        soreness_level,
+        check_in_date
+         
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_id, 
+            user_input["weight"], 
+            user_input["sleep_quality"], 
+            user_input["stress_level"], 
+            user_input["energy_level"], 
+            user_input["soreness_level"], 
+            check_in_date
+        ))
+
+        rowid = cursor.lastrowid
+        conn.commit()
+        
+        if rowid is None:
+            raise ValueError("No ID found!")
+
+        return rowid
+
+    except Exception as e:
+        return str(e)
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def validate_date(date_string):
+
+    try:
+        datetime.datetime.strptime(date_string, '%d-%m-%Y')
+        return True
+    except ValueError:
+        return False
+
 
 def user_exists(email):
     cur = None
@@ -99,15 +199,60 @@ def get_workout_history(user_id: int,
         if not startdate:
             today = datetime.date.today()
             if time_frame == "week":
-                startdate = today - datetime.timedelta(days=7)
+                # Convert datetime.date object to string format
+                startdate = (today - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
             elif time_frame == "month":
-                startdate = today - datetime.timedelta(days=30)
+                # Handle month calculation more accurately
+                # Get the first day of current month
+                first_day_current_month = today.replace(day=1)
+                
+                # Calculate first day of previous month
+                if today.month == 1:  # January
+                    previous_month = first_day_current_month.replace(year=today.year - 1, month=12)
+                else:
+                    previous_month = first_day_current_month.replace(month=today.month - 1)
+                
+                startdate = previous_month.strftime('%Y-%m-%d')
             elif time_frame == "quarter":
-                startdate = today - datetime.timedelta(days=90)
+                # Calculate date 3 months ago
+                month = today.month - 3
+                year = today.year
+                if month <= 0:  # Handle year boundary
+                    month += 12
+                    year -= 1
+                
+                # Handle potential day-of-month issues (e.g., Feb 30 doesn't exist)
+                try:
+                    quarter_date = today.replace(year=year, month=month)
+                except ValueError:
+                    # If day doesn't exist in the target month, use the last day of that month
+                    if month == 2:  # February
+                        last_day = 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28
+                    elif month in [4, 6, 9, 11]:  # April, June, September, November
+                        last_day = 30
+                    else:
+                        last_day = 31
+                    quarter_date = today.replace(year=year, month=month, day=last_day)
+                
+                startdate = quarter_date.strftime('%Y-%m-%d')
             elif time_frame == "year":
-                startdate = today - datetime.timedelta(days=365)
+                # Handle leap year correctly
+                try:
+                    year_ago = today.replace(year=today.year - 1)
+                except ValueError:
+                    # Handle February 29 in leap years
+                    if today.month == 2 and today.day == 29:
+                        year_ago = datetime.date(today.year - 1, 2, 28)
+                    else:
+                        raise
+                
+                startdate = year_ago.strftime('%Y-%m-%d')
             else:
                 startdate = None  # allow full history if no time_frame
+        
+        # Set enddate to today if not specified
+        if not enddate:
+            enddate = datetime.date.today().strftime('%Y-%m-%d')
 
         # Build dynamic query
         query = "SELECT workout_type, workout_date, notes FROM workouts WHERE user_id = ?"
@@ -136,98 +281,6 @@ def get_workout_history(user_id: int,
         if conn:
             conn.close()
 
-
-def register_user(email, password_hash, name, gender, dob, height, weight, activity_level):
-    conn = None
-    cursor = None
-
-    try:
-        conn = create_conn()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            INSERT INTO users (
-                email, 
-                password_hash, 
-                name, 
-                gender, 
-                dateOfBirth, 
-                height, 
-                weight, 
-                initialActivityLevel
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (email, password_hash, name, gender, dob, height, weight, activity_level))
-
-        user_id = cursor.lastrowid
-        conn.commit()
-        
-        if user_id is None:
-            raise ValueError("No User ID found!")
-
-        return user_id
-
-    except Exception as e:
-        error_message = str(e)
-        return error_message
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def insert_check_in(user_id, weight, sleep, stress, energy, soreness, check_in_date):
-    conn = None
-    cursor = None
-
-    try:
-        conn = create_conn()
-        cursor = conn.cursor()
-
-        user_input = {
-        "weight": weight,
-        "sleep_quality": sleep,
-        "stress_level" : stress,
-        "energy_level" : energy,
-        "soreness_level": soreness
-        }
-        
-        cursor.execute("""
-        INSERT INTO daily_checkins(
-        user_id,
-        weight,
-        sleep_quality,
-        stress_level,
-        energy_level,
-        soreness_level,
-        check_in_date
-         
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (user_id, weight, sleep, stress, energy, soreness, check_in_date))
-
-        rowid = cursor.lastrowid
-        conn.commit()
-        
-        if rowid is None:
-            raise ValueError("No ID found!")
-
-        return rowid
-
-    except Exception as e:
-        return str(e)
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def validate_date(date_string):
-
-    try:
-        datetime.datetime.strptime(date_string, '%d-%m-%Y')
-        return True
-    except ValueError:
-        return False
 
 def get_nutrition_history(user_id, start_date=None, end_date=None):
     """
