@@ -521,8 +521,6 @@ def get_latest_checkin_id(user_id: int) -> Optional[int]:
         if conn:
             conn.close()
 
-from typing import Optional, Union
-
 def save_readiness_score(data: dict) -> Optional[int]:
     conn = None
     cursor = None
