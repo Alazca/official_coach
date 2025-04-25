@@ -122,7 +122,7 @@ def login_user():
     if isinstance(data, Exception):
         return jsonify({"error": f"{str(data)}"}), 400
     if not data:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"error": "User does not exist"}), 404
 
     if check_password_hash(data['password_hash'], password):
         additional_claims = {
@@ -142,3 +142,76 @@ def login_user():
 if __name__ == '__main__':
     with app.app_context():
         app.run(debug=True)
+
+# for testing /api/me rout to get info of current user
+@app.route('/api/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    return jsonify({
+        "user_id": identity,
+        "email": claims["email"]
+    }), 200
+
+# for testing /api/checkin to check for successful checkin
+@app.route('/api/checkin', methods=['POST'])
+@jwt_required()
+def submit_checkin():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    required_fields = ['weight', 'sleep', 'stress', 'energy', 'soreness']
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required check-in fields"}), 400
+
+    try:
+        insert_check_in(
+            user_id=user_id,
+            weight=data['weight'],
+            sleep=data['sleep'],
+            stress=data['stress'],
+            energy=data['energy'],
+            soreness=data['soreness'],
+            check_in_date=str(datetime.date.today())
+        )
+        return jsonify({"message": "Check-in saved successfully"}), 200
+    except Exception as e:
+        print("CHECK-IN ERROR:", e)  # 👈 Add this line
+        return jsonify({"error": f"Failed to insert check-in: {str(e)}"}), 500
+
+# for testing if user can fetch all checkins
+@app.route('/api/checkins/<int:user_id>', methods=['GET'])
+@jwt_required()
+def get_user_checkins(user_id):
+    current_user = get_jwt_identity()
+    if int(current_user) != user_id:
+        return jsonify({"error": "Unauthorized access to another user's data"}), 403
+
+    try:
+        checkins = get_all_checkins(user_id)
+        return jsonify(checkins), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch check-ins: {str(e)}"}), 500
+    
+# for testing route to get workout history
+@app.route('/api/workout-history', methods=['GET'])
+@jwt_required()
+def workout_history():
+    user_id = get_jwt_identity()
+    try:
+        history = get_workout_history(user_id)
+        return jsonify(history), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to get workout history: {str(e)}"}), 500
+
+# for testing route for getting nutrition history
+@app.route('/api/nutrition', methods=['GET'])
+@jwt_required()
+def get_nutrition():
+    user_id = get_jwt_identity()
+    try:
+        nutrition_data = get_nutrition_history(user_id)
+        return jsonify(nutrition_data), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to get nutrition history: {str(e)}"}), 500
