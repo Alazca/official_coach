@@ -30,6 +30,7 @@ CREATE TABLE goals (
     goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     goalType TEXT CHECK(goalType IN ('Strength', 'Endurance', 'Weight-Loss', 'Performace')),
+    category TEXT CHECK(category IN ('Nutrition', 'Strength', 'Conditioning')) NOT NULL,
     description TEXT,
     target_date TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -77,10 +78,25 @@ CREATE TABLE progress_Log (
     notes TEXT
 );
 
+CREATE TABLE nutrition_log (
+    entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    calories REAL,
+    protein REAL,
+    carbs REAL,
+    fats REAL,
+    fiber REAL,
+    hydration REAL,
+    similarity_score REAL,
+    log_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 CREATE TABLE readiness_scores (
     readiness_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    readiness_score INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
+    readiness_level INTEGER CHECK(readiness_score BETWEEN 0 AND 100),
     contributing_factors TEXT, 
     readiness_date DATE NOT NULL,
     source TEXT CHECK(source IN ('Manual', 'Auto', 'Coach')),
@@ -118,7 +134,9 @@ CREATE TABLE workout_plans (
 
 CREATE TABLE target_profiles (
     profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     dimensions TEXT NOT NULL, 
-    vector TEXT NOT NULL  
+    vector TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 )

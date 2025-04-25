@@ -3,284 +3,341 @@
  * Handles the registration process with clean separation of concerns
  */
 const CoachSignup = (() => {
-    // Private configuration
-    const config = {
-      apiEndpoint: '/api/register',
-      formId: 'signupForm',
-      redirectPath: '../../index.html'
-    };
-  
-    /**
-     * Validates email format
-     * @param {string} email - Email to validate
-     * @returns {boolean} Whether email is valid
-     */
-    const isValidEmail = (email) => {
-      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(email.toLowerCase());
-    };
-  
-    /**
-     * Shows error message for a specific input
-     * @param {string} inputId - ID of the input with error
-     * @param {string} message - Error message to display
-     */
-    const showError = (inputId, message) => {
-      const input = document.getElementById(inputId);
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'text-red-500 text-sm mt-1';
-      errorDiv.textContent = message;
-  
-      // Add error class to input
-      input.classList.add('border-red-500');
-  
-      // Add error message after input
-      input.parentNode.appendChild(errorDiv);
-  
-      // Shake animation
-      input.classList.add('animate-shake');
-      setTimeout(() => input.classList.remove('animate-shake'), 500);
-    };
-  
-    /**
-     * Clears all error messages
-     */
-    const clearErrors = () => {
-      document.querySelectorAll('.text-red-500.text-sm').forEach(el => el.remove());
-      document.querySelectorAll('input, select').forEach(input => {
-        input.classList.remove('border-red-500');
-      });
-    };
-  
-    /**
-     * Shows success message
-     * @param {string} message - Success message to display
-     */
-    const showSuccessMessage = (message) => {
-      const successDiv = document.createElement('div');
-      successDiv.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-      successDiv.textContent = message;
-      document.body.appendChild(successDiv);
-    };
-  
-    /**
-     * Sets button to loading state
-     * @param {HTMLElement} button - Button element
-     * @param {boolean} isLoading - Whether to show loading state
-     * @returns {string} Original button text
-     */
-    const setButtonLoading = (button, isLoading) => {
-      const originalText = button.innerHTML;
-      
-      if (isLoading) {
-        button.innerHTML = '<span class="inline-block animate-spin mr-2">↻</span> Creating Account...';
-        button.disabled = true;
-      } else {
-        button.disabled = false;
-      }
-      
-      return originalText;
-    };
-  
-    /**
-     * Validates all form inputs
-     * @param {Object} formData - Form data to validate
-     * @returns {boolean} Whether validation passed
-     */
-    const validateForm = (formData) => {
-      let isValid = true;
-  
+  // Private configuration
+  const config = {
+    apiEndpoint: "/api/register",
+    formId: "signupForm",
+    redirectPath: "../../index.html",
+  };
+
+  /**
+   * Validates email format
+   * @param {string} email - Email to validate
+   * @returns {boolean} Whether email is valid
+   */
+  const isValidEmail = (email) => {
+    const re =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email.toLowerCase());
+  };
+
+  /**
+   * Shows error message for a specific input
+   * @param {HTMLElement} input - Input element with error
+   * @param {string} message - Error message to display
+   */
+  const showError = (input, message) => {
+    input.classList.add("border-red-500");
+    const errorElement = input.nextElementSibling;
+    if (errorElement && errorElement.classList.contains("error-message")) {
+      errorElement.textContent = message;
+      errorElement.classList.add("text-red-500", "text-sm", "mt-1");
+    }
+
+    // Add shake animation
+    input.classList.add("form-error");
+    setTimeout(() => input.classList.remove("form-error"), 500);
+  };
+
+  /**
+   * Clears all error messages
+   */
+  const clearErrors = () => {
+    document.querySelectorAll(".error-message").forEach((el) => {
+      el.textContent = "";
+      el.classList.remove("text-red-500");
+    });
+
+    document.querySelectorAll("input, select").forEach((input) => {
+      input.classList.remove("border-red-500");
+    });
+  };
+
+  /**
+   * Validates a specific step in the multi-step form
+   * @param {number} step - Step number to validate
+   * @returns {boolean} Whether step is valid
+   */
+  const validateStep = (step) => {
+    let isValid = true;
+
+    // Clear previous errors
+    clearErrors();
+
+    if (step === 1) {
+      // Step 1: Account Details
+      const name = document.getElementById("name");
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirmPassword");
+
       // Name validation
-      if (formData.name === '' || formData.name.split(' ').filter(word => word.length > 0).length < 2) {
-        showError('name', 'Please enter your full name (first and last name)');
+      if (
+        name.value.trim() === "" ||
+        name.value.split(" ").filter((word) => word.length > 0).length < 2
+      ) {
+        showError(name, "Please enter your full name (first and last name)");
         isValid = false;
       }
-  
+
       // Email validation
-      if (!isValidEmail(formData.email)) {
-        showError('email', 'Please enter a valid email address');
+      if (!isValidEmail(email.value)) {
+        showError(email, "Please enter a valid email address");
         isValid = false;
       }
-  
+
       // Password validation
-      if (formData.password.length < 8) {
-        showError('password', 'Password must be at least 8 characters long');
+      if (password.value.length < 8) {
+        showError(password, "Password must be at least 8 characters long");
         isValid = false;
-      } else if (!/\d/.test(formData.password)) {
-        showError('password', 'Password must contain at least one number');
+      } else if (!/\d/.test(password.value)) {
+        showError(password, "Password must contain at least one number");
         isValid = false;
-      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-        showError('password', 'Password must contain at least one special character');
-        isValid = false;
-      }
-  
-      // Password confirmation
-      if (formData.password !== formData.confirmPassword) {
-        showError('confirmPassword', 'Passwords do not match');
+      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password.value)) {
+        showError(
+          password,
+          "Password must contain at least one special character",
+        );
         isValid = false;
       }
-  
-      // Date of birth validation
-      if (!formData.dob) {
-        showError('dob', 'Please enter your date of birth');
+
+      // Confirm password
+      if (password.value !== confirmPassword.value) {
+        showError(confirmPassword, "Passwords do not match");
         isValid = false;
       }
-  
-      // Gender validation
-      if (!formData.gender) {
-        showError('gender', 'Please select your gender');
+    } else if (step === 2) {
+      // Step 2: Personal Details
+      const dob = document.getElementById("dob");
+      const gender = document.getElementById("gender");
+      const height = document.getElementById("height");
+      const weight = document.getElementById("weight");
+
+      if (!dob.value) {
+        showError(dob, "Please enter your date of birth");
         isValid = false;
       }
-  
-      // Height validation
-      if (isNaN(formData.height) || formData.height <= 0) {
-        showError('height', 'Please enter a valid height');
+
+      if (!gender.value) {
+        showError(gender, "Please select your gender");
         isValid = false;
       }
-  
-      // Weight validation
-      if (isNaN(formData.weight) || formData.weight <= 0) {
-        showError('weight', 'Please enter a valid weight');
+
+      if (!height.value || isNaN(height.value) || height.value <= 0) {
+        showError(height, "Please enter a valid height");
         isValid = false;
       }
-  
-      // Activity level validation
-      if (!formData.activityLevel) {
-        showError('activityLevel', 'Please select an activity level');
+
+      if (!weight.value || isNaN(weight.value) || weight.value <= 0) {
+        showError(weight, "Please enter a valid weight");
         isValid = false;
       }
-  
-      // Terms validation
-      if (!formData.termsChecked) {
-        showError('terms', 'You must agree to the Terms of Service and Privacy Policy');
+    } else if (step === 3) {
+      // Step 3: Fitness Profile
+      const activityLevel = document.getElementById("activityLevel");
+      const terms = document.getElementById("terms");
+
+      if (!activityLevel.value) {
+        showError(activityLevel, "Please select your activity level");
         isValid = false;
       }
-  
-      return isValid;
+
+      if (!terms.checked) {
+        showError(
+          terms,
+          "You must agree to the Terms of Service and Privacy Policy",
+        );
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
+  /**
+   * Collects all form data from the signup form
+   * @returns {Object} Form data object
+   */
+  const collectFormData = () => {
+    // Collect basic form data
+    const formData = {
+      name: document.getElementById("name")?.value.trim() || "",
+      email: document.getElementById("email")?.value.trim() || "",
+      password: document.getElementById("password")?.value || "",
+      dob: document.getElementById("dob")?.value || "",
+      gender: document.getElementById("gender")?.value || "",
+      height: parseFloat(document.getElementById("height")?.value) || 0,
+      weight: parseFloat(document.getElementById("weight")?.value) || 0,
+      activityLevel: document.getElementById("activityLevel")?.value || "",
+      termsAccepted: document.getElementById("terms")?.checked || false,
+      fitnessGoals: [],
     };
-  
-    /**
-     * Collects form data from the signup form
-     * @returns {Object} Form data object
-     */
-    const collectFormData = () => {
-      const form = document.getElementById(config.formId);
-      
-      return {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirmPassword').value,
-        dob: document.getElementById('dob').value,
-        gender: document.getElementById('gender').value,
-        height: parseFloat(document.getElementById('height').value),
-        weight: parseFloat(document.getElementById('weight').value),
-        activityLevel: document.getElementById('activityLevel').value,
-        termsChecked: document.getElementById('terms').checked
-      };
-    };
-  
-    /**
-     * Submits registration data to the API
-     * @param {Object} userData - User data to submit
-     * @param {HTMLElement} submitButton - Submit button element
-     * @returns {Promise} Promise resolving to the API response
-     */
-    const submitRegistration = async (userData, submitButton) => {
-      // Format the data according to API requirements
-      const apiData = {
-        name: userData.name,
-        email: userData.email,
-        password: userData.password,
-        dob: userData.dob,
-        gender: userData.gender,
-        height: userData.height,
-        weight: userData.weight,
-        initialActivityLevel: userData.activityLevel
-      };
-  
-      try {
-        // Set button to loading state
-        const originalButtonText = setButtonLoading(submitButton, true);
-        
-        // Make the API request
-        const response = await fetch(config.apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(apiData)
-        });
-  
-        // Parse the JSON response
-        const data = await response.json();
-  
-        // Handle successful registration
-        if (data.message) {
-          showSuccessMessage('Account created successfully! Redirecting to dashboard...');
-          setTimeout(() => {
-            window.location.href = config.redirectPath;
-          }, 1500);
-          return { success: true };
-        } 
-        // Handle API errors
-        else {
-          const errorMessage = data.error || 
-                              data["Database error"] || 
-                              data["Validation error"] ||
-                              'Registration failed.';
-          showError('email', errorMessage);
-          return { success: false, error: errorMessage };
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showError('email', 'An error occurred. Please try again later.');
-        return { success: false, error: 'Connection error' };
-      } finally {
-        // Reset button state
-        submitButton.innerHTML = originalButtonText;
-        submitButton.disabled = false;
-      }
-    };
-  
-    /**
-     * Initializes the signup form handlers
-     */
-    const initialize = () => {
-      // Wait for DOM to be fully loaded
-      document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById(config.formId);
-        
-        if (form) {
-          form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Clear any previous errors
-            clearErrors();
-            
-            // Collect form data
-            const formData = collectFormData();
-            
-            // Validate form inputs
-            if (validateForm(formData)) {
-              // Submit registration if validation passes
-              const submitButton = form.querySelector('button[type="submit"]');
-              await submitRegistration(formData, submitButton);
-            }
-          });
-        } else {
-          console.error(`Signup form with ID "${config.formId}" not found`);
-        }
+
+    // Collect fitness goals (multiple checkboxes)
+    document
+      .querySelectorAll('input[name="fitnessGoals"]:checked')
+      .forEach((checkbox) => {
+        formData.fitnessGoals.push(checkbox.value);
       });
+
+    return formData;
+  };
+
+  /**
+   * Shows success message and handles redirection
+   */
+  const showSuccessMessage = () => {
+    // Show the success modal
+    const successModal = document.getElementById("success-modal");
+    if (successModal) {
+      successModal.classList.remove("hidden");
+
+      // Start the progress bar and countdown
+      const redirectProgress = document.getElementById("redirect-progress");
+      const redirectCountdown = document.getElementById("redirect-countdown");
+      let count = 3;
+
+      const countdownInterval = setInterval(() => {
+        count--;
+        redirectCountdown.textContent = count;
+        redirectProgress.style.width = `${((3 - count) / 3) * 100}%`;
+
+        if (count <= 0) {
+          clearInterval(countdownInterval);
+          window.location.href = config.redirectPath;
+        }
+      }, 1000);
+    } else {
+      // Fallback if modal not found
+      alert("Account created successfully! Redirecting to dashboard...");
+      setTimeout(() => {
+        window.location.href = config.redirectPath;
+      }, 1500);
+    }
+  };
+
+  /**
+   * Initializes the multi-step form navigation
+   */
+  const initializeMultiStepForm = () => {
+    const steps = [
+      document.getElementById("step-1"),
+      document.getElementById("step-2"),
+      document.getElementById("step-3"),
+    ];
+    const progressBar = document.getElementById("progress-bar");
+    const stepIndicator = document.getElementById("step-indicator");
+    const progressPercentage = document.getElementById("progress-percentage");
+
+    let currentStep = 0;
+
+    // Go to specific step function
+    const goToStep = (stepIndex) => {
+      steps[currentStep].classList.remove("active");
+      currentStep = stepIndex;
+      steps[currentStep].classList.add("active");
+
+      // Update progress bar
+      const progress = (currentStep / (steps.length - 1)) * 100;
+      progressBar.style.width = `${progress}%`;
+      stepIndicator.textContent = `Step ${currentStep + 1} of ${steps.length}`;
+      progressPercentage.textContent = `${Math.round(progress)}%`;
     };
-  
-    // Public API
-    return {
-      initialize,
-      validateForm,   // Exposed for testing
-      submitRegistration // Exposed for testing or external usage
-    };
-  })();
-  
-  // Initialize the signup form
-  CoachSignup.initialize();
+
+    // Next buttons
+    document.getElementById("next-1")?.addEventListener("click", function () {
+      if (validateStep(1)) goToStep(1);
+    });
+
+    document.getElementById("next-2")?.addEventListener("click", function () {
+      if (validateStep(2)) goToStep(2);
+    });
+
+    // Previous buttons
+    document.getElementById("prev-2")?.addEventListener("click", function () {
+      goToStep(0);
+    });
+
+    document.getElementById("prev-3")?.addEventListener("click", function () {
+      goToStep(1);
+    });
+
+    // Initialize fitness goal option highlighting
+    document.querySelectorAll(".fitness-goal-option").forEach((option) => {
+      const checkbox = option.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.addEventListener("change", function () {
+          if (this.checked) {
+            option.classList.add("border-red-500");
+            option.classList.remove("border-gray-600");
+          } else {
+            option.classList.remove("border-red-500");
+            option.classList.add("border-gray-600");
+          }
+        });
+      }
+    });
+  };
+
+  /**
+   * Initializes the signup form handlers
+   */
+  const initialize = () => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById(config.formId);
+
+      if (form) {
+        // Initialize multi-step form
+        initializeMultiStepForm();
+
+        // Handle form submission
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          if (validateStep(3)) {
+            // Get submit button
+            const submitBtn = document.getElementById("submit-form");
+
+            // Collect all form data
+            const formData = collectFormData();
+
+            // Use the utility function to send the POST request and redirect
+            if (window.CoachUtils) {
+              window.CoachUtils.sendPostAndRedirect(
+                config.apiEndpoint,
+                formData,
+                config.redirectPath,
+                (result) => {
+                  // Show success modal on successful API response
+                  showSuccessMessage();
+                },
+                (error) => {
+                  // The API call is already handled by the utility function,
+                  // we just need to re-enable the submit button if needed
+                  if (submitBtn) submitBtn.disabled = false;
+                },
+              );
+            } else {
+              console.error(
+                "CoachUtils not loaded. Make sure utils.js is included before signup.js",
+              );
+            }
+          }
+        });
+      } else {
+        console.error(`Signup form with ID "${config.formId}" not found`);
+      }
+    });
+  };
+
+  // Public API
+  return {
+    initialize,
+    validateStep,
+    collectFormData,
+    showSuccessMessage,
+  };
+})();
+
+// Initialize the signup module
+CoachSignup.initialize();

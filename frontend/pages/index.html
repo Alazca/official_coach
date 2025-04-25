@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COACH</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="frontend/assets/style.css" />
+  </head>
+  <body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <nav
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold text-white tracking-wide">COACH</h1>
+    </nav>
+
+    <div class="text-center mt-16">
+      <button
+        onclick="showCheckInModal()"
+        id="checkInButton"
+        class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 flex flex-col items-center text-center rounded-xl border border-red-800 transform transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-red-600/20 w-full active:scale-98"
+      >
+        <span class="text-red-500 text-4xl mb-2">⚖️</span>
+        <h3 class="text-lg font-semibold text-white">Daily Check-In</h3>
+        <p class="mt-2 text-gray-400">
+          Log your daily metrics and track your progress!
+        </p>
+      </button>
+    </div>
+
+    <div
+      class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4"
+    >
+      <button
+        onclick="window.location.href='frontend/pages/workout_of_the_day.html'"
+        id="workoutTile"
+        class="p-6 flex flex-col items-center text-center bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-red-800 transform transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-red-600/20 active:scale-98"
+      >
+        <span class="text-red-500 text-3xl">🏋️</span>
+        <h3 class="text-lg font-semibold mt-2 text-white">
+          Workout of the Day
+        </h3>
+        <p class="mt-2 text-gray-400">
+          Get your daily workout routine and stay fit!
+        </p>
+      </button>
+      <button
+        onclick="window.location.href='frontend/pages/visualize_data.html'"
+        id="visualizeTile"
+        class="p-6 flex flex-col items-center text-center bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-red-800 transform transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-red-600/20 active:scale-98"
+      >
+        <span class="text-red-500 text-3xl">📊</span>
+        <h3 class="text-lg font-semibold mt-2 text-white">Visualize my Data</h3>
+        <p class="mt-2 text-gray-400">
+          Track your progress with detailed data visualization.
+        </p>
+      </button>
+      <button
+        onclick="window.location.href='frontend/pages/log_food.html'"
+        id="logFoodTile"
+        class="p-6 flex flex-col items-center text-center bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-red-800 transform transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-red-600/20 active:scale-98"
+      >
+        <span class="text-red-500 text-3xl">🍽️</span>
+        <h3 class="text-lg font-semibold mt-2 text-white">
+          Log Food and Nutrition
+        </h3>
+        <p class="mt-2 text-gray-400">
+          Keep a record of your daily food intake and nutrition.
+        </p>
+      </button>
+    </div>
+
+    <!-- Replace Activity Log Section with Readiness Section -->
+    <div class="w-full max-w-6xl mx-auto mt-12 p-4">
+      <div class="bg-gray-800 rounded-xl border border-red-800 overflow-hidden">
+        <div class="bg-gray-900 border-b border-red-800 p-4">
+          <h3 class="text-lg font-bold text-white">Daily Readiness</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div id="activityLog" class="divide-y divide-gray-700">
+            <!-- Readiness score and metrics will be displayed here -->
+            <div class="p-4 text-center text-gray-400">
+              Complete your daily check-in to see your readiness score
+            </div>
+          </div>
+          <div class="bg-gray-900 p-4 rounded-lg">
+            <canvas id="readinessChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load scripts in correct order -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="frontend/js/storage.js"></script>
+    <script src="frontend/js/ui.js"></script>
+    <script src="frontend/js/readiness.js"></script>
+    <script src="frontend/js/core.js"></script>
+    <script src="frontend/js/index.js"></script>
+  </body>
+</html>

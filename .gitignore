@@ -7,9 +7,9 @@ __pycache__/
 
 # Environment
 .env
-venv/
-.coach
+venv/*
 .env.*
+.coach/
 
 # Byte-compiled / cache
 *.log

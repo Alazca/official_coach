@@ -1,200 +1,354 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Food</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/style.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/style.css" />
     <style>
-        .calendar-day {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 4px;  /* Changed from border-radius: 50% to 4px */
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            background: #374151;
-            color: #f3f4f6;
-            border: 1px solid #4B5563;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+      .calendar-day {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 4px; /* Changed from border-radius: 50% to 4px */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: #374151;
+        color: #f3f4f6;
+        border: 1px solid #4b5563;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
 
-        .calendar-day:hover {
-            background: #4B5563;
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
-        }
+      .calendar-day:hover {
+        background: #4b5563;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+      }
 
-        .calendar-day::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(59, 130, 246, 0.2);
-            border-radius: 4px;  /* Changed to match new square style */
-            transform: translate(-50%, -50%);
-            transition: all 0.4s ease-out;
-        }
+      .calendar-day::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(59, 130, 246, 0.2);
+        border-radius: 4px; /* Changed to match new square style */
+        transform: translate(-50%, -50%);
+        transition: all 0.4s ease-out;
+      }
 
-        .calendar-day:hover::before {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
+      .calendar-day:hover::before {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
 
-        .calendar-day.selected {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #ffffff;
-            border-color: #ef4444;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px -1px rgb(59 130 246 / 0.5);
-            border-radius: 4px;  /* Changed to match new square style */
-        }
+      .calendar-day.selected {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #ffffff;
+        border-color: #ef4444;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px -1px rgb(59 130 246 / 0.5);
+        border-radius: 4px; /* Changed to match new square style */
+      }
 
-        .calendar-header {
-            color: #9CA3AF;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.5rem 0;
-        }
+      .calendar-header {
+        color: #9ca3af;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.5rem 0;
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        #calendarDays > div {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
+      #calendarDays > div {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
 
-        #calendarDays > div:nth-child(n) {
-            animation-delay: calc(0.05s * var(--animation-order, 0));
-        }
+      #calendarDays > div:nth-child(n) {
+        animation-delay: calc(0.05s * var(--animation-order, 0));
+      }
 
-        /* Style calendar navigation */
-        #prevMonth, #nextMonth {
-            color: #f3f4f6;
-            transition: color 0.3s;
-            font-size: 1.5rem;
-            padding: 0.5rem;
-        }
+      /* Style calendar navigation */
+      #prevMonth,
+      #nextMonth {
+        color: #f3f4f6;
+        transition: color 0.3s;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+      }
 
-        /* Style month display */
-        #currentMonth {
-            color: #f3f4f6;
-        }
+      /* Style month display */
+      #currentMonth {
+        color: #f3f4f6;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+  </head>
+  <body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
     <!-- Navigation -->
-    <nav class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
-        <h1 class="text-2xl font-bold text-white">Food Logger</h1>
-        <button onclick="window.location.href='../../index.html'" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg">Home</button>
+    <nav
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold text-white">Food Logger</h1>
+      <button
+        onclick="window.location.href='../../index.html'"
+        class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg"
+      >
+        Home
+      </button>
     </nav>
 
     <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Calendar Section -->
-        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-            <div class="flex justify-between items-center mb-4">
-                <button id="prevMonth" class="text-gray-400 hover:text-white text-2xl">←</button>
-                <h2 id="currentMonth" class="text-xl font-bold"></h2>
-                <button id="nextMonth" class="text-gray-400 hover:text-white text-2xl">→</button>
-            </div>
-            <div class="grid grid-cols-7 gap-2 text-center">
-                <div class="calendar-header">S</div>
-                <div class="calendar-header">M</div>
-                <div class="calendar-header">T</div>
-                <div class="calendar-header">W</div>
-                <div class="calendar-header">T</div>
-                <div class="calendar-header">F</div>
-                <div class="calendar-header">S</div>
-            </div>
-            <div id="calendarDays" class="grid grid-cols-7 gap-2 mt-2">
-                <!-- Calendar days will be inserted here -->
-            </div>
+      <!-- Calendar Section -->
+      <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+        <div class="flex justify-between items-center mb-4">
+          <button
+            id="prevMonth"
+            class="text-gray-400 hover:text-white text-2xl"
+          >
+            ←
+          </button>
+          <h2 id="currentMonth" class="text-xl font-bold"></h2>
+          <button
+            id="nextMonth"
+            class="text-gray-400 hover:text-white text-2xl"
+          >
+            →
+          </button>
+        </div>
+        <div class="grid grid-cols-7 gap-2 text-center">
+          <div class="calendar-header">S</div>
+          <div class="calendar-header">M</div>
+          <div class="calendar-header">T</div>
+          <div class="calendar-header">W</div>
+          <div class="calendar-header">T</div>
+          <div class="calendar-header">F</div>
+          <div class="calendar-header">S</div>
+        </div>
+        <div id="calendarDays" class="grid grid-cols-7 gap-2 mt-2">
+          <!-- Calendar days will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Food Logging Section -->
+      <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold">
+            Meals for <span id="selectedDate"></span>
+          </h3>
+          <button
+            onclick="resetDayMeals()"
+            class="bg-red-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700"
+          >
+            Reset Day
+          </button>
+        </div>
+        <button
+          onclick="NutritionModule.generateMealSuggestion()"
+          class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mb-4"
+        >
+          Generate Meal Suggestions
+        </button>
+        <div id="foodList" class="space-y-4">
+          <!-- Meals will be displayed here -->
         </div>
 
-        <!-- Food Logging Section -->
-        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">Meals for <span id="selectedDate"></span></h3>
-                <button onclick="resetDayMeals()" class="bg-red-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700">
-                    Reset Day
-                </button>
+        <!-- Add Food Form -->
+        <div class="mt-6 border-t border-gray-700 pt-4">
+          <h4 class="text-md font-bold mb-3">Add Food Item</h4>
+
+          <div class="space-y-4">
+            <div>
+              <label
+                for="foodDate"
+                class="block text-sm font-medium text-gray-300 mb-1"
+                >Date</label
+              >
+              <input
+                type="date"
+                id="foodDate"
+                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+              />
             </div>
-            <button onclick="NutritionModule.generateMealSuggestion()" 
-                class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mb-4">
-                Generate Meal Suggestions
+
+            <div>
+              <label
+                for="mealType"
+                class="block text-sm font-medium text-gray-300 mb-1"
+                >Meal Type</label
+              >
+              <select
+                id="mealType"
+                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+              >
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snack</option>
+              </select>
+            </div>
+
+            <!-- Food Items (dynamically added) -->
+            <div id="foodItemsContainer" class="space-y-3">
+              <div class="food-item-row grid grid-cols-12 gap-2">
+                <div class="col-span-6">
+                  <input
+                    type="text"
+                    placeholder="Food name"
+                    class="food-name w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"
+                  />
+                </div>
+                <div class="col-span-3">
+                  <input
+                    type="text"
+                    placeholder="Serving"
+                    class="serving-size w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"
+                  />
+                </div>
+                <div class="col-span-2">
+                  <input
+                    type="number"
+                    placeholder="Kcal"
+                    class="food-calories w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"
+                  />
+                </div>
+                <div class="col-span-1 flex items-center justify-center">
+                  <button
+                    type="button"
+                    class="remove-food text-red-500 hover:text-red-400"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              id="addFoodItemBtn"
+              class="text-red-500 flex items-center text-sm hover:text-red-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-1"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Add Another Food Item
             </button>
-            <div id="foodList" class="space-y-4">
-                <!-- Meals will be displayed here -->
+
+            <div class="mt-4">
+              <button
+                id="logFoodBtn"
+                class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-3 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mt-2"
+              >
+                Save Food Log
+              </button>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Daily Summary -->
     <div class="max-w-6xl mx-auto mt-6 p-4">
-        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-            <h3 class="text-lg font-bold mb-4">Daily Nutrition Summary</h3>
-            <div class="grid grid-cols-4 gap-4">
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Calories</div>
-                    <div id="totalCalories" class="text-2xl font-bold text-red-500">0</div>
-                    <div class="text-xs text-gray-400">Target: <span id="calorieTarget">2000</span></div>
-                    <div class="text-xs text-green-500">Remaining: <span id="caloriesRemaining">2000</span></div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Protein</div>
-                    <div id="totalProtein" class="text-2xl font-bold text-red-500">0g</div>
-                    <div class="text-xs text-gray-400">Target: <span id="proteinTarget">150g</span></div>
-                    <div class="text-xs text-green-500">Remaining: <span id="proteinRemaining">150g</span></div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Carbs</div>
-                    <div id="totalCarbs" class="text-2xl font-bold text-red-500">0g</div>
-                    <div class="text-xs text-gray-400">Target: <span id="carbsTarget">250g</span></div>
-                    <div class="text-xs text-green-500">Remaining: <span id="carbsRemaining">250g</span></div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Fats</div>
-                    <div id="totalFats" class="text-2xl font-bold text-red-500">0g</div>
-                    <div class="text-xs text-gray-400">Target: <span id="fatsTarget">55g</span></div>
-                    <div class="text-xs text-green-500">Remaining: <span id="fatsRemaining">55g</span></div>
-                </div>
+      <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+        <h3 class="text-lg font-bold mb-4">Daily Nutrition Summary</h3>
+        <div class="grid grid-cols-4 gap-4">
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Calories</div>
+            <div id="totalCalories" class="text-2xl font-bold text-red-500">
+              0
             </div>
+            <div class="text-xs text-gray-400">
+              Target: <span id="calorieTarget">2000</span>
+            </div>
+            <div class="text-xs text-green-500">
+              Remaining: <span id="caloriesRemaining">2000</span>
+            </div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Protein</div>
+            <div id="totalProtein" class="text-2xl font-bold text-red-500">
+              0g
+            </div>
+            <div class="text-xs text-gray-400">
+              Target: <span id="proteinTarget">150g</span>
+            </div>
+            <div class="text-xs text-green-500">
+              Remaining: <span id="proteinRemaining">150g</span>
+            </div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Carbs</div>
+            <div id="totalCarbs" class="text-2xl font-bold text-red-500">
+              0g
+            </div>
+            <div class="text-xs text-gray-400">
+              Target: <span id="carbsTarget">250g</span>
+            </div>
+            <div class="text-xs text-green-500">
+              Remaining: <span id="carbsRemaining">250g</span>
+            </div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Fats</div>
+            <div id="totalFats" class="text-2xl font-bold text-red-500">0g</div>
+            <div class="text-xs text-gray-400">
+              Target: <span id="fatsTarget">55g</span>
+            </div>
+            <div class="text-xs text-green-500">
+              Remaining: <span id="fatsRemaining">55g</span>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Load scripts in correct order -->
-    <script>console.log('Starting script load...');</script>
+    <script src="../js/utils.js"></script>
     <script src="../js/storage.js"></script>
-    <script>console.log('Storage loaded');</script>
     <script src="../js/ui.js"></script>
-    <script>console.log('UI loaded');</script>
     <script src="../js/calendar.js"></script>
-    <script>console.log('Calendar loaded');</script>
     <script src="../js/nutrition.js"></script>
-    <script>console.log('Nutrition loaded');</script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded');
-            if (typeof NutritionModule !== 'undefined') {
-                console.log('NutritionModule found, initializing...');
-                CalendarModule.initializeCalendar();
-                NutritionModule.displayAllMeals();
-            } else {
-                console.error('NutritionModule not found!');
-            }
-        });
-    </script>
-</body>
+    <script src="../js/food_logger.js"></script>
+    <script src="../js/index.js"></script>
+  </body>
 </html>
