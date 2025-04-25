@@ -328,14 +328,3 @@ def workout_history():
         return jsonify(history), 200
     except Exception as e:
         return jsonify({"error": f"Failed to get workout history: {str(e)}"}), 500
-
-# for testing route for getting nutrition history
-@app.route('/api/nutrition', methods=['GET'])
-@jwt_required()
-def get_nutrition():
-    user_id = get_jwt_identity()
-    try:
-        nutrition_data = get_nutrition_history(user_id)
-        return jsonify(nutrition_data), 200
-    except Exception as e:
-        return jsonify({"error": f"Failed to get nutrition history: {str(e)}"}), 500
