@@ -122,13 +122,12 @@ def user_exists(email):
     try:
         conn = create_conn()
         cur = conn.cursor()
-        cur.execute(f"""SELECT user_id, email, password_hash FROM users WHERE email = '{email}'""")
+        cur.execute("SELECT user_id, email, password_hash FROM users WHERE email = ?", (email,))
         data = cur.fetchone()
-        data = dict(data)
-        if data:
-            return data
-        if not data:
-            return False
+        if data:  # Only call dict() if data exists
+            return dict(data)
+        else:
+            return False  # clean False, not Exception
     except Exception as e:
         return e
     finally:
