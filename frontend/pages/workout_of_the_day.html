@@ -1,173 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Workout of the Day</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/style.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/style.css" />
     <style>
-        .calendar-day {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            background: #374151;
-            color: #f3f4f6;
-            border: 1px solid #4B5563;
-        }
+      .calendar-day {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        background: #374151;
+        color: #f3f4f6;
+        border: 1px solid #4b5563;
+      }
 
-        .calendar-day:hover {
-            background: #4B5563;
-            transform: translateY(-2px);
-        }
+      .calendar-day:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+      }
 
-        .calendar-day.selected {
-            background: #dc2626;
-            border-color: #ef4444;
-        }
+      .calendar-day.selected {
+        background: #dc2626;
+        border-color: #ef4444;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
-    <nav class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
-        <h1 class="text-2xl font-bold text-white">Workout Logger</h1>
-        <button id="homeButton" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg">Home</button>
+  </head>
+  <body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <nav
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold text-white">Workout Logger</h1>
+      <button
+        id="homeButton"
+        class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg"
+      >
+        Home
+      </button>
     </nav>
 
     <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Exercise Recommendations Section (Left) -->
-        <div id="recommendationsContainer" class="bg-gray-900 p-6 rounded-lg border border-red-800 hidden lg:block">
-            <h3 class="text-xl font-bold mb-4">Exercise Recommendations</h3>
-            <div id="recommendationsLoader" class="flex justify-center items-center py-8 hidden">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-            </div>
-            <div id="recommendationsList" class="space-y-4">
-                <p class="text-gray-400">Click "Get Recommendations" to see personalized exercise suggestions based on your fitness goals.</p>
-            </div>
+      <!-- Exercise Recommendations Section (Left) -->
+      <div
+        id="recommendationsContainer"
+        class="bg-gray-900 p-6 rounded-lg border border-red-800 hidden lg:block"
+      >
+        <h3 class="text-xl font-bold mb-4">Exercise Recommendations</h3>
+        <div
+          id="recommendationsLoader"
+          class="flex justify-center items-center py-8 hidden"
+        >
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"
+          ></div>
+        </div>
+        <div id="recommendationsList" class="space-y-4">
+          <p class="text-gray-400">
+            Click "Get Recommendations" to see personalized exercise suggestions
+            based on your fitness goals.
+          </p>
+        </div>
+      </div>
+
+      <!-- Middle Section with Calendar and Workout Selection -->
+      <div class="lg:col-span-2 grid grid-cols-1 gap-6">
+        <!-- Calendar Section -->
+        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+          <div class="flex justify-between items-center mb-4">
+            <button
+              id="prevMonth"
+              class="text-gray-400 hover:text-white text-2xl"
+            >
+              ←
+            </button>
+            <h2 id="currentMonth" class="text-xl font-bold"></h2>
+            <button
+              id="nextMonth"
+              class="text-gray-400 hover:text-white text-2xl"
+            >
+              →
+            </button>
+          </div>
+          <div id="calendarDays" class="grid grid-cols-7 gap-2">
+            <!-- Calendar days will be inserted here -->
+          </div>
         </div>
 
-        <!-- Middle Section with Calendar and Workout Selection -->
-        <div class="lg:col-span-2 grid grid-cols-1 gap-6">
-            <!-- Calendar Section -->
-            <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-                <div class="flex justify-between items-center mb-4">
-                    <button id="prevMonth" class="text-gray-400 hover:text-white text-2xl">←</button>
-                    <h2 id="currentMonth" class="text-xl font-bold"></h2>
-                    <button id="nextMonth" class="text-gray-400 hover:text-white text-2xl">→</button>
-                </div>
-                <div id="calendarDays" class="grid grid-cols-7 gap-2">
-                    <!-- Calendar days will be inserted here -->
-                </div>
+        <!-- Workout Section -->
+        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">
+              Workout for <span id="selectedDate"></span>
+            </h3>
+            <div>
+              <button
+                id="getRecommendationsBtn"
+                class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700 mr-2"
+              >
+                Get Recommendations
+              </button>
+              <button
+                id="resetDayBtn"
+                class="bg-red-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700"
+              >
+                Reset Day
+              </button>
+            </div>
+          </div>
+
+          <!-- Workout Type Selection -->
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <button
+              data-workout-type="bodybuilding"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">💪</span>
+              <span class="block">Bodybuilding</span>
+            </button>
+            <button
+              data-workout-type="powerlifting"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">🏋️</span>
+              <span class="block">Powerlifting</span>
+            </button>
+            <button
+              data-workout-type="olympic"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">🎯</span>
+              <span class="block">Olympic Lifting</span>
+            </button>
+            <button
+              data-workout-type="yoga"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">🧘</span>
+              <span class="block">Yoga</span>
+            </button>
+            <button
+              data-workout-type="running"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">🏃</span>
+              <span class="block">Running</span>
+            </button>
+            <button
+              data-workout-type="crossfit"
+              class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            >
+              <span class="text-2xl mb-2">⚡</span>
+              <span class="block">CrossFit</span>
+            </button>
+          </div>
+
+          <div id="workoutList" class="space-y-4">
+            <!-- Workout will be displayed here -->
+          </div>
+
+          <!-- Workout Date and Notes -->
+          <div class="mt-6">
+            <div class="mb-4">
+              <label
+                for="workoutDate"
+                class="block text-sm font-medium text-gray-300 mb-1"
+                >Workout Date</label
+              >
+              <input
+                type="date"
+                id="workoutDate"
+                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+              />
             </div>
 
-            <!-- Workout Section -->
-            <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">Workout for <span id="selectedDate"></span></h3>
-                    <div>
-                        <button id="getRecommendationsBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700 mr-2">
-                            Get Recommendations
-                        </button>
-                        <button id="resetDayBtn" class="bg-red-600 text-white px-4 py-1 rounded-lg text-sm hover:bg-red-700">
-                            Reset Day
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Workout Type Selection -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <button data-workout-type="bodybuilding" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">💪</span>
-                        <span class="block">Bodybuilding</span>
-                    </button>
-                    <button data-workout-type="powerlifting" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">🏋️</span>
-                        <span class="block">Powerlifting</span>
-                    </button>
-                    <button data-workout-type="olympic" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">🎯</span>
-                        <span class="block">Olympic Lifting</span>
-                    </button>
-                    <button data-workout-type="yoga" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">🧘</span>
-                        <span class="block">Yoga</span>
-                    </button>
-                    <button data-workout-type="running" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">🏃</span>
-                        <span class="block">Running</span>
-                    </button>
-                    <button data-workout-type="crossfit" 
-                        class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105">
-                        <span class="text-2xl mb-2">⚡</span>
-                        <span class="block">CrossFit</span>
-                    </button>
-                </div>
-
-                <div id="workoutList" class="space-y-4">
-                    <!-- Workout will be displayed here -->
-                </div>
-                
-                <!-- Workout Date and Notes -->
-                <div class="mt-6">
-                    <div class="mb-4">
-                        <label for="workoutDate" class="block text-sm font-medium text-gray-300 mb-1">Workout Date</label>
-                        <input type="date" id="workoutDate" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="workoutDuration" class="block text-sm font-medium text-gray-300 mb-1">Duration (minutes)</label>
-                        <input type="number" id="workoutDuration" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors" min="1" max="300">
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="workoutNotes" class="block text-sm font-medium text-gray-300 mb-1">Notes</label>
-                        <textarea id="workoutNotes" class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors" rows="3"></textarea>
-                    </div>
-                    
-                    <button id="saveWorkoutBtn" class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-3 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mt-4">
-                        Save Workout
-                    </button>
-                </div>
+            <div class="mb-4">
+              <label
+                for="workoutDuration"
+                class="block text-sm font-medium text-gray-300 mb-1"
+                >Duration (minutes)</label
+              >
+              <input
+                type="number"
+                id="workoutDuration"
+                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                min="1"
+                max="300"
+              />
             </div>
+
+            <div class="mb-4">
+              <label
+                for="workoutNotes"
+                class="block text-sm font-medium text-gray-300 mb-1"
+                >Notes</label
+              >
+              <textarea
+                id="workoutNotes"
+                class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <button
+              id="saveWorkoutBtn"
+              class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-3 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mt-4"
+            >
+              Save Workout
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Daily Summary -->
     <div class="max-w-7xl mx-auto mt-6 p-4">
-        <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
-            <h3 class="text-lg font-bold mb-4">Workout Summary</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Total Volume</div>
-                    <div id="totalVolume" class="text-2xl font-bold text-red-500">0 kg</div>
-                    <div class="text-xs text-gray-500">Today's Total</div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Sets Completed</div>
-                    <div id="totalSets" class="text-2xl font-bold text-red-500">0</div>
-                    <div class="text-xs text-gray-500">Sets Today</div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Max Weight</div>
-                    <div id="maxWeight" class="text-2xl font-bold text-red-500">0 kg</div>
-                    <div class="text-xs text-gray-500">Heaviest Set</div>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                    <div class="text-sm text-gray-400">Total Reps</div>
-                    <div id="totalReps" class="text-2xl font-bold text-red-500">0</div>
-                    <div class="text-xs text-gray-500">Reps Today</div>
-                </div>
+      <div class="bg-gray-900 p-6 rounded-lg border border-red-800">
+        <h3 class="text-lg font-bold mb-4">Workout Summary</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Total Volume</div>
+            <div id="totalVolume" class="text-2xl font-bold text-red-500">
+              0 kg
             </div>
+            <div class="text-xs text-gray-500">Today's Total</div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Sets Completed</div>
+            <div id="totalSets" class="text-2xl font-bold text-red-500">0</div>
+            <div class="text-xs text-gray-500">Sets Today</div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Max Weight</div>
+            <div id="maxWeight" class="text-2xl font-bold text-red-500">
+              0 kg
+            </div>
+            <div class="text-xs text-gray-500">Heaviest Set</div>
+          </div>
+          <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div class="text-sm text-gray-400">Total Reps</div>
+            <div id="totalReps" class="text-2xl font-bold text-red-500">0</div>
+            <div class="text-xs text-gray-500">Reps Today</div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Load scripts in the correct order -->
@@ -178,5 +262,6 @@
     <script src="../js/workout.js"></script>
     <script src="../js/workout_dashboard.js"></script>
     <script src="../js/index.js"></script>
-</body>
+  </body>
 </html>
+

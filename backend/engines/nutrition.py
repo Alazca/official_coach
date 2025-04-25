@@ -1,12 +1,19 @@
 # nutrition_engine.py
 from typing import Dict, Any, Optional
 import numpy as np
-from backend.engines.base_vector import weighted_similarity, generate_vector_feedback, normalize
+from backend.engines.base_vector import (
+    weighted_similarity,
+    generate_vector_feedback,
+    normalize,
+)
 from backend.database.db import get_target_profile
 
-def evaluate_nutrition_input(user_input: Dict[str, float],
-                             profile_name: str = "default",
-                             date: Optional[str] = None) -> Dict[str, Any]:
+
+def evaluate_nutrition_input(
+    user_input: Dict[str, float],
+    profile_name: str = "default",
+    date: Optional[str] = None,
+) -> Dict[str, Any]:
     """
     Evaluate user nutrition and return feedback + similarity score.
 
@@ -34,12 +41,14 @@ def evaluate_nutrition_input(user_input: Dict[str, float],
 
     # Compute similarity and generate feedback
     similarity_score = weighted_similarity(input_vec_norm, target_norm)
-    feedback = generate_vector_feedback(input_vec, target_vector, dimensions, threshold=0.1)
+    feedback = generate_vector_feedback(
+        input_vec, target_vector, dimensions, threshold=0.1
+    )
 
     return {
         "date": date,
         "raw_vector": input_vec.tolist(),
         "normalized_vector": input_vec_norm.tolist(),
         "similarity_score": round(similarity_score, 4),
-        "feedback": feedback
+        "feedback": feedback,
     }

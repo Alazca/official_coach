@@ -1,102 +1,164 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Interactive Calendar Dashboard</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="../assets/style.css">
-        <style>
-            .dropdown-menu {
-            display: none;
-            }
-            .dropdown-menu.show {
-            display: block;
-            }
-        </style>
-    </head>
-    <body class="bg-gray-900 text-white h-screen flex flex-col">
-        <!-- Navigation Header -->
-        <header class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
-            <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
-            <div class="flex gap-4 items-center flex-wrap">
-                <button onclick="window.location.href='workout_of_the_day.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Get Workout</button>
-                <button onclick="window.location.href='log_food.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Log Food</button>
-                <button onclick="window.location.href='visualize_data.html'" class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition">Metrics</button>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Interactive Calendar Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/style.css" />
+    <style>
+      .dropdown-menu {
+        display: none;
+      }
+      .dropdown-menu.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white h-screen flex flex-col">
+    <!-- Navigation Header -->
+    <header
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
+      <div class="flex gap-4 items-center flex-wrap">
+        <button
+          onclick="window.location.href='workout_of_the_day.html'"
+          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+        >
+          Get Workout
+        </button>
+        <button
+          onclick="window.location.href='log_food.html'"
+          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+        >
+          Log Food
+        </button>
+        <button
+          onclick="window.location.href='visualize_data.html'"
+          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+        >
+          Metrics
+        </button>
+      </div>
+    </header>
+    <!-- Main Dashboard -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Calendar Panel -->
+      <main class="w-3/4 p-6 overflow-auto">
+        <div
+          class="bg-gray-800 rounded-xl border border-red-800 p-4 h-full flex flex-col"
+        >
+          <!-- Calendar Header: Arrows + Month/Year + Today -->
+          <div class="flex justify-center items-center gap-4 mb-4">
+            <!-- Left Arrow -->
+            <div
+              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
+            >
+              <button
+                id="prevMonth"
+                class="text-xl font-bold hover:text-red-400"
+              >
+                &lt;
+              </button>
             </div>
-        </header>
-        <!-- Main Dashboard -->
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Calendar Panel -->
-            <main class="w-3/4 p-6 overflow-auto">
-                <div class="bg-gray-800 rounded-xl border border-red-800 p-4 h-full flex flex-col">
-                    <!-- Calendar Header: Arrows + Month/Year + Today -->
-                    <div class="flex justify-center items-center gap-4 mb-4">
-                        <!-- Left Arrow -->
-                        <div class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2">
-                            <button id="prevMonth" class="text-xl font-bold hover:text-red-400">
-                            &lt;
-                            </button>
-                        </div>
-                        <!-- Month + Year -->
-                        <div class="flex items-center gap-4 bg-black border border-red-800 rounded-lg px-6 py-2">
-                            <!-- Month Picker -->
-                            <div class="relative">
-                                <button id="monthBtn" class="text-white font-bold hover:underline"></button>
-                                <div id="monthDropdown" class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10">
-                                    <ul></ul>
-                                </div>
-                            </div>
-                            <!-- Year Picker -->
-                            <div class="relative">
-                                <button id="yearBtn" class="text-white font-bold hover:underline"></button>
-                                <div id="yearDropdown" class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto">
-                                    <ul></ul>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Right Arrow -->
-                        <div class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2">
-                            <button id="nextMonth" class="text-xl font-bold hover:text-red-400">
-                            &gt;
-                            </button>
-                        </div>
-                        <!-- Today Button -->
-                        <button id="todayBtn" class="ml-4 text-sm bg-red-700 hover:bg-red-800 px-4 py-2 rounded-md shadow">
-                        Today
-                        </button>
-                    </div>
-                    <!-- Weekday Labels -->
-                    <div class="grid grid-cols-7 text-center text-gray-400 font-semibold text-sm mb-1">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
-                    </div>
-                    <!-- Calendar Grid -->
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-px flex-1"></div>
+            <!-- Month + Year -->
+            <div
+              class="flex items-center gap-4 bg-black border border-red-800 rounded-lg px-6 py-2"
+            >
+              <!-- Month Picker -->
+              <div class="relative">
+                <button
+                  id="monthBtn"
+                  class="text-white font-bold hover:underline"
+                ></button>
+                <div
+                  id="monthDropdown"
+                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10"
+                >
+                  <ul></ul>
                 </div>
-            </main>
-            <!-- Sidebar -->
-            <aside class="w-1/4 p-4 flex flex-col gap-4 overflow-y-auto">
-                <div class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]">
-                    <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
-                    <p class="mt-2 text-gray-300 text-sm">Squat Volume Up<br/>Recovery: Moderate</p>
+              </div>
+              <!-- Year Picker -->
+              <div class="relative">
+                <button
+                  id="yearBtn"
+                  class="text-white font-bold hover:underline"
+                ></button>
+                <div
+                  id="yearDropdown"
+                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto"
+                >
+                  <ul></ul>
                 </div>
-                <div class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]">
-                    <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-                    <p class="mt-2 text-gray-300 text-sm">Calories: 2,300 kcal<br/>Hydration: 3.2L</p>
-                </div>
-                <div class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]">
-                    <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-                    <p class="mt-2 text-gray-300 text-sm">"You're trending up! Focus on consistency."</p>
-               </div>
-            </aside>
+              </div>
+            </div>
+            <!-- Right Arrow -->
+            <div
+              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
+            >
+              <button
+                id="nextMonth"
+                class="text-xl font-bold hover:text-red-400"
+              >
+                &gt;
+              </button>
+            </div>
+            <!-- Today Button -->
+            <button
+              id="todayBtn"
+              class="ml-4 text-sm bg-red-700 hover:bg-red-800 px-4 py-2 rounded-md shadow"
+            >
+              Today
+            </button>
+          </div>
+          <!-- Weekday Labels -->
+          <div
+            class="grid grid-cols-7 text-center text-gray-400 font-semibold text-sm mb-1"
+          >
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <!-- Calendar Grid -->
+          <div id="calendar-grid" class="grid grid-cols-7 gap-px flex-1"></div>
         </div>
-        <!-- JS Link -->
-        <script src="../js/dashboard.js"></script>
-    </body>
+      </main>
+      <!-- Sidebar -->
+      <aside class="w-1/4 p-4 flex flex-col gap-4 overflow-y-auto">
+        <div
+          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+        >
+          <h3 class="text-lg font-bold text-red-400">
+            Strength & Conditioning
+          </h3>
+          <p class="mt-2 text-gray-300 text-sm">
+            Squat Volume Up<br />Recovery: Moderate
+          </p>
+        </div>
+        <div
+          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+        >
+          <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
+          <p class="mt-2 text-gray-300 text-sm">
+            Calories: 2,300 kcal<br />Hydration: 3.2L
+          </p>
+        </div>
+        <div
+          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+        >
+          <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
+          <p class="mt-2 text-gray-300 text-sm">
+            "You're trending up! Focus on consistency."
+          </p>
+        </div>
+      </aside>
+    </div>
+    <!-- JS Link -->
+    <script src="../js/dashboard.js"></script>
+  </body>
 </html>

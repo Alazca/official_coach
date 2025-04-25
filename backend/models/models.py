@@ -3,10 +3,12 @@ from enum import Enum
 import re
 from datetime import date
 
+
 class Gender(str, Enum):
-    MALE = 'Male'
-    FEMALE = 'Female'
-    OTHER = 'Other'
+    MALE = "Male"
+    FEMALE = "Female"
+    OTHER = "Other"
+
 
 class ActivityLevel(str, Enum):
     SEDENTARY = "Sedentary"
@@ -15,10 +17,12 @@ class ActivityLevel(str, Enum):
     ACTIVE = "Active"
     INTENSE = "Intense"
 
+
 class Source(str, Enum):
     MANUAL = "Manual"
     AUTO = "Auto"
     COACH = "Coach"
+
 
 class StrengthDimension(str, Enum):
     MAXIMAL_STRENGTH = "Maximal_strength"
@@ -29,16 +33,19 @@ class StrengthDimension(str, Enum):
     SPEED_STRENGTH = "Speed_strength"
     STARTING_STRENGTH = "Starting_strength"
 
+
 class ConditioningDimension(str, Enum):
     CARDIOVASCULAR_ENDURANCE = "cardiovascular_endurance"
     MUSCLE_STRENGTH = "Muscle_strength"
     MUSCLE_ENDURANCE = "Muscle_endurance"
     FLEXIBILITY = "Flexibility"
     BODY_COMPOSITION = "Body_composition"
-    
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
 
 class ReadinessScore(BaseModel):
     user_id: int
@@ -49,11 +56,13 @@ class ReadinessScore(BaseModel):
     alignment_score: float = 0.0
     overtraining_score: float = 0.0
 
+
 class GoalType(str, Enum):
     STRENGTH = "Strength"
     ENDURANCE = "Endurance"
     WEIGHT_LOSS = "Weight-Loss"
     PERFORMANCE = "Performance"
+
 
 class UserGoal(BaseModel):
     user_id: int
@@ -69,37 +78,38 @@ class DailyCheckIn(BaseModel):
     energy: int
     soreness: int
 
-    @field_validator('weight')
+    @field_validator("weight")
     def validate_weight(cls, v):
         if not isinstance(v, int):
-            raise ValueError('Weight must be an integer')
+            raise ValueError("Weight must be an integer")
         if v < 0:
-            raise ValueError('Weight must be greater than 0')
+            raise ValueError("Weight must be greater than 0")
         return v
-    
-    @field_validator('sleep')
+
+    @field_validator("sleep")
     def validate_sleep(cls, v):
         if v < 1 or v > 10:
-            raise ValueError('Sleep must be between 1 and 10')
+            raise ValueError("Sleep must be between 1 and 10")
         return v
 
-    @field_validator('stress')
+    @field_validator("stress")
     def validate_stress(cls, v):
         if v < 1 or v > 10:
-            raise ValueError('Stress must be between 1 and 10')
+            raise ValueError("Stress must be between 1 and 10")
         return v
 
-    @field_validator('energy')
+    @field_validator("energy")
     def validate_energy(cls, v):
         if v < 1 or v > 10:
-            raise ValueError('Energy must be between 1 and 10')
+            raise ValueError("Energy must be between 1 and 10")
         return v
 
-    @field_validator('soreness')
+    @field_validator("soreness")
     def validate_soreness(cls, v):
         if v < 1 or v > 10:
-            raise ValueError('Soreness must be between 1 and 10')
+            raise ValueError("Soreness must be between 1 and 10")
         return v
+
 
 class UserRegistration(BaseModel):
     email: EmailStr
@@ -111,15 +121,15 @@ class UserRegistration(BaseModel):
     weight: float
     initialActivityLevel: ActivityLevel
 
-    @field_validator('password')
+    @field_validator("password")
     def validate_password(cls, v):
         if len(v) < 8:
-            raise ValueError('Password too short')
-        if not re.search(r'[a-zA-Z]', v):
+            raise ValueError("Password too short")
+        if not re.search(r"[a-zA-Z]", v):
             raise ValueError("Password must contain at least one letter")
 
             # Check for at least one digit
-        if not re.search(r'\d', v):
+        if not re.search(r"\d", v):
             raise ValueError("Password must contain at least one number")
 
             # Check for at least one special character
@@ -128,17 +138,18 @@ class UserRegistration(BaseModel):
 
         return v
 
-    @field_validator('height')
+    @field_validator("height")
     def validate_height(cls, v):
         if v <= 0:
             raise ValueError("Height must be positive")
         return v
 
-    @field_validator('weight')
+    @field_validator("weight")
     def validate_weight(cls, v):
         if v <= 0:
             raise ValueError("Weight must be positive")
         return v
+
 
 class DimensionScore(BaseModel):
     dimension: str

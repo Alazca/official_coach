@@ -1,103 +1,118 @@
 /**
- * COACH Food Logger Module 
+ * COACH Food Logger Module
  * Handles all functionality related to logging food and meal tracking
  */
 const FoodLoggerModule = (() => {
   // Private variables
   let currentDate = new Date();
-  
+
   /**
    * Initialize the food logger components
    */
   const initialize = () => {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('Food Logger Module initializing...');
-      
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("Food Logger Module initializing...");
+
       // Check dependencies
-      if (typeof NutritionModule === 'undefined' || typeof CalendarModule === 'undefined') {
-        console.error('Required modules (NutritionModule or CalendarModule) not found!');
+      if (
+        typeof NutritionModule === "undefined" ||
+        typeof CalendarModule === "undefined"
+      ) {
+        console.error(
+          "Required modules (NutritionModule or CalendarModule) not found!",
+        );
         return;
       }
-      
+
       // Initialize calendar and nutrition components
       CalendarModule.initializeCalendar();
       NutritionModule.displayAllMeals();
-      
+
       // Set today's date as the default food date
-      const today = new Date().toISOString().split('T')[0];
-      const foodDateInput = document.getElementById('foodDate');
+      const today = new Date().toISOString().split("T")[0];
+      const foodDateInput = document.getElementById("foodDate");
       if (foodDateInput) {
         foodDateInput.value = today;
       }
-      
+
       // Set up event listeners
       initializeEventListeners();
       initializeFoodItemManager();
-      
+
       // Connect the Save Food Log button with the API
       setupSaveButton();
     });
   };
-  
+
   /**
    * Initialize all event listeners for the food logger
    */
   const initializeEventListeners = () => {
     // Setup Reset Day button
-    const resetButton = document.querySelector('button[onclick="resetDayMeals()"]');
+    const resetButton = document.querySelector(
+      'button[onclick="resetDayMeals()"]',
+    );
     if (resetButton) {
       // Replace the inline handler with a proper event listener
-      resetButton.removeAttribute('onclick');
-      resetButton.addEventListener('click', () => {
-        if (typeof NutritionModule !== 'undefined' && NutritionModule.resetDayMeals) {
+      resetButton.removeAttribute("onclick");
+      resetButton.addEventListener("click", () => {
+        if (
+          typeof NutritionModule !== "undefined" &&
+          NutritionModule.resetDayMeals
+        ) {
           NutritionModule.resetDayMeals();
         } else {
-          console.error('NutritionModule.resetDayMeals not found');
+          console.error("NutritionModule.resetDayMeals not found");
         }
       });
     }
-    
+
     // Setup Generate Meal Suggestions button
-    const generateButton = document.querySelector('button[onclick="NutritionModule.generateMealSuggestion()"]');
+    const generateButton = document.querySelector(
+      'button[onclick="NutritionModule.generateMealSuggestion()"]',
+    );
     if (generateButton) {
       // Replace the inline handler with a proper event listener
-      generateButton.removeAttribute('onclick');
-      generateButton.addEventListener('click', () => {
-        if (typeof NutritionModule !== 'undefined' && NutritionModule.generateMealSuggestion) {
+      generateButton.removeAttribute("onclick");
+      generateButton.addEventListener("click", () => {
+        if (
+          typeof NutritionModule !== "undefined" &&
+          NutritionModule.generateMealSuggestion
+        ) {
           NutritionModule.generateMealSuggestion();
         } else {
-          console.error('NutritionModule.generateMealSuggestion not found');
+          console.error("NutritionModule.generateMealSuggestion not found");
         }
       });
     }
   };
-  
+
   /**
    * Initialize the food item row management (add/remove)
    */
   const initializeFoodItemManager = () => {
     // Initialize add food item button functionality
-    const addFoodItemBtn = document.getElementById('addFoodItemBtn');
+    const addFoodItemBtn = document.getElementById("addFoodItemBtn");
     if (addFoodItemBtn) {
-      addFoodItemBtn.addEventListener('click', addNewFoodItemRow);
+      addFoodItemBtn.addEventListener("click", addNewFoodItemRow);
     }
-    
+
     // Add remove functionality to initial food item
-    const initialRemoveBtn = document.querySelector('.remove-food');
+    const initialRemoveBtn = document.querySelector(".remove-food");
     if (initialRemoveBtn) {
-      initialRemoveBtn.addEventListener('click', handleRemoveFoodItem);
+      initialRemoveBtn.addEventListener("click", handleRemoveFoodItem);
     }
   };
-  
+
   /**
    * Add a new food item row to the container
    */
   const addNewFoodItemRow = () => {
-    const container = document.getElementById('foodItemsContainer');
+    const container = document.getElementById("foodItemsContainer");
     if (!container) return;
-    
-    const newRow = document.createElement('div');
-    newRow.className = 'food-item-row grid grid-cols-12 gap-2';
+
+    const newRow = document.createElement("div");
+    newRow.className = "food-item-row grid grid-cols-12 gap-2";
     newRow.innerHTML = `
       <div class="col-span-6">
         <input type="text" placeholder="Food name" class="food-name w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-red-500 text-sm">
@@ -117,113 +132,120 @@ const FoodLoggerModule = (() => {
       </div>
     `;
     container.appendChild(newRow);
-    
+
     // Add event listener to the remove button
-    newRow.querySelector('.remove-food').addEventListener('click', handleRemoveFoodItem);
+    newRow
+      .querySelector(".remove-food")
+      .addEventListener("click", handleRemoveFoodItem);
   };
-  
+
   /**
    * Handle removing a food item row
    */
-  const handleRemoveFoodItem = function() {
-    const container = document.getElementById('foodItemsContainer');
+  const handleRemoveFoodItem = function () {
+    const container = document.getElementById("foodItemsContainer");
     if (!container) return;
-    
+
     if (container.children.length > 1) {
-      this.closest('.food-item-row').remove();
+      this.closest(".food-item-row").remove();
     } else {
       // Clear inputs instead of removing if it's the last row
-      const row = this.closest('.food-item-row');
+      const row = this.closest(".food-item-row");
       if (row) {
-        const nameInput = row.querySelector('.food-name');
-        const servingInput = row.querySelector('.serving-size');
-        const caloriesInput = row.querySelector('.food-calories');
-        
-        if (nameInput) nameInput.value = '';
-        if (servingInput) servingInput.value = '';
-        if (caloriesInput) caloriesInput.value = '';
+        const nameInput = row.querySelector(".food-name");
+        const servingInput = row.querySelector(".serving-size");
+        const caloriesInput = row.querySelector(".food-calories");
+
+        if (nameInput) nameInput.value = "";
+        if (servingInput) servingInput.value = "";
+        if (caloriesInput) caloriesInput.value = "";
       }
     }
   };
-  
+
   /**
    * Collect all food item data from the form
    * @returns {Array} Array of food items
    */
   const collectFoodItems = () => {
     const foodItems = [];
-    const rows = document.querySelectorAll('.food-item-row');
-    
-    rows.forEach(row => {
-      const nameInput = row.querySelector('.food-name');
-      const servingInput = row.querySelector('.serving-size');
-      const caloriesInput = row.querySelector('.food-calories');
-      
+    const rows = document.querySelectorAll(".food-item-row");
+
+    rows.forEach((row) => {
+      const nameInput = row.querySelector(".food-name");
+      const servingInput = row.querySelector(".serving-size");
+      const caloriesInput = row.querySelector(".food-calories");
+
       // Only add items that have at least a name
       if (nameInput && nameInput.value.trim()) {
         foodItems.push({
           name: nameInput.value.trim(),
-          serving: servingInput ? servingInput.value.trim() : '',
-          calories: caloriesInput ? parseInt(caloriesInput.value, 10) || 0 : 0
+          serving: servingInput ? servingInput.value.trim() : "",
+          calories: caloriesInput ? parseInt(caloriesInput.value, 10) || 0 : 0,
         });
       }
     });
-    
+
     return foodItems;
   };
-  
+
   /**
    * Set up the save button to use the CoachUtils API
    */
   const setupSaveButton = () => {
-    const saveButton = document.getElementById('logFoodBtn');
+    const saveButton = document.getElementById("logFoodBtn");
     if (!saveButton) return;
-    
-    saveButton.addEventListener('click', () => {
+
+    saveButton.addEventListener("click", () => {
       // Collect form data
-      const foodDate = document.getElementById('foodDate')?.value;
-      const mealType = document.getElementById('mealType')?.value;
+      const foodDate = document.getElementById("foodDate")?.value;
+      const mealType = document.getElementById("mealType")?.value;
       const foodItems = collectFoodItems();
-      
+
       // Validate data
       if (!foodDate || !mealType || foodItems.length === 0) {
-        alert('Please fill out all required fields and add at least one food item.');
+        alert(
+          "Please fill out all required fields and add at least one food item.",
+        );
         return;
       }
-      
+
       // Prepare data for API
       const mealData = {
         date: foodDate,
         mealType: mealType,
-        items: foodItems
+        items: foodItems,
       };
-      
+
       // Send data to API
       if (window.CoachUtils) {
         window.CoachUtils.sendPostAndRedirect(
-          '/api/meals', 
-          mealData, 
-          'visualize_data.html',
-          result => {
-            console.log('Meal logged successfully:', result);
+          "/api/meals",
+          mealData,
+          "visualize_data.html",
+          (result) => {
+            console.log("Meal logged successfully:", result);
           },
-          error => {
-            console.error('Error logging meal:', error);
-          }
+          (error) => {
+            console.error("Error logging meal:", error);
+          },
         );
       } else {
-        console.error('CoachUtils not loaded. Make sure utils.js is included before food_logger.js');
+        console.error(
+          "CoachUtils not loaded. Make sure utils.js is included before food_logger.js",
+        );
       }
     });
   };
-  
+
   // Public API
   return {
     initialize,
     addNewFoodItemRow,
-    collectFoodItems
+    collectFoodItems,
   };
 })();
 
 // Initialize the module when loaded
 FoodLoggerModule.initialize();
+

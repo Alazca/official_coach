@@ -10,13 +10,15 @@ from backend.database.db import (
     save_readiness_score,
     update_checkin_with_readiness,
     save_fitness_analysis,
-    get_latest_checkin
+    get_latest_checkin,
 )
 import numpy as np
 import datetime
 
 
-def evaluate_and_store_all(user_id: int, user_input: dict, profile_name: str = "default") -> None:
+def evaluate_and_store_all(
+    user_id: int, user_input: dict, profile_name: str = "default"
+) -> None:
     # 1. Evaluate Conditioning
     conditioning_result = evaluate_conditioning(user_input, profile_name)
     conditioning_score = conditioning_result["similarity_score"]
@@ -41,7 +43,7 @@ def evaluate_and_store_all(user_id: int, user_input: dict, profile_name: str = "
         "readiness_date": datetime.date.today().isoformat(),
         "source": "Auto",
         "alignment_score": None,
-        "overtraining_score": None
+        "overtraining_score": None,
     }
     readiness_id = save_readiness_score(readiness_data)
     checkin_id = get_latest_checkin(user_id)
@@ -49,8 +51,10 @@ def evaluate_and_store_all(user_id: int, user_input: dict, profile_name: str = "
     if checkin_id is not None and readiness_id is not None:
         update_checkin_with_readiness(checkin_id=checkin_id, readiness_id=readiness_id)
     else:
-        print("[WARN] Could not link readiness to check-in: checkin_id or readiness_id is None")
-    
+        print(
+            "[WARN] Could not link readiness to check-in: checkin_id or readiness_id is None"
+        )
+
     # 8. Save Full Fitness Analysis
     analysis_data = {
         "user_id": user_id,
@@ -62,8 +66,7 @@ def evaluate_and_store_all(user_id: int, user_input: dict, profile_name: str = "
         "analysis_data": {
             "conditioning": conditioning_result,
             "progression": progression_result,
-            "workout": workout_result
-        }
+            "workout": workout_result,
+        },
     }
     save_fitness_analysis(analysis_data)
-

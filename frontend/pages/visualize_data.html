@@ -1,162 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualize My Data</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/style.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      /* Responsive chart sizing */
+      @media (max-width: 768px) {
         .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-            margin: 0 auto;
+          height: 250px;
         }
-        
-        /* Responsive chart sizing */
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 250px;
-            }
+      }
+
+      @media (max-width: 480px) {
+        .chart-container {
+          height: 200px;
         }
-        
-        @media (max-width: 480px) {
-            .chart-container {
-                height: 200px;
-            }
-        }
-        
-        canvas {
-            max-width: 100%;
-        }
+      }
+
+      canvas {
+        max-width: 100%;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
-    <nav class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800">
-        <h1 class="text-2xl font-bold text-white">Data Dashboard</h1>
-        <div class="flex gap-4">
-            <button id="homeButton" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg">Home</button>
-        </div>
+  </head>
+  <body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <nav
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold text-white">Data Dashboard</h1>
+      <div class="flex gap-4">
+        <button
+          id="homeButton"
+          class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg"
+        >
+          Home
+        </button>
+      </div>
     </nav>
-    
+
     <div class="max-w-7xl mx-auto p-6">
-        <!-- Filters -->
-        <div class="mb-8 bg-gray-800 p-4 rounded-lg border border-red-800">
-            <div class="flex gap-4">
-                <select id="timeRange" class="bg-gray-700 text-white px-4 py-2 rounded-lg">
-                    <option value="7">Last 7 Days</option>
-                    <option value="30">Last 30 Days</option>
-                    <option value="90">Last 3 Months</option>
-                </select>
-                <button id="updateCharts" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                    Update Charts
-                </button>
-            </div>
+      <!-- Filters -->
+      <div class="mb-8 bg-gray-800 p-4 rounded-lg border border-red-800">
+        <div class="flex gap-4">
+          <select
+            id="timeRange"
+            class="bg-gray-700 text-white px-4 py-2 rounded-lg"
+          >
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 30 Days</option>
+            <option value="90">Last 3 Months</option>
+          </select>
+          <button
+            id="updateCharts"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          >
+            Update Charts
+          </button>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Workout Volume Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Workout Volume Trends</h3>
+          <div class="chart-container">
+            <canvas id="volumeChart"></canvas>
+          </div>
         </div>
 
-        <!-- Charts Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Workout Volume Chart -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Workout Volume Trends</h3>
-                <div class="chart-container">
-                    <canvas id="volumeChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Nutrition Chart -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Calorie & Macro Tracking</h3>
-                <div class="chart-container">
-                    <canvas id="nutritionChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Body Metrics -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Body Metrics</h3>
-                <div class="chart-container">
-                    <canvas id="weightChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Exercise Distribution -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Exercise Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="exerciseChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Running Distance Chart -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Running Distance Over Time</h3>
-                <div class="chart-container">
-                    <canvas id="distanceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Running Pace Chart -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Average Pace Trend</h3>
-                <div class="chart-container">
-                    <canvas id="paceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Heart Rate Chart -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Heart Rate Zones</h3>
-                <div class="chart-container">
-                    <canvas id="heartRateChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Running Stats -->
-            <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
-                <h3 class="text-xl font-bold mb-4">Running Statistics</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="text-center p-4 bg-gray-700 rounded-lg">
-                        <h4 class="text-sm text-gray-400">Total Distance</h4>
-                        <div id="totalDistance" class="text-2xl font-bold text-red-500">0 km</div>
-                    </div>
-                    <div class="text-center p-4 bg-gray-700 rounded-lg">
-                        <h4 class="text-sm text-gray-400">Average Pace</h4>
-                        <div id="avgPace" class="text-2xl font-bold text-red-500">0:00 /km</div>
-                    </div>
-                    <div class="text-center p-4 bg-gray-700 rounded-lg">
-                        <h4 class="text-sm text-gray-400">Total Time</h4>
-                        <div id="totalTime" class="text-2xl font-bold text-red-500">0 hrs</div>
-                    </div>
-                    <div class="text-center p-4 bg-gray-700 rounded-lg">
-                        <h4 class="text-sm text-gray-400">Avg Heart Rate</h4>
-                        <div id="avgHeartRate" class="text-2xl font-bold text-red-500">0 bpm</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Nutrition Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Calorie & Macro Tracking</h3>
+          <div class="chart-container">
+            <canvas id="nutritionChart"></canvas>
+          </div>
         </div>
 
-        <!-- Stats Summary -->
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-                <h4 class="text-sm text-gray-400">Total Volume</h4>
-                <div id="totalVolume" class="text-2xl font-bold text-red-500">0 kg</div>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-                <h4 class="text-sm text-gray-400">Avg. Daily Calories</h4>
-                <div id="avgCalories" class="text-2xl font-bold text-red-500">0</div>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-                <h4 class="text-sm text-gray-400">Weight Change</h4>
-                <div id="weightChange" class="text-2xl font-bold text-red-500">0 kg</div>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-                <h4 class="text-sm text-gray-400">Workouts Completed</h4>
-                <div id="workoutCount" class="text-2xl font-bold text-red-500">0</div>
-            </div>
+        <!-- Body Metrics -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Body Metrics</h3>
+          <div class="chart-container">
+            <canvas id="weightChart"></canvas>
+          </div>
         </div>
+
+        <!-- Exercise Distribution -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Exercise Distribution</h3>
+          <div class="chart-container">
+            <canvas id="exerciseChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Running Distance Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Running Distance Over Time</h3>
+          <div class="chart-container">
+            <canvas id="distanceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Running Pace Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Average Pace Trend</h3>
+          <div class="chart-container">
+            <canvas id="paceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Heart Rate Chart -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Heart Rate Zones</h3>
+          <div class="chart-container">
+            <canvas id="heartRateChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Running Stats -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+          <h3 class="text-xl font-bold mb-4">Running Statistics</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center p-4 bg-gray-700 rounded-lg">
+              <h4 class="text-sm text-gray-400">Total Distance</h4>
+              <div id="totalDistance" class="text-2xl font-bold text-red-500">
+                0 km
+              </div>
+            </div>
+            <div class="text-center p-4 bg-gray-700 rounded-lg">
+              <h4 class="text-sm text-gray-400">Average Pace</h4>
+              <div id="avgPace" class="text-2xl font-bold text-red-500">
+                0:00 /km
+              </div>
+            </div>
+            <div class="text-center p-4 bg-gray-700 rounded-lg">
+              <h4 class="text-sm text-gray-400">Total Time</h4>
+              <div id="totalTime" class="text-2xl font-bold text-red-500">
+                0 hrs
+              </div>
+            </div>
+            <div class="text-center p-4 bg-gray-700 rounded-lg">
+              <h4 class="text-sm text-gray-400">Avg Heart Rate</h4>
+              <div id="avgHeartRate" class="text-2xl font-bold text-red-500">
+                0 bpm
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Summary -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+          <h4 class="text-sm text-gray-400">Total Volume</h4>
+          <div id="totalVolume" class="text-2xl font-bold text-red-500">
+            0 kg
+          </div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+          <h4 class="text-sm text-gray-400">Avg. Daily Calories</h4>
+          <div id="avgCalories" class="text-2xl font-bold text-red-500">0</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+          <h4 class="text-sm text-gray-400">Weight Change</h4>
+          <div id="weightChange" class="text-2xl font-bold text-red-500">
+            0 kg
+          </div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
+          <h4 class="text-sm text-gray-400">Workouts Completed</h4>
+          <div id="workoutCount" class="text-2xl font-bold text-red-500">0</div>
+        </div>
+      </div>
     </div>
 
     <script src="../js/script.js"></script>
@@ -165,5 +193,5 @@
     <script src="../js/calendar.js"></script>
     <script src="../js/core.js"></script>
     <script src="../js/visualization.js"></script>
-</body>
+  </body>
 </html>
