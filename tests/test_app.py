@@ -11,7 +11,7 @@ def client():
 
 def test_register_success(client):
     response = client.post('/api/register', json={
-        'email': 'test10@example.com',
+        'email': 'test11@example.com',
         'password': 'Secret123!',
         'name': 'Test User',
         'gender': 'Female',
