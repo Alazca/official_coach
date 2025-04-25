@@ -2,6 +2,7 @@
  * dashboard.js - Main JavaScript for the COACH dashboard
  * Handles dashboard initialization, chart rendering, and UI interactions
  */
+
 // Global variables
 let currentDate = new Date();
 let events = {};
@@ -134,6 +135,15 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
       yearDropdown.classList.remove("show");
     }
+  });
+
+  // Close modal box
+  document.getElementById("closeModal").onclick = () => {
+    document.getElementById("dayModal").classList.add("hidden");
+  };
+  window.addEventListener("click", (e) => {
+    const modal = document.getElementById("dayModal");
+    if (e.target === modal) modal.classList.add("hidden");
   });
 });
 
@@ -289,6 +299,25 @@ function createDayCell(day, isToday, hasEvent, date) {
       cell.classList.remove("bg-gray-800", "border-red-800");
     });
     div.classList.add("bg-gray-800", "border-red-800");
+
+    // Show modal with day details
+    const modal = document.getElementById("dayModal");
+    const modalContent = document.getElementById("modalContent");
+
+    if (hasEvent) {
+      const d = date.getDate();
+      const eventData = events[date.getFullYear()][date.getMonth()][d];
+      modalContent.innerHTML = `
+        <p><strong>Workout:</strong> ${eventData.workout}</p>
+        <p><strong>Nutrition:</strong> ${eventData.nutrition}</p>
+        <p><strong>Sleep:</strong> ${eventData.sleep}</p>
+        <p><strong>Energy:</strong> ${eventData.energy}</p>
+        <p><strong>Readiness:</strong> ${eventData.readiness}%</p>
+      `;
+    } else {
+      modalContent.innerHTML = `<p>No data available for this day.</p>`;
+    }
+    modal.classList.remove("hidden");
   });
 
   // Hover effect to show a preview of the day's data
