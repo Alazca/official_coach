@@ -15,14 +15,12 @@ from backend.engines.base_vector import (
     weighted_similarity,
     generate_vector_feedback,
 )
-
 from backend.database.db import get_target_profile
-
 from backend.engines.exercise_recommendation import generate_exercise_recommendations
 
 
 def evaluate_conditioning(
-    user_input: Dict[str, float], profile_name: str = "default"
+    user_input: Dict[str, float], user_id:int
 ) -> Dict[str, Any]:
     """
     Evaluate user conditioning and return feedback + similarity score.
@@ -33,7 +31,7 @@ def evaluate_conditioning(
     Returns:
         dict: Similarity score, raw vector, normalized, feedback
     """
-    dimensions, target_vector = get_target_profile(profile_name)
+    dimensions, target_vector = get_target_profile(user_id)
 
     # Convert input to ordered vector
     user_vec = np.array([user_input[dim] for dim in dimensions])
