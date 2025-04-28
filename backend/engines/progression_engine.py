@@ -5,8 +5,6 @@ This module provides functionality to analyze workout performance over time,
 track progress metrics, and generate insights and recommendations for progression.
 """
 
-import sqlite3
-import datetime
 import numpy as np
 from backend.config.config import Config
 from backend.database.db import create_conn, get_workout_history

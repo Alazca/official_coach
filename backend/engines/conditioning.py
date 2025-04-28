@@ -6,8 +6,6 @@ and provides personalized feedback for improvement and visualization.
 """
 
 import numpy as np
-import datetime
-
 from typing import Dict, List, Any, Tuple
 
 from backend.engines.base_vector import (
@@ -15,9 +13,7 @@ from backend.engines.base_vector import (
     weighted_similarity,
     generate_vector_feedback,
 )
-
 from backend.database.db import get_target_profile
-
 from backend.engines.exercise_recommendation import generate_exercise_recommendations
 
 

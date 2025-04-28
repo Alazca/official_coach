@@ -5,8 +5,6 @@ This module provides functionality to evaluate user biometric and readiness data
 to produce a readiness score and training recommendations.
 """
 
-import sqlite3
-import datetime
 from typing import Dict, Any
 
 from backend.database.db import get_all_checkins

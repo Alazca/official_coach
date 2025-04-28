@@ -5,10 +5,7 @@ This module provides core vector operations and similarity calculations
 that serve as the foundation for various attribute engines in the system.
 """
 
-import sqlite3
 import numpy as np
-import json
-import os
 from typing import List, Dict, Union, Tuple, Any
 
 
