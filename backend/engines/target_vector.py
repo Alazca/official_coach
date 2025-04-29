@@ -38,6 +38,7 @@ def get_timeline_ratio(
 
 
 def generate_target_vector(
+    user_id: int,
     goal_vector: np.ndarray,
     baseline_vector: np.ndarray,
     start_date: str,
@@ -72,7 +73,7 @@ def generate_target_vector(
 
     # Calculate scalar from user's activity & metrics
     activity_scalar = calculate_current_activity_scalar(
-        user_id=None,  # Optional override if needed
+        user_id=user_id,  # Optional override if needed
         initial_activity_level=initial_activity_level,
     )
 
