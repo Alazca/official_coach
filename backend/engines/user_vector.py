@@ -6,6 +6,7 @@ then weights them using influence factors derived from performance classificatio
 """
 
 import numpy as np
+
 from backend.database.db import create_conn
 from backend.engines.base_vector_math import normalize, weighted_similarity
 from backend.engines.scalars import (
