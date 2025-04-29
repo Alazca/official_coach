@@ -8,7 +8,7 @@ and provides personalized feedback for improvement and visualization.
 import numpy as np
 from typing import Dict, List, Any, Tuple
 
-from backend.engines.base_vector import (
+from backend.engines.base_vector_math import (
     normalize,
     weighted_similarity,
     generate_vector_feedback,
