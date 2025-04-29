@@ -52,7 +52,6 @@ CREATE TABLE goals (
     target_date TEXT,
     status TEXT CHECK(status IN ('Not Started', 'In Progress', 'Completed', 'Abandoned')) DEFAULT 'Not Started',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
