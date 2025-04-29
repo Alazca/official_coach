@@ -35,7 +35,6 @@ from backend.models.models import UserRegistration, DailyCheckIn
 
 load_dotenv()
 
-
 app = Flask(
     __name__,
     static_folder="../frontend",
