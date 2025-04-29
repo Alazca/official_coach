@@ -14,12 +14,9 @@ from backend.engines.base_vector import (
     generate_vector_feedback,
 )
 from backend.database.db import get_target_profile
-from backend.engines.exercise_recommendation import generate_exercise_recommendations
 
 
-def evaluate_conditioning(
-    user_input: Dict[str, float], user_id:int
-) -> Dict[str, Any]:
+def evaluate_conditioning(user_input: Dict[str, float], user_id: int) -> Dict[str, Any]:
     """
     Evaluate user conditioning and return feedback + similarity score.
 

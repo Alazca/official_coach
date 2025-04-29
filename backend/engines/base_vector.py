@@ -6,7 +6,7 @@ that serve as the foundation for various attribute engines in the system.
 """
 
 import numpy as np
-from typing import List, Dict, Union, Tuple, Any
+from typing import List, Dict, Any
 
 
 def normalize(vector: np.ndarray) -> np.ndarray:

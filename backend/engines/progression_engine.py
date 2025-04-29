@@ -6,7 +6,6 @@ track progress metrics, and generate insights and recommendations for progressio
 """
 
 import numpy as np
-from backend.config.config import Config
 from backend.database.db import create_conn, get_workout_history
 
 

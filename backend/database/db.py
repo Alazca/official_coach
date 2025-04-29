@@ -525,11 +525,15 @@ def get_exercise_distribution(user_id, start_date=None, end_date=None):
 
 
 def get_target_profile(
-    user_id, start_date=None, end_date=None
+    user_id: int,
+    profile_name: str = "default",
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
 ) -> Tuple[List[str], List[float]]:
     """
-    Get the user's target profile for use.
+    Get the user's target profile based on profile name.
     """
+
     conn = None
     cursor = None
 
@@ -540,11 +544,12 @@ def get_target_profile(
         # Query to get target profile dimensions and vector
         query = """
         SELECT dimensions, vector
-        FROM target_profiles
+        FROM user_profile 
         WHERE user_id = ?
+        AND name = ?
         """
 
-        params = [user_id]
+        params = [user_id, profile_name]
 
         if start_date and end_date:
             query += " AND created_at BETWEEN ? AND ?"
@@ -630,7 +635,7 @@ def save_readiness_score(data: dict) -> Optional[int]:
             INSERT INTO readiness_scores (
                 user_id, readiness_score, contributing_factors,
                 readiness_date, source, alignment_score, overtraining_score
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)projects
         """,
             (
                 data["user_id"],
