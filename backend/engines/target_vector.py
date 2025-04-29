@@ -15,19 +15,21 @@ from backend.engines.scalars import (
 )
 
 
-def get_timeline_ratio(
-    start_date: str, end_date: str, current_date: str = None
-) -> float:
+def get_timeline_ratio(start_date: str, end_date: str) -> float:
     """
-    Calculate the ratio of progress through the goal timeline (0.0 to 1.0).
+    Calculate the ratio of progress through the goal timeline (0.0 to 1.0)
+    using today's date as the current time marker.
+
+    Parameters:
+        start_date (str): Timeline start in 'YYYY-MM-DD'
+        end_date (str): Timeline end in 'YYYY-MM-DD'
+
+    Returns:
+        float: Progress ratio from 0.0 (just started) to 1.0 (completed or past due)
     """
     start = datetime.strptime(start_date, "%Y-%m-%d")
     end = datetime.strptime(end_date, "%Y-%m-%d")
-    today = (
-        datetime.strptime(current_date, "%Y-%m-%d")
-        if current_date
-        else datetime.today()
-    )
+    today = datetime.today()
 
     total_days = (end - start).days
     elapsed_days = (today - start).days
