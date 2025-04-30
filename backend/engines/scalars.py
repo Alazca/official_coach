@@ -1,49 +1,66 @@
-"""
-Scalar Module.
-
-Handles mapping of conditioning classifications and activity levels
-into numerical scalars for vector operations, performance evaluation,
-and dynamic target setting.
-"""
-
 import numpy as np
+from typing import Dict, Optional
+
 from backend.database.db import create_conn
+from backend.engines.metrics import get_strength_metrics, get_conditioning_metrics
 
 
-def get_conditioning_scalar_from_classification(conditioning_level: str) -> float:
+def compute_influence_scalars(
+    user_id: int, days: int = 7, weights: Optional[Dict[str, float]] = None
+) -> Dict[str, float]:
     """
-    Get scalar value based on conditioning classification.
+    Compute influence factors (scalars) for user_vector and target_vector:
+      - Fetch raw metrics
+      - Normalize each to [0.0,1.0]
+      - Apply weights and return combined scalar
 
-    Parameters:
-        conditioning_level (str): 'Elite', 'Advanced', etc.
-
-    Returns:
-        float: Scalar value between 0.0 and 1.0
+    Returns dict of each normalized scalar plus final 'influence_scalar'.
     """
-    scalar_map = {
-        "Elite": 0.9,
-        "Advanced": 0.85,
-        "Intermediate": 0.65,
-        "Novice": 0.4,
-        "Beginner": 0.2,
+    strength = get_strength_metrics(user_id, days)
+    cond = get_conditioning_metrics(user_id, days)
+
+    # Default weights
+    if weights is None:
+        weights = {
+            "combined_strength": 0.3,
+            "total_volume": 0.2,
+            "volume_percentile": 0.1,
+            "weekly_volume": 0.15,
+            "training_days": 0.1,
+            "volume_change_pct": 0.05,
+            "intensity_avg": 0.05,
+            "consistency_pct": 0.03,
+        }
+
+    # Normalize metrics
+    norm_strength = min(
+        strength["combined_strength"] / 2.0, 1.0
+    )  # assume 2x bodyweight as cap
+    norm_total_vol = min(strength["total_volume"] / 10000.0, 1.0)  # cap at 10k
+    norm_vol_pct = strength["volume_percentile"] / 100.0
+
+    norm_weekly = min(cond["weekly_volume"] / 20000.0, 1.0)
+    norm_days = cond["training_days"] / days
+    norm_change = max(min((cond["volume_change_pct"] + 100) / 200.0, 1.0), 0.0)
+    norm_intensity = min(cond["intensity_avg"] / 100.0, 1.0)
+    norm_consistency = max(1.0 - cond["consistency_pct"] / 100.0, 0.0)
+
+    scalars = {
+        "combined_strength": norm_strength,
+        "total_volume": norm_total_vol,
+        "volume_percentile": norm_vol_pct,
+        "weekly_volume": norm_weekly,
+        "training_days": norm_days,
+        "volume_change_pct": norm_change,
+        "intensity_avg": norm_intensity,
+        "consistency_pct": norm_consistency,
     }
-    return scalar_map.get(conditioning_level, 0.5)
 
+    # Weighted sum
+    influence_scalar = sum(scalars[k] * weights.get(k, 0) for k in scalars)
+    scalars["influence_scalar"] = round(influence_scalar, 3)
 
-def classify_conditioning_level(similarity_score: float) -> str:
-    """
-    Categorize a similarity score into a conditioning classification label.
-    """
-    if similarity_score >= 0.9:
-        return "Elite"
-    elif similarity_score >= 0.75:
-        return "Advanced"
-    elif similarity_score >= 0.6:
-        return "Intermediate"
-    elif similarity_score >= 0.4:
-        return "Novice"
-    else:
-        return "Beginner"
+    return scalars
 
 
 def classify_activity_level(activity_level: str) -> float:
@@ -66,96 +83,106 @@ def classify_activity_level(activity_level: str) -> float:
     return activity_scalar_map.get(activity_level, 0.5)  # Default neutral if unknown
 
 
-def get_user_checkin_count(user_id: int) -> int:
-    """
-    Get total number of check-ins a user has made.
-
-    Parameters:
-        user_id (int): The user's ID.
-
-    Returns:
-        int: Number of check-ins.
-    """
-    conn = create_conn()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM daily_checkins
-        WHERE user_id = ?
-    """,
-        (user_id,),
-    )
-    row = cursor.fetchone()
-    return row[0] if row else 0
-
-
-def calculate_avg_sleep_quality(user_id: int, days: int = 7) -> float:
-    """
-    Calculate the user's average sleep quality over recent check-ins.
-
-    Parameters:
-        user_id (int): The user's ID.
-        days (int): Lookback window.
-
-    Returns:
-        float: Average sleep quality (0–10 scale).
-    """
-    conn = create_conn()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT sleep_quality
-        FROM daily_checkins
-        WHERE user_id = ?
-          AND sleep_quality IS NOT NULL
-          AND check_in_date >= date('now', ?)
-    """,
-        (user_id, f"-{days} days"),
-    )
-
-    rows = cursor.fetchall()
-    sleep_scores = [
-        row["sleep_quality"] for row in rows if row["sleep_quality"] is not None
-    ]
-
-    if not sleep_scores:
-        return 0.0  # No data fallback
-
-    avg_sleep = np.mean(sleep_scores)
-    return round(avg_sleep, 2)
-
-
-def calculate_current_activity_scalar(
-    user_id: int, initial_activity_level: str
+def calculate_overall_fitness_scalar(
+    strength_conditioning_scalar: float,
+    activity_level_scalar: float,
+    strength_weight: float = 0,
+    activity_weight: float = 0,
 ) -> float:
     """
-    Calculate final current activity scalar based on engagement and recovery metrics.
+    Calculates an overall fitness scalar based on weighted strength/conditioning and activity level.
 
-    Parameters:
-        user_id (int): The user's ID.
-        initial_activity_level (str): Initial activity level at registration.
-
-    Returns:
-        float: Activity scalar value.
+    Returns a float between 0.0 and 1.0.
     """
-    # 1. Base scalar from initial activity level
-    base_scalar = classify_activity_level(initial_activity_level)
+    if not (0.0 <= strength_conditioning_scalar <= 1.0):
+        raise ValueError("Strength and conditioning scalar must be between 0.0 and 1.0")
+    if not (0.0 <= activity_level_scalar <= 1.0):
+        raise ValueError("Activity level scalar must be between 0.0 and 1.0")
+    if (
+        strength_weight < 0
+        or activity_weight < 0
+        or abs(strength_weight + activity_weight - 1.0) > 1e-6
+    ):
+        raise ValueError("Weights must be non-negative and sum to 1.0")
 
-    # 2. Check-in based engagement score (0.0 to 1.0)
-    checkin_count = get_user_checkin_count(user_id)
-    checkin_scalar = min(checkin_count / 30.0, 1.0)
-
-    # 3. Sleep quality scalar (0.0 to 1.0)
-    avg_sleep_quality = calculate_avg_sleep_quality(user_id)
-    sleep_scalar = min(avg_sleep_quality / 10.0, 1.0)
-
-    # 4. Nutrition quality scalar (placeholder, assume perfect)
-    nutrition_scalar = 1.0
-
-    # 5. Final scalar blend
-    final_scalar = base_scalar * (
-        0.5 * checkin_scalar + 0.25 * sleep_scalar + 0.25 * nutrition_scalar
+    return round(
+        strength_conditioning_scalar * strength_weight
+        + activity_level_scalar * activity_weight,
+        3,
     )
 
-    return round(final_scalar, 3)
+
+def compute_final_scalar(
+    user_id: int,
+    days: int = 7,
+    strength_weight: float = 0.6,
+    activity_weight: float = 0.4,
+) -> float:
+    """
+    Computes the final scalar combining overall influence and activity level for user_vector updates.
+
+    Mathematically this is:
+      influence_scalar = Σ(weight_i * normalized_metric_i)
+      activity_scalar  = map(currentActivityLevel)
+      final_scalar     = strength_weight * influence_scalar + activity_weight * activity_scalar
+
+    Steps:
+      1. Calculate the influence scalar (0.0–1.0) from normalized metrics.
+      2. Fetch currentActivityLevel from users and map to a 0.0–1.0 scalar.
+      3. Compute the weighted blend:
+         final_scalar = strength_weight * influence_scalar
+                      + activity_weight  * activity_scalar
+
+    Returns a float between 0.0 and 1.0.
+    """
+    # 1) Influence scalar: linear combination of normalized metrics
+    # Σ(weight_i * normalized_metric_i)
+
+    scalars = compute_influence_scalars(user_id, days)
+    influence = scalars["influence_scalar"]
+    with create_conn() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT currentActivityLevel FROM users WHERE user_id = ?", (user_id,)
+        )
+        row = cur.fetchone()
+
+    level = row[0] if row else None
+    activity_map = {
+        "Sedentary": 0.0,
+        "Casual": 0.25,
+        "Moderate": 0.5,
+        "Active": 0.75,
+        "Intense": 1.0,
+    }
+    activity_scalar = activity_map.get(level, 0.5)
+
+    # 3) Final weighted blend
+    # final_scalar = strength_weight*influence + activity_weight*activity_scalar
+    return calculate_overall_fitness_scalar(
+        strength_conditioning_scalar=influence,
+        activity_level_scalar=activity_scalar,
+        strength_weight=strength_weight,
+        activity_weight=activity_weight,
+    )
+
+
+def classify_overall_fitness_tier(final_scalar: float) -> str:
+    """
+    Categorize the final fitness scalar into tiers:
+      - 'Elite'       : final_scalar >= 0.9
+      - 'Advanced'    : final_scalar >= 0.75
+      - 'Intermediate': final_scalar >= 0.5
+      - 'Novice'      : final_scalar >= 0.4
+      - 'Beginner'    : final_scalar < 0.4
+    """
+    if final_scalar >= 0.9:
+        return "Elite"
+    elif final_scalar >= 0.75:
+        return "Advanced"
+    elif final_scalar >= 0.5:
+        return "Intermediate"
+    elif final_scalar >= 0.4:
+        return "Novice"
+    else:
+        return "Beginner"
