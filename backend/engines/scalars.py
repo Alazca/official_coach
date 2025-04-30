@@ -119,70 +119,87 @@ def compute_final_scalar(
     activity_weight: float = 0.4,
 ) -> float:
     """
-    Computes the final scalar combining overall influence and activity level for user_vector updates.
-
-    Mathematically this is:
-      influence_scalar = Σ(weight_i * normalized_metric_i)
-      activity_scalar  = map(currentActivityLevel)
-      final_scalar     = strength_weight * influence_scalar + activity_weight * activity_scalar
+    Computes and persists the final scalar combining overall influence and activity level.
 
     Steps:
-      1. Calculate the influence scalar (0.0–1.0) from normalized metrics.
-      2. Fetch currentActivityLevel from users and map to a 0.0–1.0 scalar.
-      3. Compute the weighted blend:
-         final_scalar = strength_weight * influence_scalar
-                      + activity_weight  * activity_scalar
+      1. Calculate the influence scalar (0.0–1.0).
+      2. Fetch and map currentActivityLevel to a scalar (0.0–1.0).
+      3. Compute final_scalar = strength_weight * influence + activity_weight * activity_scalar.
+      4. Persist new activity level derived from final_scalar.
 
     Returns a float between 0.0 and 1.0.
     """
-    # 1) Influence scalar: linear combination of normalized metrics
-    # Σ(weight_i * normalized_metric_i)
-
+    # 1) Influence scalar
     scalars = compute_influence_scalars(user_id, days)
     influence = scalars["influence_scalar"]
+
+    # 2) Activity level scalar mapping
     with create_conn() as conn:
         cur = conn.cursor()
         cur.execute(
             "SELECT currentActivityLevel FROM users WHERE user_id = ?", (user_id,)
         )
         row = cur.fetchone()
-
     level = row[0] if row else None
-    activity_map = {
-        "Sedentary": 0.0,
-        "Casual": 0.25,
-        "Moderate": 0.5,
-        "Active": 0.75,
+    level_str = level if isinstance(level, str) else ""
+
+    activity_map: Dict[str, float] = {
+        "Sedentary": 0.2,
+        "Casual": 0.5,
+        "Moderate": 0.75,
+        "Active": 0.90,
         "Intense": 1.0,
     }
-    activity_scalar = activity_map.get(level, 0.5)
+    activity_scalar = activity_map.get(level_str, 0.5)
 
     # 3) Final weighted blend
-    # final_scalar = strength_weight*influence + activity_weight*activity_scalar
-    return calculate_overall_fitness_scalar(
+    final_scalar = calculate_overall_fitness_scalar(
         strength_conditioning_scalar=influence,
         activity_level_scalar=activity_scalar,
         strength_weight=strength_weight,
         activity_weight=activity_weight,
     )
 
+    # 4) Persist updated activity level
+    # Map final_scalar to discrete level
+    if final_scalar >= 1.0:
+        new_level = "Intense"
+    elif final_scalar >= 0.9:
+        new_level = "Active"
+    elif final_scalar >= 0.75:
+        new_level = "Moderate"
+    elif final_scalar >= 0.5:
+        new_level = "Casual"
+    else:
+        new_level = "Sedentary"
+
+    with create_conn() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET currentActivityLevel = ? WHERE user_id = ?",
+            (new_level, user_id),
+        )
+        conn.commit()
+
+    return final_scalar
+
 
 def classify_overall_fitness_tier(final_scalar: float) -> str:
     """
     Categorize the final fitness scalar into tiers:
-      - 'Elite'       : final_scalar >= 0.9
-      - 'Advanced'    : final_scalar >= 0.75
+      - 'Elite'       : final_scalar >= 1.0
+      - 'Advanced'    : final_scalar >= 0.9
       - 'Intermediate': final_scalar >= 0.5
-      - 'Novice'      : final_scalar >= 0.4
-      - 'Beginner'    : final_scalar < 0.4
+      - 'Novice'      : final_scalar >= 0.2
+      - 'Beginner'    : final_scalar < 0.2
     """
-    if final_scalar >= 0.9:
+    if final_scalar >= 1.0:
         return "Elite"
-    elif final_scalar >= 0.75:
+    elif final_scalar >= 0.9:
         return "Advanced"
     elif final_scalar >= 0.5:
         return "Intermediate"
-    elif final_scalar >= 0.4:
+    elif final_scalar >= 0.2:
         return "Novice"
     else:
         return "Beginner"
