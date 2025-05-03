@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 
 from backend.config.config import Config
 from backend.database.db import (
+    create_conn,
     get_all_checkins,
     get_workout_history,
     register_user,
