@@ -24,6 +24,14 @@ class Source(str, Enum):
     COACH = "Coach"
 
 
+class GoalType(str, Enum):
+    STRENGTH = "Strength"
+    ENDURANCE = "Endurance"
+    WEIGHT_LOSS = "Weight-Loss"
+    PERFORMANCE = "Performance"
+    DEFAULT = "Default"
+
+
 class StrengthDimension(str, Enum):
     MAXIMAL_STRENGTH = "Maximal_strength"
     RELATIVE_STRENGTH = "Relative_strength"
@@ -55,13 +63,6 @@ class ReadinessScore(BaseModel):
     source: Source = Source.AUTO
     alignment_score: float = 0.0
     overtraining_score: float = 0.0
-
-
-class GoalType(str, Enum):
-    STRENGTH = "Strength"
-    ENDURANCE = "Endurance"
-    WEIGHT_LOSS = "Weight-Loss"
-    PERFORMANCE = "Performance"
 
 
 class UserGoal(BaseModel):
@@ -120,6 +121,7 @@ class UserRegistration(BaseModel):
     height: float
     weight: float
     initialActivityLevel: ActivityLevel
+    goal: GoalType
 
     @field_validator("password")
     def validate_password(cls, v):
@@ -149,8 +151,3 @@ class UserRegistration(BaseModel):
         if v <= 0:
             raise ValueError("Weight must be positive")
         return v
-
-
-class DimensionScore(BaseModel):
-    dimension: str
-    score: float

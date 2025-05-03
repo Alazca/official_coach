@@ -31,11 +31,12 @@ CREATE TABLE users (
 CREATE TABLE user_profile (
   profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
+  goal_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   dimensions TEXT NOT NULL,
   vector TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users (user_id)
+  FOREIGN KEY (user_id) REFERENCES users (user_id) FOREIGN KEY (goal_id) REFERENCES goal (goal_id)
 );
 
 CREATE TABLE daily_checkins (
@@ -102,8 +103,6 @@ CREATE TABLE goals (
       'Endurance',
       'Weight-Loss',
       'Performance',
-      'Muscle-Gain',
-      'Flexibility'
     )
   ),
   category TEXT CHECK (

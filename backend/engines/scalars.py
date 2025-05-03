@@ -1,8 +1,18 @@
 import numpy as np
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from backend.database.db import create_conn
 from backend.engines.metrics import get_strength_metrics, get_conditioning_metrics
+from backend.models.models import ActivityLevel
+
+
+ACTIVITY_SCALAR_MAP = {
+    ActivityLevel.SEDENTARY: 0.2,
+    ActivityLevel.CASUAL: 0.5,
+    ActivityLevel.MODERATE: 0.75,
+    ActivityLevel.ACTIVE: 0.9,
+    ActivityLevel.INTENSE: 1.0,
+}
 
 
 def compute_influence_scalars(
@@ -73,14 +83,14 @@ def classify_activity_level(activity_level: str) -> float:
     Returns:
         float: Scalar value.
     """
-    activity_scalar_map = {
-        "Sedentary": 0.2,
-        "Casual": 0.5,
-        "Moderate": 0.75,
-        "Active": 1.0,
-        "Intense": 1.5,
-    }
-    return activity_scalar_map.get(activity_level, 0.5)  # Default neutral if unknown
+    if isinstance(activity_level, str):
+        try:
+            activity_level = ActivityLevel(activity_level.capitalize())
+        except ValueError:
+            # Unknown string → neutral
+            return 0.5
+
+    return ACTIVITY_SCALAR_MAP.get(activity_level, 0.5)
 
 
 def calculate_overall_fitness_scalar(
