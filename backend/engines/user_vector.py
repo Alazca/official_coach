@@ -1,4 +1,8 @@
 import numpy as np
+import logging
+
+from datetime import date, timedelta
+from typing import List, Dict, Any, Optional
 
 from backend.database.db import create_conn
 from backend.models.models import UserVector
@@ -260,7 +264,6 @@ def get_user_vector_history(
                 "vector": vector,
                 "snapshot_date": snapshot_date,
                 "created_at": created_at,
-                "vector_dict": vector_to_dict(np.array(vector), dimensions),
             }
         )
 
