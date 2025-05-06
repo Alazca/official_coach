@@ -51,6 +51,8 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=7)
 app.config["USDA_API_KEY"] = os.getenv("USDA_API_KEY")
 app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+app.config["FOODDATA_API_KEY"] = os.getenv("FOODDATA_API_KEY")
+
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 
