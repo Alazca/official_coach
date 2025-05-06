@@ -2,9 +2,19 @@
  * credentials.js
  * Manages JWT tokens and authentication status
  */
-
 const Credentials = (function () {
   const TOKEN_KEY = "jwt_token";
+
+  // Helper to decode JWT payload
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(window.atob(base64));
+    } catch (e) {
+      return null;
+    }
+  }
 
   return {
     // Save JWT to localStorage
@@ -22,9 +32,25 @@ const Credentials = (function () {
       localStorage.removeItem(TOKEN_KEY);
     },
 
-    // Check if user is logged in
+    // Check if user is logged in with a non-expired token
     isAuthenticated: function () {
-      return !!localStorage.getItem(TOKEN_KEY);
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return false;
+
+      // Check if token is expired
+      const payload = parseJwt(token);
+      if (!payload) return false;
+
+      // JWT exp is in seconds since epoch
+      const expiry = payload.exp * 1000; // Convert to milliseconds
+      return Date.now() < expiry;
+    },
+
+    // Get user info from token
+    getUserInfo: function () {
+      const token = this.getToken();
+      if (!token) return null;
+      return parseJwt(token);
     },
   };
 })();

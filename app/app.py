@@ -173,21 +173,24 @@ def login_user():
     inputdata = request.get_json()
     email = inputdata.get("email", "")
     password = inputdata.get("password", "")
+
+    # Validate input
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
     data = user_exists(email)
     if isinstance(data, Exception):
         return jsonify({"error": f"{str(data)}"}), 400
     if not data:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"error": "User does not exist"}), 404
 
     if check_password_hash(data["password_hash"], password):
         additional_claims = {"email": data["email"], "role": "user"}
-
         access_token = create_access_token(
             identity=str(data["user_id"]), additional_claims=additional_claims
         )
-
         return (
-            jsonify({"message": "Login successful", "access token": access_token}),
+            jsonify({"message": "Login successful", "access_token": access_token}),
             200,
         )
     else:
