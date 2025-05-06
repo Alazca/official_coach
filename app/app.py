@@ -85,7 +85,7 @@ initialize_database("backend/database/schema.sql")
 
 @app.route("/")
 def index():
-    return redirect(url_for("frontpage")
+    return redirect(url_for("frontpage"))
 
 
 @app.route("/dashboard")
