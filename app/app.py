@@ -60,24 +60,25 @@ def initialize_database(schema_path: str = "backend/database/schema.sql") -> Non
     try:
         config = Config()
         db_path = config.get_database_path()
+        print("→ Initialising DB at:", db_path)  # NEW
 
-        # Get absolute path to project root
+        # Resolve full path to schema.sql
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
+        full_schema = os.path.join(project_root, schema_path)
+        print("→ Using schema file:", full_schema)  # NEW
 
-        # Build absolute path to schema.sql
-        full_schema_path = os.path.join(project_root, schema_path)
-
-        with open(full_schema_path, "r") as f:
-            schema = f.read()
+        with open(full_schema, "r", encoding="utf-8") as f:
+            schema_sql = f.read()
 
         with sqlite3.connect(db_path) as conn:
-            conn.executescript(schema)
+            conn.executescript(schema_sql)
             conn.commit()
 
-        print("✅ Database initialized successfully.")
+        print("✅ Database initialised successfully.")
+
     except Exception as e:
-        print(f"❌ Failed to initialize database: {e}")
+        print(f"❌ Failed to initialise database: {e}")
 
 
 initialize_database("backend/database/schema.sql")

@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
@@ -28,17 +28,19 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user_profile (
+CREATE TABLE IF NOT EXISTS user_profile (
   profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  goal_id INTEGER,
   user_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   dimensions TEXT NOT NULL,
   vector TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users (user_id) FOREIGN KEY (goal_id) REFERENCES goal (goal_id)
+  FOREIGN KEY (user_id) REFERENCES users (user_id),
+  FOREIGN KEY (goal_id) REFERENCES goals (goal_id)
 );
 
-CREATE TABLE daily_checkins (
+CREATE TABLE IF NOT EXISTS daily_checkins (
   checkin_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   readiness_id INTEGER,
@@ -52,7 +54,7 @@ CREATE TABLE daily_checkins (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE workouts (
+CREATE TABLE IF NOT EXISTS workouts (
   workout_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   workout_date DATE,
@@ -64,7 +66,7 @@ CREATE TABLE workouts (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE workout_sets (
+CREATE TABLE IF NOT EXISTS workout_sets (
   workout_exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
   workout_id INTEGER NOT NULL,
   exercise_id INTEGER NOT NULL,
@@ -77,11 +79,11 @@ CREATE TABLE workout_sets (
   rm_notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (workout_id) REFERENCES workouts (workout_id),
-  FOREIGN KEY (exercise_id) REFERENCES Exercises (exercise_id)
+  FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id)
 );
 
 --- This is to show how able the user is 
-CREATE TABLE readiness_scores (
+CREATE TABLE IF NOT EXISTS readiness_scores (
   readiness_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   readiness_level INTEGER CHECK (readiness_level BETWEEN 0 AND 100),
@@ -89,11 +91,12 @@ CREATE TABLE readiness_scores (
   readiness_date DATE NOT NULL,
   source TEXT CHECK (source IN ('Manual', 'Auto', 'Coach')),
   alignment_score REAL,
-  overtraining_score REAL created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  overtraining_score REAL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE goals (
+CREATE TABLE IF NOT EXISTS goals (
   goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   goal_type TEXT CHECK (
@@ -128,13 +131,13 @@ CREATE TABLE goals (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE goal_templates (
+CREATE TABLE IF NOT EXISTS goal_templates (
   template_id INTEGER PRIMARY KEY AUTOINCREMENT,
   goal_type TEXT,
   category TEXT,
   name TEXT,
   description TEXT,
-  recommended_duration INTEGER, -- in days
+  recommended_duration INTEGER,
   difficulty_level TEXT CHECK (
     difficulty_level IN (
       'Beginner',
@@ -146,26 +149,26 @@ CREATE TABLE goal_templates (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE goal_progress (
+CREATE TABLE IF NOT EXISTS goal_progress (
   progress_id INTEGER PRIMARY KEY AUTOINCREMENT,
   goal_id INTEGER,
   current_value REAL,
   notes TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP FOREIGN KEY (goal_id) REFERENCES goals (goal_id)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (goal_id) REFERENCES goals (goal_id)
 );
 
-CREATE TABLE goal_exercises (
-  goal_id INTEGER,
-  exercise_id INTEGER,
-  target_weight REAL,
-  target_reps INTEGER,
-  target_sets INTEGER,
-  PRIMARY KEY (goal_id, exercise_id),
-  FOREIGN KEY (goal_id) REFERENCES goals (goal_id),
-  FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id)
-);
-
-CREATE TABLE goal_nutrition (
+-- CREATE TABLE goal_exercises (
+--   goal_id INTEGER,
+--   exercise_id INTEGER,
+--   target_weight REAL,
+--   target_reps INTEGER,
+--   target_sets INTEGER,
+--   PRIMARY KEY (goal_id, exercise_id),
+--   FOREIGN KEY (goal_id) REFERENCES goals (goal_id),
+--   FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id)
+-- );
+CREATE TABLE IF NOT EXISTS goal_nutrition (
   goal_id INTEGER,
   target_calories REAL,
   target_protein REAL,
@@ -177,7 +180,7 @@ CREATE TABLE goal_nutrition (
   FOREIGN KEY (goal_id) REFERENCES goals (goal_id)
 );
 
-CREATE TABLE goal_recommendations (
+CREATE TABLE IF NOT EXISTS goal_recommendations (
   recommendation_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   goal_type TEXT,
@@ -189,7 +192,7 @@ CREATE TABLE goal_recommendations (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE exercises (
+CREATE TABLE IF NOT EXISTS exercises (
   exercise_id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT,
   category TEXT CHECK (
@@ -209,19 +212,21 @@ CREATE TABLE exercises (
       'Advanced',
       'Professional'
     )
-  ) created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  ),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE progress_Log (
+CREATE TABLE IF NOT EXISTS progress_Log (
   log_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   log_date TEXT,
   logged_weight INTEGER,
   BMI REAL CHECK (BMI >= 0),
-  notes TEXT created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE nutrition_log (
+CREATE TABLE IF NOT EXISTS nutrition_log (
   entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   calories REAL,
@@ -236,7 +241,7 @@ CREATE TABLE nutrition_log (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE fitness_analyses (
+CREATE TABLE IF NOT EXISTS fitness_analyses (
   analysis_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   analysis_date DATE NOT NULL,
@@ -249,7 +254,7 @@ CREATE TABLE fitness_analyses (
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
-CREATE TABLE workout_plans (
+CREATE TABLE IF NOT EXISTS workout_plans (
   plan_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   duration_weeks INTEGER NOT NULL,
