@@ -25,14 +25,12 @@ CREATE TABLE users (
       'Intense'
     )
   ),
-  goal_id INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE user_profile (
   profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
-  goal_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   dimensions TEXT NOT NULL,
   vector TEXT NOT NULL,

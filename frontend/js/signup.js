@@ -171,6 +171,7 @@ const CoachSignup = (() => {
       initialActivityLevel:
         document.getElementById("activityLevel")?.value || "", // Changed to match backend model
       fitnessGoals: [],
+      goal: "Strength",
     };
 
     // Collect fitness goals (multiple checkboxes)
@@ -179,6 +180,22 @@ const CoachSignup = (() => {
       .forEach((checkbox) => {
         formData.fitnessGoals.push(checkbox.value);
       });
+
+    // Map the first selected fitness goal to the database schema's allowed values
+    if (formData.fitnessGoals.length > 0) {
+      // Create mapping based on your database schema
+      const goalMapping = {
+        lose_weight: "Weight-Loss",
+        build_muscle: "Strength",
+        improve_strength: "Strength",
+        improve_endurance: "Endurance",
+        general_fitness: "Performance",
+        athletic_performance: "Performance",
+      };
+
+      const firstGoal = formData.fitnessGoals[0];
+      formData.goal = goalMapping[firstGoal] || "Strength";
+    }
 
     return formData;
   };

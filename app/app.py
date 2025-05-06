@@ -158,6 +158,7 @@ def register():
             user_data.height,
             user_data.weight,
             user_data.initialActivityLevel.value,
+            user_data.goal.value,
         )
         if isinstance(user_id, int):
             return jsonify({"message": f"Successfully registered user {user_id}"}), 200

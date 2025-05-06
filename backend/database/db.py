@@ -17,11 +17,10 @@ def create_conn():
 
 
 def register_user(
-    email, password_hash, name, gender, dob, height, weight, activity_level
+    email, password_hash, name, gender, dob, height, weight, activity_level, goal
 ):
     conn = None
     cursor = None
-
     try:
         conn = create_conn()
         cursor = conn.cursor()
@@ -36,21 +35,40 @@ def register_user(
                 dateOfBirth, 
                 height, 
                 weight, 
-                initialActivityLevel,
-                
+                initialActivityLevel
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (email, password_hash, name, gender, dob, height, weight, activity_level),
         )
 
+        # Get the user_id of the newly inserted user
         user_id = cursor.lastrowid
-        conn.commit()
 
+        # Then insert the initial goal into the goals table
+        # Using 'Strength' as the category to match one of the allowed values
+        cursor.execute(
+            """
+            INSERT INTO goals (
+                user_id, 
+                goal_type, 
+                category, 
+                description, 
+                status
+            ) VALUES (?, ?, ?, ?, ?)
+        """,
+            (
+                user_id,
+                goal,  # From form (one of the allowed values)
+                "Strength",  # Valid category from the schema
+                "Initial fitness goal",  # Description
+                "Not Started",  # Default status
+            ),
+        )
+
+        conn.commit()
         if user_id is None:
             raise ValueError("No User ID found!")
-
         return user_id
-
     except Exception as e:
         error_message = str(e)
         return error_message
