@@ -70,8 +70,7 @@ function initializePostAndRedirectButtons() {
       "logFoodBtn",
       "/api/nutrition/log",
       () => {
-        // Function to collect nutrition data
-        const nutritionData = {
+        // Function to collect nutrition data const nutritionData = {
           date:
             document.getElementById("foodDate")?.value ||
             new Date().toISOString().split("T")[0],
