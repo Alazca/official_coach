@@ -136,7 +136,7 @@ class UserRegistration(BaseModel):
     height: float = Field(gt=0)
     weight: float = Field(gt=0)
     initialActivityLevel: ActivityLevel
-    goal_type: GoalType
+    goal: GoalType
 
     @field_validator("password")
     def validate_password(cls, v):

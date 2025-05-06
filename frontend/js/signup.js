@@ -7,7 +7,7 @@ const CoachSignup = (() => {
   const config = {
     apiEndpoint: "/api/register",
     formId: "signupForm",
-    redirectPath: "/dashboard",
+    redirectPath: "../../index.html",
   };
 
   /**
@@ -27,16 +27,23 @@ const CoachSignup = (() => {
    * @param {string} message - Error message to display
    */
   const showError = (input, message) => {
-    input.classList.add("border-red-500");
-    const errorElement = input.nextElementSibling;
-    if (errorElement && errorElement.classList.contains("error-message")) {
-      errorElement.textContent = message;
-      errorElement.classList.add("text-red-500", "text-sm", "mt-1");
+    const errorDiv = input.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains("error-message")) {
+      errorDiv.textContent = message;
+      input.classList.add("border-red-500");
     }
+  };
 
-    // Add shake animation
-    input.classList.add("form-error");
-    setTimeout(() => input.classList.remove("form-error"), 500);
+  /**
+   * Clears error message for a specific input
+   * @param {HTMLElement} input - Input element to clear error
+   */
+  const clearError = (input) => {
+    const errorDiv = input.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains("error-message")) {
+      errorDiv.textContent = "";
+      input.classList.remove("border-red-500");
+    }
   };
 
   /**
@@ -45,11 +52,9 @@ const CoachSignup = (() => {
   const clearErrors = () => {
     document.querySelectorAll(".error-message").forEach((el) => {
       el.textContent = "";
-      el.classList.remove("text-red-500");
     });
-
-    document.querySelectorAll("input, select").forEach((input) => {
-      input.classList.remove("border-red-500");
+    document.querySelectorAll("input, select").forEach((el) => {
+      el.classList.remove("border-red-500");
     });
   };
 
@@ -60,95 +65,107 @@ const CoachSignup = (() => {
    */
   const validateStep = (step) => {
     let isValid = true;
+    const errorMessages = {
+      name: "Please enter your full name",
+      email: "Please enter a valid email address",
+      password:
+        "Password must be at least 8 characters with one number and one special character",
+      dob: "Please enter your date of birth",
+      gender: "Please select your gender",
+      height: "Please enter a valid height",
+      weight: "Please enter a valid weight",
+      activityLevel: "Please select your activity level",
+      goal: "Please select your fitness goal",
+    };
 
-    // Clear previous errors
-    clearErrors();
+    // Clear all error messages first
+    document.querySelectorAll(".error-message").forEach((el) => {
+      el.textContent = "";
+    });
 
-    if (step === 1) {
-      // Step 1: Account Details
-      const name = document.getElementById("name");
-      const email = document.getElementById("email");
-      const password = document.getElementById("password");
-      const confirmPassword = document.getElementById("confirmPassword");
+    switch (step) {
+      case 1:
+        // Validate name
+        const name = document.getElementById("name");
+        if (!name.value.trim()) {
+          showError(name, errorMessages.name);
+          isValid = false;
+        }
 
-      // Name validation
-      if (
-        name.value.trim() === "" ||
-        name.value.split(" ").filter((word) => word.length > 0).length < 2
-      ) {
-        showError(name, "Please enter your full name (first and last name)");
-        isValid = false;
-      }
+        // Validate email
+        const email = document.getElementById("email");
+        if (!isValidEmail(email.value)) {
+          showError(email, errorMessages.email);
+          isValid = false;
+        }
 
-      // Email validation
-      if (!isValidEmail(email.value)) {
-        showError(email, "Please enter a valid email address");
-        isValid = false;
-      }
+        // Validate password
+        const password = document.getElementById("password");
+        if (!validatePassword(password.value)) {
+          showError(password, errorMessages.password);
+          isValid = false;
+        }
 
-      // Password validation
-      if (password.value.length < 8) {
-        showError(password, "Password must be at least 8 characters long");
-        isValid = false;
-      } else if (!/\d/.test(password.value)) {
-        showError(password, "Password must contain at least one number");
-        isValid = false;
-      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password.value)) {
-        showError(
-          password,
-          "Password must contain at least one special character",
-        );
-        isValid = false;
-      }
+        // Validate confirm password
+        const confirmPassword = document.getElementById("confirmPassword");
+        if (password.value !== confirmPassword.value) {
+          showError(confirmPassword, "Passwords do not match");
+          isValid = false;
+        }
+        break;
 
-      // Confirm password
-      if (password.value !== confirmPassword.value) {
-        showError(confirmPassword, "Passwords do not match");
-        isValid = false;
-      }
-    } else if (step === 2) {
-      // Step 2: Personal Details
-      const dob = document.getElementById("dob");
-      const gender = document.getElementById("gender");
-      const height = document.getElementById("height");
-      const weight = document.getElementById("weight");
+      case 2:
+        // Validate date of birth
+        const dob = document.getElementById("dob");
+        if (!dob.value) {
+          showError(dob, errorMessages.dob);
+          isValid = false;
+        }
 
-      if (!dob.value) {
-        showError(dob, "Please enter your date of birth");
-        isValid = false;
-      }
+        // Validate gender
+        const gender = document.getElementById("gender");
+        if (!gender.value) {
+          showError(gender, errorMessages.gender);
+          isValid = false;
+        }
 
-      if (!gender.value) {
-        showError(gender, "Please select your gender");
-        isValid = false;
-      }
+        // Validate height
+        const height = document.getElementById("height");
+        if (!height.value || parseFloat(height.value) <= 0) {
+          showError(height, errorMessages.height);
+          isValid = false;
+        }
 
-      if (!height.value || isNaN(height.value) || height.value <= 0) {
-        showError(height, "Please enter a valid height");
-        isValid = false;
-      }
+        // Validate weight
+        const weight = document.getElementById("weight");
+        if (!weight.value || parseFloat(weight.value) <= 0) {
+          showError(weight, errorMessages.weight);
+          isValid = false;
+        }
+        break;
 
-      if (!weight.value || isNaN(weight.value) || weight.value <= 0) {
-        showError(weight, "Please enter a valid weight");
-        isValid = false;
-      }
-    } else if (step === 3) {
-      // Step 3: Fitness Profile
-      const activityLevel = document.getElementById("activityLevel");
-      const terms = document.getElementById("terms");
+      case 3:
+        // Validate activity level
+        const activityLevel = document.getElementById("activityLevel");
+        if (!activityLevel.value) {
+          showError(activityLevel, errorMessages.activityLevel);
+          isValid = false;
+        }
 
-      if (!activityLevel.value) {
-        showError(activityLevel, "Please select your activity level");
-        isValid = false;
-      }
+        // Validate goal
+        const goal = document.getElementById("goal");
+        if (!goal.value) {
+          showError(goal, errorMessages.goal);
+          isValid = false;
+        }
 
-      if (!terms.checked) {
-        showError(
-          terms,
-          "You must agree to the Terms of Service and Privacy Policy",
-        );
-        isValid = false;
-      }
+        // Validate terms checkbox
+        const terms = document.getElementById("terms");
+        if (!terms.checked) {
+          showError(terms, "You must agree to the terms and conditions");
+          isValid = false;
+        }
+        break;
     }
 
     return isValid;
@@ -165,37 +182,58 @@ const CoachSignup = (() => {
       email: document.getElementById("email")?.value.trim() || "",
       password: document.getElementById("password")?.value || "",
       dob: document.getElementById("dob")?.value || "",
-      gender: document.getElementById("gender")?.value || "",
+      gender: document.getElementById("gender")?.value || "Other",
       height: parseFloat(document.getElementById("height")?.value) || 0,
       weight: parseFloat(document.getElementById("weight")?.value) || 0,
       initialActivityLevel:
-        document.getElementById("activityLevel")?.value || "", // Changed to match backend model
-      fitnessGoals: [],
-      goal_type: "Strength",
+        document.getElementById("activityLevel")?.value || "Sedentary",
+      goal: document.getElementById("goal")?.value || "Default",
     };
 
-    // Collect fitness goals (multiple checkboxes)
-    document
-      .querySelectorAll('input[name="fitnessGoals"]:checked')
-      .forEach((checkbox) => {
-        formData.fitnessGoals.push(checkbox.value);
-      });
+    // Convert empty strings to null for required fields
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] === "") {
+        formData[key] = null;
+      }
+    });
 
-    // Map the first selected fitness goal to the database schema's allowed values
-    if (formData.fitnessGoals.length > 0) {
-      // Create mapping based on your database schema
-      const goalMapping = {
-        lose_weight: "Weight-Loss",
-        build_muscle: "Strength",
-        improve_strength: "Strength",
-        improve_endurance: "Endurance",
-        general_fitness: "Performance",
-        athletic_performance: "Performance",
-      };
-
-      const firstGoal = formData.fitnessGoals[0];
-      formData.goal = goalMapping[firstGoal] || "Strength";
+    // Ensure goal is one of the valid GoalType values
+    const validGoals = [
+      "Strength",
+      "Endurance",
+      "Weight-Loss",
+      "Performance",
+      "Default",
+    ];
+    if (!validGoals.includes(formData.goal)) {
+      formData.goal = "Default";
     }
+
+    // Ensure activity level is one of the valid ActivityLevel values
+    const validActivityLevels = [
+      "Sedentary",
+      "Casual",
+      "Moderate",
+      "Active",
+      "Intense",
+    ];
+    if (!validActivityLevels.includes(formData.initialActivityLevel)) {
+      formData.initialActivityLevel = "Sedentary";
+    }
+
+    // Ensure gender is one of the valid Gender values
+    const validGenders = ["Male", "Female", "Other"];
+    if (!validGenders.includes(formData.gender)) {
+      formData.gender = "Other";
+    }
+
+    // Convert height and weight to numbers
+    formData.height = Number(formData.height);
+    formData.weight = Number(formData.weight);
+
+    // Ensure height and weight are positive numbers
+    if (formData.height <= 0) formData.height = null;
+    if (formData.weight <= 0) formData.weight = null;
 
     return formData;
   };
@@ -204,61 +242,12 @@ const CoachSignup = (() => {
    * Shows success message and handles redirection
    */
   const showSuccessMessage = () => {
-    // Show the success modal
-    const successModal = document.getElementById("success-modal");
-    if (successModal) {
-      successModal.classList.remove("hidden");
-
-      // Start the progress bar and countdown
-      const redirectProgress = document.getElementById("redirect-progress");
-      const redirectCountdown = document.getElementById("redirect-countdown");
-      let count = 3;
-
-      const countdownInterval = setInterval(() => {
-        count--;
-        redirectCountdown.textContent = count;
-        redirectProgress.style.width = `${((3 - count) / 3) * 100}%`;
-
-        if (count <= 0) {
-          clearInterval(countdownInterval);
-          window.location.href = config.redirectPath;
-        }
-      }, 1000);
-    } else {
-      // Fallback if modal not found
-      alert("Account created successfully! Redirecting to dashboard...");
+    const modal = document.getElementById("success-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
       setTimeout(() => {
-        window.location.href = config.redirectPath;
-      }, 1500);
-    }
-  };
-
-  /**
-   * Handles the API submission when the form is complete
-   */
-  const submitFormData = async (formData) => {
-    try {
-      const response = await fetch(config.apiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        showSuccessMessage();
-        return true;
-      } else {
-        alert(data.error || "Registration failed. Please try again.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred during registration. Please try again.");
-      return false;
+        modal.classList.add("hidden");
+      }, 3000);
     }
   };
 
@@ -271,54 +260,41 @@ const CoachSignup = (() => {
       document.getElementById("step-2"),
       document.getElementById("step-3"),
     ];
-
-    if (!steps[0] || !steps[1] || !steps[2]) {
-      console.error("One or more form steps not found");
-      return;
-    }
-
     const progressBar = document.getElementById("progress-bar");
     const stepIndicator = document.getElementById("step-indicator");
     const progressPercentage = document.getElementById("progress-percentage");
 
-    // Fixed: Changing to 1-based indexing to match validateStep function
-    let currentStep = 1;
+    let currentStep = 0;
 
     // Go to specific step function
-    const goToStep = (stepNumber) => {
-      // Hide all steps
-      steps.forEach((step) => step.classList.remove("active"));
-
-      // Show the current step (adjust for zero-based array)
-      steps[stepNumber - 1].classList.add("active");
-
-      // Update current step tracking
-      currentStep = stepNumber;
+    const goToStep = (stepIndex) => {
+      steps[currentStep].classList.remove("active");
+      currentStep = stepIndex;
+      steps[currentStep].classList.add("active");
 
       // Update progress bar
-      const progress = ((currentStep - 1) / 2) * 100;
+      const progress = (currentStep / (steps.length - 1)) * 100;
       progressBar.style.width = `${progress}%`;
-      stepIndicator.textContent = `Step ${currentStep} of 3`;
+      stepIndicator.textContent = `Step ${currentStep + 1} of ${steps.length}`;
       progressPercentage.textContent = `${Math.round(progress)}%`;
     };
 
     // Next buttons
     document.getElementById("next-1")?.addEventListener("click", function () {
-      //if (validateStep(1)) goToStep(2);
-      goToStep(2);
+      if (validateStep(1)) goToStep(1);
     });
 
     document.getElementById("next-2")?.addEventListener("click", function () {
-      if (validateStep(2)) goToStep(3);
+      if (validateStep(2)) goToStep(2);
     });
 
     // Previous buttons
     document.getElementById("prev-2")?.addEventListener("click", function () {
-      goToStep(1);
+      goToStep(0);
     });
 
     document.getElementById("prev-3")?.addEventListener("click", function () {
-      goToStep(2);
+      goToStep(1);
     });
 
     // Initialize fitness goal option highlighting
@@ -350,28 +326,116 @@ const CoachSignup = (() => {
         initializeMultiStepForm();
 
         // Handle form submission
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          if (validateStep(3)) {
-            // Get submit button
-            const submitBtn = document.getElementById("submit-form");
-            if (submitBtn) submitBtn.disabled = true;
-
-            // Collect all form data
-            const formData = collectFormData();
-
-            // Use our own submit function (don't rely on CoachUtils)
-            await submitFormData(formData);
-
-            // Re-enable button regardless of result
-            if (submitBtn) submitBtn.disabled = false;
-          }
-        });
+        form.addEventListener("submit", handleSubmit);
       } else {
         console.error(`Signup form with ID "${config.formId}" not found`);
       }
     });
+  };
+
+  const validateEmail = (email) => {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // Password must be at least 8 characters
+    if (password.length < 8) {
+      return false;
+    }
+
+    // Must contain at least one letter
+    if (!/[a-zA-Z]/.test(password)) {
+      return false;
+    }
+
+    // Must contain at least one number
+    if (!/\d/.test(password)) {
+      return false;
+    }
+
+    // Must contain at least one special character
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate the final step
+    if (!validateStep(3)) {
+      return;
+    }
+
+    // Collect form data
+    const formData = collectFormData();
+
+    // Validate required fields
+    const requiredFields = [
+      "name",
+      "email",
+      "password",
+      "dob",
+      "gender",
+      "height",
+      "weight",
+      "initialActivityLevel",
+      "goal",
+    ];
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      showNotification(
+        `Please fill in all required fields: ${missingFields.join(", ")}`,
+        "error",
+      );
+      return;
+    }
+
+    // Send registration request
+    try {
+      if (typeof window.CoachUtils === "undefined") {
+        throw new Error(
+          "CoachUtils is not loaded. Please refresh the page and try again.",
+        );
+      }
+
+      await window.CoachUtils.sendPostAndRedirect(
+        "/api/register",
+        formData,
+        "/dashboard",
+        (result) => {
+          console.log("Registration successful:", result);
+          showSuccessMessage();
+        },
+        (error) => {
+          console.error("Registration failed:", error);
+          showNotification(
+            error.message || "Registration failed. Please try again.",
+            "error",
+          );
+        },
+      );
+    } catch (error) {
+      console.error("Registration error:", error);
+      showNotification(
+        "An error occurred during registration. Please try again.",
+        "error",
+      );
+    }
+  };
+
+  const showNotification = (message, type = "info") => {
+    if (typeof window.CoachUtils !== "undefined") {
+      window.CoachUtils.showNotification(message, type);
+    } else {
+      // Fallback notification if CoachUtils is not available
+      alert(message);
+    }
   };
 
   // Public API

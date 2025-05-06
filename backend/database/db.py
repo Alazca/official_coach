@@ -21,10 +21,26 @@ def register_user(
 ):
     conn = None
     cursor = None
+
     try:
         conn = create_conn()
         cursor = conn.cursor()
 
+        # First, create a goal record
+        cursor.execute(
+            """
+            INSERT INTO goals (
+                goal_type,
+                category,
+                description,
+                status
+            ) VALUES (?, ?, ?, ?)
+            """,
+            (goal, "Strength", f"Initial goal: {goal}", "Not Started"),
+        )
+        goal_id = cursor.lastrowid
+
+        # Then create the user with the goal_id
         cursor.execute(
             """
             INSERT INTO users (
@@ -35,39 +51,31 @@ def register_user(
                 dateOfBirth, 
                 height, 
                 weight, 
-                initialActivityLevel
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (email, password_hash, name, gender, dob, height, weight, activity_level),
-        )
-
-        # Get the user_id of the newly inserted user
-        user_id = cursor.lastrowid
-
-        # Then insert the initial goal into the goals table
-        cursor.execute(
-            """
-            INSERT INTO goals (
-                user_id, 
-                goal_type, 
-                category, 
-                description, 
-                status
-            ) VALUES (?, ?, ?, ?, ?)
+                initialActivityLevel,
+                goal_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (
-                user_id,
-                goal,
-                "Strength",  # Default category
-                f"Initial {goal} goal",  # Dynamic description based on goal type
-                "Not Started",
+                email,
+                password_hash,
+                name,
+                gender,
+                dob,
+                height,
+                weight,
+                activity_level,
+                goal_id,
             ),
         )
 
+        user_id = cursor.lastrowid
         conn.commit()
+
         if user_id is None:
             raise ValueError("No User ID found!")
+
         return user_id
+
     except Exception as e:
         error_message = str(e)
         return error_message

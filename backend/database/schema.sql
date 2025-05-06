@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
       'Intense'
     )
   ),
+  goal_id INTEGER NOT NUlL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -104,7 +105,8 @@ CREATE TABLE IF NOT EXISTS goals (
       'Strength',
       'Endurance',
       'Weight-Loss',
-      'Performance'
+      'Performance',
+      'Default'
     )
   ),
   category TEXT CHECK (
