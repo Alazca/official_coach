@@ -940,8 +940,8 @@ def insert_workout(conn, workout_data):
     try:
         # Prepare query with named placeholders for readability
         query = """
-            INSERT INTO workouts (name, date, notes, duration)
-            VALUES (:name, :date, :notes, :duration)
+            INSERT INTO workouts (workout_type, workout_date, notes, duration, user_id)
+            VALUES (:workout_type, :workout_date, :notes, :duration, :user_id)
         """
 
         # Execute query with parameter binding for security

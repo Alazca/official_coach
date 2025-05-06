@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS workouts (
     workout_type IN ('Strength', 'Cardio', 'Mobility', 'Recovery')
   ),
   notes TEXT,
+  duration INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
