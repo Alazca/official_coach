@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, url_for, redirect
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -85,7 +85,7 @@ initialize_database("backend/database/schema.sql")
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return redirect(url_for("frontpage")
 
 
 @app.route("/dashboard")
