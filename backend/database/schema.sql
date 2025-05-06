@@ -25,6 +25,7 @@ CREATE TABLE users (
       'Intense'
     )
   ),
+  goal_id INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
