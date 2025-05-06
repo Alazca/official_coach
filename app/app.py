@@ -173,14 +173,9 @@ def head_coach_hub():
     return render_template("head_coach_hub.html")
 
 
-@app.route("/visualize-data")
-def visualize_data():
-    return render_template("visualize_data.html")
-
-
-@app.route("/workout-of-the-day")
-def workout_of_the_day():
-    return render_template("workout_of_the_day.html")
+@app.route("/get-workout")
+def get_workout():
+    return render_template("get_workout.html")
 
 
 @app.route("/api/register", methods=["POST"])

@@ -6,7 +6,7 @@ const WorkoutDashboard = (() => {
   // Private variables
   const config = {
     // apiEndpoint: '/api/workouts', // Keep if needed for other dashboard actions
-    homePath: "dashboard.html", // Path to navigate home
+    homePath: "/dashboard", // Path to navigate home
   };
 
   /**
@@ -186,4 +186,3 @@ const WorkoutDashboard = (() => {
 
 // Initialize the module when the script loads
 WorkoutDashboard.initialize();
-

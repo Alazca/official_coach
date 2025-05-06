@@ -52,6 +52,16 @@ const FoodLoggerModule = (() => {
     const resetButton = document.querySelector(
       'button[onclick="resetDayMeals()"]',
     );
+
+    // --------------------- Home Button ---------------------
+    const homeButton = document.getElementById("homeButton");
+    if (homeButton) {
+      homeButton.addEventListener("click", () => {
+        // Navigate to root; adjust if your home route differs
+        window.location.href = "/dashboard";
+      });
+    }
+
     if (resetButton) {
       // Replace the inline handler with a proper event listener
       resetButton.removeAttribute("onclick");
@@ -248,4 +258,3 @@ const FoodLoggerModule = (() => {
 
 // Initialize the module when loaded
 FoodLoggerModule.initialize();
-
