@@ -32,6 +32,7 @@ from dotenv import load_dotenv
 
 from backend.config.config import Config
 from backend.database.db import (
+    create_conn,
     get_all_checkins,
     get_workout_history,
     register_user,
@@ -42,6 +43,7 @@ from backend.database.db import (
     get_weight_history,
     get_exercise_distribution,
     get_user_goals,
+    insert_workout
 )
 
 from backend.models.models import UserRegistration, DailyCheckIn
@@ -429,6 +431,29 @@ def general_coach_chat():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/workout/log", methods=["POST"])
+def log_workout():
+    try:
+        data = request.get_json()
+        print("Received workout data:", data)
+
+        workout_data = {
+            "workout_type": data["workout_type"],
+            "workout_date": data["workout_date"],
+            "notes": data.get("notes", ""),
+            "duration": data.get("duration", None),
+            "user_id": 1  # Temporary hardcoded user until JWT is re-enabled
+        }
+
+        conn = create_conn()
+        workout_id = insert_workout(conn, workout_data)
+        conn.close()
+
+        return jsonify({"success": True, "workout_id": workout_id}), 201
+
+    except Exception as e:
+        print("Error while logging workout:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     with app.app_context():
