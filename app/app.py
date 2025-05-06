@@ -212,7 +212,6 @@ def register():
 
 
 @app.route("/api/login", methods=["POST"])
-@jwt_required()
 def login_user():
     inputdata = request.get_json()
     email = inputdata.get("email", "")
