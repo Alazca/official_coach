@@ -7,7 +7,7 @@ const CoachSignup = (() => {
   const config = {
     apiEndpoint: "/api/register",
     formId: "signupForm",
-    redirectPath: "/dashboard", // Changed to use Flask route instead of HTML file
+    redirectPath: "/dashboard",
   };
 
   /**

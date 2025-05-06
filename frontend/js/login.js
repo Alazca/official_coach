@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // If already logged in, send straight to dashboard
   if (Credentials.isAuthenticated()) {
-    window.location.href = "dashboard.html";
+    window.location.href = "/dashboard";
     return;
   }
 
@@ -46,10 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Changed to match your backend response format
-      Credentials.saveToken(data.access_token);
+      Credentials.saveToken(data.accessToken);
 
       // Redirect to your protected page
-      window.location.href = "dashboard.html";
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login error:", err);
       loginMessage.textContent = "Network error. Please try again.";
@@ -62,4 +62,3 @@ document.addEventListener("DOMContentLoaded", () => {
     submitButton.textContent = "Log In";
   }
 });
-
