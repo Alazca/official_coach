@@ -198,65 +198,108 @@ def goals():
 
 @app.route("/api/register", methods=["POST"])
 def register():
+
+    user_id = None
+
     try:
+        # Parse and validate user data in one step
         data = request.get_json()
         user_data = UserRegistration(**data)
+
+        # Hash password
         password_hash = generate_password_hash(user_data.password)
-        user_id = register_user(
-            user_data.email,
-            password_hash,
-            user_data.name,
-            user_data.gender.value,
-            user_data.dob,
-            user_data.height,
-            user_data.weight,
-            user_data.initialActivityLevel.value,
-            user_data.goal.value if hasattr(user_data, "goal") else None,
-        )
-        if isinstance(user_id, int):
-            # Initialize user vector and create default goal
-            try:
-                user_vector = update_user_vector(user_id)
-                save_vector_snapshot(user_id)
 
-                # Create initial goal based on user's selected goal type
-                if hasattr(user_data, "goal"):
-                    target = initialize_target_vector(
-                        user_id=user_id,
-                        goal_type=user_data.goal,
-                        target_date=datetime.date.today()
-                        + datetime.timedelta(days=90),  # 90-day initial goal
-                    )
+        # Database operations in a single transaction
+        with create_conn() as conn:
+            cursor = conn.cursor()
 
-                logger.info(f"Successfully created vector profile for user {user_id}")
-            except Exception as e:
-                logger.error(f"Error initializing vector profile: {str(e)}")
-
-            return (
-                jsonify(
-                    {
-                        "success": True,
-                        "message": f"Successfully registered user {user_id}",
-                        "user_id": user_id,
-                    }
+            # Insert user
+            cursor.execute(
+                """
+                INSERT INTO users (
+                    email, 
+                    password_hash, 
+                    name, 
+                    gender, 
+                    dateOfBirth, 
+                    height, 
+                    weight, 
+                    initialActivityLevel,
+                    currentActivityLevel
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    user_data.email,
+                    password_hash,
+                    user_data.name,
+                    user_data.gender.value,
+                    user_data.dob,
+                    user_data.height,
+                    user_data.weight,
+                    user_data.initialActivityLevel.value,
+                    user_data.initialActivityLevel.value,
                 ),
-                200,
+            )
+            user_id = cursor.lastrowid
+
+            # Create initial goal in the same transaction
+            target_date = datetime.date.today() + datetime.timedelta(days=90)
+            cursor.execute(
+                """
+                INSERT INTO goals (
+                    user_id,
+                    goal_type,
+                    target_date
+                ) VALUES (?, ?, ?)
+                """,
+                (user_id, user_data.goal.value, target_date),
+            )
+            goal_id = cursor.lastrowid
+
+            # Update user with current goal ID
+            cursor.execute(
+                """
+                UPDATE users
+                SET current_goal_id = ?
+                WHERE user_id = ?
+                """,
+                (goal_id, user_id),
             )
 
-        if isinstance(user_id, str):
-            return (
-                jsonify({"success": False, "error": f"Database error: {user_id}"}),
-                400,
+            # Commit the entire transaction
+            conn.commit()
+
+        # Initialize user vector after DB transaction is complete
+        try:
+            user_vector = update_user_vector(user_id)
+            save_vector_snapshot(user_id)
+
+            # Initialize target vector
+            target = initialize_target_vector(
+                user_id=user_id, goal_type=user_data.goal, target_date=target_date
             )
+
+            logger.info(f"Successfully created vector profile for user {user_id}")
+        except Exception as e:
+            # Non-critical error - log but don't fail registration
+            logger.error(f"Error initializing vector profile: {str(e)}")
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": f"Successfully registered user {user_id}",
+                    "user_id": user_id,
+                }
+            ),
+            200,
+        )
 
     except ValueError as ve:
         return jsonify({"success": False, "error": f"Validation error: {str(ve)}"}), 400
-
     except Exception as e:
         logger.error(f"Unexpected error during registration: {str(e)}")
         return jsonify({"success": False, "error": f"Unexpected error: {str(e)}"}), 500
-
-    return jsonify({"success": False, "error": "Unknown error occurred"}), 500
 
 
 @app.route("/api/login", methods=["POST"])

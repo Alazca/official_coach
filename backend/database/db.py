@@ -36,7 +36,8 @@ def register_user(
                 dateOfBirth, 
                 height, 
                 weight, 
-                initialActivityLevel
+                initialActivityLevel,
+                
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
             (email, password_hash, name, gender, dob, height, weight, activity_level),
