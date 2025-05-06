@@ -101,7 +101,7 @@ CREATE TABLE goals (
       'Strength',
       'Endurance',
       'Weight-Loss',
-      'Performance',
+      'Performance'
     )
   ),
   category TEXT CHECK (

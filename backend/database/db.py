@@ -45,7 +45,6 @@ def register_user(
         user_id = cursor.lastrowid
 
         # Then insert the initial goal into the goals table
-        # Using 'Strength' as the category to match one of the allowed values
         cursor.execute(
             """
             INSERT INTO goals (
@@ -58,10 +57,10 @@ def register_user(
         """,
             (
                 user_id,
-                goal,  # From form (one of the allowed values)
-                "Strength",  # Valid category from the schema
-                "Initial fitness goal",  # Description
-                "Not Started",  # Default status
+                goal,
+                "Strength",  # Default category
+                f"Initial {goal} goal",  # Dynamic description based on goal type
+                "Not Started",
             ),
         )
 

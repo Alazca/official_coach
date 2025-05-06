@@ -171,7 +171,7 @@ const CoachSignup = (() => {
       initialActivityLevel:
         document.getElementById("activityLevel")?.value || "", // Changed to match backend model
       fitnessGoals: [],
-      goal: "Strength",
+      goal_type: "Strength",
     };
 
     // Collect fitness goals (multiple checkboxes)
