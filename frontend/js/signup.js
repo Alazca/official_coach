@@ -7,7 +7,7 @@ const CoachSignup = (() => {
   const config = {
     apiEndpoint: "/api/register",
     formId: "signupForm",
-    redirectPath: "../../index.html",
+    redirectPath: "/dashboard", // Changed to use Flask route instead of HTML file
   };
 
   /**
@@ -168,8 +168,8 @@ const CoachSignup = (() => {
       gender: document.getElementById("gender")?.value || "",
       height: parseFloat(document.getElementById("height")?.value) || 0,
       weight: parseFloat(document.getElementById("weight")?.value) || 0,
-      activityLevel: document.getElementById("activityLevel")?.value || "",
-      termsAccepted: document.getElementById("terms")?.checked || false,
+      initialActivityLevel:
+        document.getElementById("activityLevel")?.value || "", // Changed to match backend model
       fitnessGoals: [],
     };
 
@@ -217,6 +217,35 @@ const CoachSignup = (() => {
   };
 
   /**
+   * Handles the API submission when the form is complete
+   */
+  const submitFormData = async (formData) => {
+    try {
+      const response = await fetch(config.apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showSuccessMessage();
+        return true;
+      } else {
+        alert(data.error || "Registration failed. Please try again.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration. Please try again.");
+      return false;
+    }
+  };
+
+  /**
    * Initializes the multi-step form navigation
    */
   const initializeMultiStepForm = () => {
@@ -225,41 +254,53 @@ const CoachSignup = (() => {
       document.getElementById("step-2"),
       document.getElementById("step-3"),
     ];
+
+    if (!steps[0] || !steps[1] || !steps[2]) {
+      console.error("One or more form steps not found");
+      return;
+    }
+
     const progressBar = document.getElementById("progress-bar");
     const stepIndicator = document.getElementById("step-indicator");
     const progressPercentage = document.getElementById("progress-percentage");
 
-    let currentStep = 0;
+    // Fixed: Changing to 1-based indexing to match validateStep function
+    let currentStep = 1;
 
     // Go to specific step function
-    const goToStep = (stepIndex) => {
-      steps[currentStep].classList.remove("active");
-      currentStep = stepIndex;
-      steps[currentStep].classList.add("active");
+    const goToStep = (stepNumber) => {
+      // Hide all steps
+      steps.forEach((step) => step.classList.remove("active"));
+
+      // Show the current step (adjust for zero-based array)
+      steps[stepNumber - 1].classList.add("active");
+
+      // Update current step tracking
+      currentStep = stepNumber;
 
       // Update progress bar
-      const progress = (currentStep / (steps.length - 1)) * 100;
+      const progress = ((currentStep - 1) / 2) * 100;
       progressBar.style.width = `${progress}%`;
-      stepIndicator.textContent = `Step ${currentStep + 1} of ${steps.length}`;
+      stepIndicator.textContent = `Step ${currentStep} of 3`;
       progressPercentage.textContent = `${Math.round(progress)}%`;
     };
 
     // Next buttons
     document.getElementById("next-1")?.addEventListener("click", function () {
-      if (validateStep(1)) goToStep(1);
+      if (validateStep(1)) goToStep(2);
     });
 
     document.getElementById("next-2")?.addEventListener("click", function () {
-      if (validateStep(2)) goToStep(2);
+      if (validateStep(2)) goToStep(3);
     });
 
     // Previous buttons
     document.getElementById("prev-2")?.addEventListener("click", function () {
-      goToStep(0);
+      goToStep(1);
     });
 
     document.getElementById("prev-3")?.addEventListener("click", function () {
-      goToStep(1);
+      goToStep(2);
     });
 
     // Initialize fitness goal option highlighting
@@ -297,31 +338,16 @@ const CoachSignup = (() => {
           if (validateStep(3)) {
             // Get submit button
             const submitBtn = document.getElementById("submit-form");
+            if (submitBtn) submitBtn.disabled = true;
 
             // Collect all form data
             const formData = collectFormData();
 
-            // Use the utility function to send the POST request and redirect
-            if (window.CoachUtils) {
-              window.CoachUtils.sendPostAndRedirect(
-                config.apiEndpoint,
-                formData,
-                config.redirectPath,
-                (result) => {
-                  // Show success modal on successful API response
-                  showSuccessMessage();
-                },
-                (error) => {
-                  // The API call is already handled by the utility function,
-                  // we just need to re-enable the submit button if needed
-                  if (submitBtn) submitBtn.disabled = false;
-                },
-              );
-            } else {
-              console.error(
-                "CoachUtils not loaded. Make sure utils.js is included before signup.js",
-              );
-            }
+            // Use our own submit function (don't rely on CoachUtils)
+            await submitFormData(formData);
+
+            // Re-enable button regardless of result
+            if (submitBtn) submitBtn.disabled = false;
           }
         });
       } else {
