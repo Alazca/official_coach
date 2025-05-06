@@ -109,23 +109,23 @@ const FrontpageModule = (() => {
   const setupNavigationButtons = () => {
     // Setup signup buttons
     document
-      .querySelectorAll('button[onclick*="sign-up.html"]')
+      .querySelectorAll('button[onclick*="signup.html"]')
       .forEach((button) => {
         button.removeAttribute("onclick");
         button.addEventListener("click", () => {
-          window.location.href = "sign-up.html";
+          window.location.href = "signup.html";
         });
       });
 
     // Setup Start Free Trial button
     document
       .querySelectorAll(
-        "button[onclick*=\"window.location.href='sign-up.html'\"]",
+        "button[onclick*=\"window.location.href='signup.html'\"]",
       )
       .forEach((button) => {
         button.removeAttribute("onclick");
         button.addEventListener("click", () => {
-          window.location.href = "sign-up.html";
+          window.location.href = "signup.html";
         });
       });
   };
@@ -138,4 +138,3 @@ const FrontpageModule = (() => {
 
 // Initialize the module when loaded
 FrontpageModule.initialize();
-
