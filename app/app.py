@@ -98,6 +98,11 @@ def sign_up():
     return render_template("sign-up.html")
 
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+
 @app.route("/frontpage")
 def frontpage():
     return render_template("frontpage.html")
