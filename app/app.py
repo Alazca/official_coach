@@ -93,9 +93,9 @@ def dashboard():
     return render_template("dashboard.html")
 
 
-@app.route("/sign-up")
-def sign_up():
-    return render_template("sign-up.html")
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
 
 
 @app.route("/login")
