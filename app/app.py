@@ -5,7 +5,17 @@ import os
 import sqlite3
 import openai
 
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    session,
+)
+
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -16,6 +26,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     get_jwt,
 )
+
 from dotenv import load_dotenv
 
 from backend.config.config import Config
@@ -48,58 +59,60 @@ app = Flask(
 )
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=7)
 app.config["USDA_API_KEY"] = os.getenv("USDA_API_KEY")
 app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 app.config["FOODDATA_API_KEY"] = os.getenv("FOODDATA_API_KEY")
-
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 
 
 def initialize_database(schema_path: str = "backend/database/schema.sql") -> None:
     """
-    Initialize the database schema from a .sql file.
+    Create the SQLite database (and apply schema) if it does not already exist.
 
     Args:
-        schema_path (str): Path to the schema.sql file
+        schema_path (str): Relative path to schema.sql from project root.
     """
-    try:
-        config = Config()
-        db_path = config.get_database_path()
+    config = Config()
+    db_path = config.get_database_path()
 
-        # Get absolute path to project root
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(current_dir)
+    # Absolute paths
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+    full_schema_path = os.path.join(project_root, schema_path)
 
-        # Build absolute path to schema.sql
-        full_schema_path = os.path.join(project_root, schema_path)
-        print(f"Schema path: {full_schema_path}")
+    # 1. If DB file already exists **and** at least one table is present, do nothing.
+    if os.path.exists(db_path):
+        try:
+            with sqlite3.connect(db_path) as conn:
+                # Quick existence check for a table you KNOW is in your schema
+                cursor = conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='users';"
+                )
+                if cursor.fetchone():
+                    print("✅ Database already initialized. Skipping.")
+                    return
+        except sqlite3.Error as e:
+            # Fall through and recreate if file exists but is corrupt/empty
+            print(f"⚠️  Existing DB found but validation failed ({e}); re‑initializing.")
 
-        # Delete the existing database file if it exists
-        if os.path.exists(db_path):
-            try:
-                os.remove(db_path)
-                print("✅ Existing database file deleted.")
-            except Exception as e:
-                print(f"❌ Failed to delete existing database: {e}")
-                return
+    # 2. Ensure parent directory exists
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-        # Create the database directory if it doesn't exist
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    # 3. Read and execute schema
+    with open(full_schema_path, "r") as f:
+        schema_sql = f.read()
 
-        with open(full_schema_path, "r") as f:
-            schema = f.read()
+    with sqlite3.connect(db_path) as conn:
+        conn.executescript(schema_sql)
+        conn.commit()
 
-        with sqlite3.connect(db_path) as conn:
-            conn.executescript(schema)
-            conn.commit()
-
-        print("✅ Database initialized successfully.")
-    except Exception as e:
-        print(f"❌ Failed to initialize database: {e}")
+    print("✅ Database initialized successfully.")
 
 
+# Call only on application start‑up
 initialize_database("backend/database/schema.sql")
 
 
@@ -121,6 +134,13 @@ def sign_up():
 @app.route("/login")
 def login():
     return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()  # or session.pop("jwt", None), etc.
+    flash("You’ve been logged out. See you next time!", "info")
+    return redirect(url_for("login"))
 
 
 @app.route("/frontpage")
