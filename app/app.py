@@ -175,7 +175,7 @@ def head_coach_hub():
     return render_template("head_coach_hub.html")
 
 
-@app.route("/strength_conditioning-hub")
+@app.route("/get-workout")
 def get_workout():
     return render_template("get_workout.html")
 
@@ -201,7 +201,7 @@ def register():
             return jsonify({"message": f"Successfully registered user {user_id}"}), 200
 
         if isinstance(user_id, str):
-            return jsonify({"Database error": f"{user_id}"}), 400
+            return jsonify({"Database error": f"{user_id}"}), 405
 
     except ValueError as ve:
         return jsonify({"Validation error": f"{str(ve)}"}), 400
@@ -212,6 +212,7 @@ def register():
 
 
 @app.route("/api/login", methods=["POST"])
+@jwt_required()
 def login_user():
     inputdata = request.get_json()
     email = inputdata.get("email", "")
