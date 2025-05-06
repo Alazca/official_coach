@@ -521,4 +521,3 @@ window.WorkoutModule = WorkoutModule;
 //     const today = new Date().toISOString().split('T')[0];
 //     WorkoutModule.loadWorkout(today);
 // });
-
