@@ -140,7 +140,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.clear()  # or session.pop("jwt", None), etc.
+    session.clear()
     flash("You’ve been logged out. See you next time!", "info")
     return redirect(url_for("login"))
 
@@ -175,7 +175,7 @@ def head_coach_hub():
     return render_template("head_coach_hub.html")
 
 
-@app.route("/get-workout")
+@app.route("/strength_conditioning-hub")
 def get_workout():
     return render_template("get_workout.html")
 
