@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nutrition Hub - COACH</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen">
+    <header
+      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    >
+      <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
+      <div class="flex gap-4 items-center">
+        <a
+          href="/dashboard"
+          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+        >
+          Back to Dashboard
+        </a>
+      </div>
+    </header>
+    <main class="container mx-auto px-4 py-8">
+      <!-- Nutrition Goals -->
+      <div class="bg-gray-800 border border-red-800 rounded-xl p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">Your Nutrition Goals</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-gray-700 rounded-lg p-4 flex flex-col">
+            <span class="text-gray-300 text-sm">Daily Calories</span>
+            <span class="text-2xl font-bold text-white">2000 kcal</span>
+          </div>
+          <div class="bg-gray-700 rounded-lg p-4 flex flex-col">
+            <span class="text-gray-300 text-sm">Protein Target</span>
+            <span class="text-2xl font-bold text-white">150g</span>
+          </div>
+          <div class="bg-gray-700 rounded-lg p-4 flex flex-col">
+            <span class="text-gray-300 text-sm">Goal</span>
+            <span class="text-2xl font-bold text-white">Muscle Gain</span>
+          </div>
+        </div>
+      </div>
+      <!-- Chat and Food Logger -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <!-- Chat -->
+        <div
+          class="md:col-span-2 bg-gray-800 border border-red-800 rounded-xl p-6 flex flex-col"
+        >
+          <h3 class="text-lg font-bold mb-2">
+            Chat with Your AI Nutrition Coach
+          </h3>
+          <p class="text-gray-300 mb-4">
+            Ask questions about nutrition, get meal recommendations, or discuss
+            your dietary needs.
+          </p>
+          <div
+            id="chatWindow"
+            class="bg-gray-700 rounded-lg p-4 h-48 overflow-y-auto mb-4 flex flex-col gap-2"
+          >
+            <div
+              class="self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]"
+            >
+              Hello! I'm your AI Nutrition Coach. How can I help you today?
+            </div>
+          </div>
+          <form id="chatForm" class="flex gap-2">
+            <input
+              id="chatInput"
+              type="text"
+              placeholder="Ask about nutrition, recipes, or meal planning..."
+              class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none"
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              class="bg-red-700 hover:bg-red-800 text-white font-bold px-6 py-2 rounded-lg transition"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+        <!-- Food Logger -->
+        <div
+          class="bg-gray-800 border border-red-800 rounded-xl p-6 flex flex-col"
+        >
+          <h3 class="text-lg font-bold mb-4">Food Logger</h3>
+          <form id="foodLoggerForm" class="flex gap-2 mb-2">
+            <input
+              id="foodInput"
+              type="text"
+              placeholder="Search food..."
+              class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none"
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              class="bg-red-700 hover:bg-red-800 text-white font-bold px-4 py-2 rounded-lg transition"
+            >
+              Log Food
+            </button>
+          </form>
+          <div
+            id="foodLoggerResults"
+            class="bg-gray-700 rounded-lg p-2 text-gray-300 text-sm"
+          >
+            Loading...
+          </div>
+        </div>
+      </div>
+      <!-- Meal Recommendations and Special Diets -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Meal Recommendations -->
+        <div class="bg-gray-800 border border-red-800 rounded-xl p-6">
+          <h4 class="text-lg font-bold mb-4">Meal Recommendations</h4>
+          <div class="flex flex-col gap-3">
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              Breakfast Ideas
+            </button>
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              Lunch Ideas
+            </button>
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              Dinner Ideas
+            </button>
+          </div>
+        </div>
+        <!-- Special Diets -->
+        <div class="bg-gray-800 border border-red-800 rounded-xl p-6">
+          <h4 class="text-lg font-bold mb-4">Special Diets</h4>
+          <div class="flex flex-col gap-3">
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              High Protein
+            </button>
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              Low Carb
+            </button>
+            <button
+              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+            >
+              Vegetarian
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="../js/credentials.js"></script>
+    <script src="../js/nutrition_hub.js"></script>
+  </body>
+</html>
