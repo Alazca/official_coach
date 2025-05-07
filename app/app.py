@@ -142,9 +142,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.clear()
-    flash("You’ve been logged out. See you next time!", "info")
-    return redirect(url_for("login"))
+    return redirect("/")
 
 
 @app.route("/frontpage")

@@ -3,7 +3,7 @@
  * Manages JWT tokens and authentication status
  */
 const Credentials = (function () {
-  const TOKEN_KEY = "jwt_token";
+  const TOKEN_KEY = "access_token";
 
   // Helper to decode JWT payload
   function parseJwt(token) {
