@@ -106,6 +106,7 @@ class DailyCheckIn(BaseModel):
     stress: int  # Stress level 1-10
     energy: int  # Energy level 1-10
     soreness: int  # Soreness level 1-10
+    check_in_date: date
 
     @field_validator("weight")
     def validate_weight(cls, v):

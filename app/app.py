@@ -250,10 +250,10 @@ def check_in():
         checkin_id = insert_check_in(
             user_id=user_id,
             weight=checkin.weight,
-            sleep=checkin.sleep_quality,
-            stress=checkin.stress_level,
-            energy=checkin.energy_level,
-            soreness=checkin.soreness_level,
+            sleep=checkin.sleep,
+            stress=checkin.stress,
+            energy=checkin.energy,
+            soreness=checkin.soreness,
             check_in_date=checkin.check_in_date,
         )
         return jsonify({"message": "Check-in recorded", "checkin_id": checkin_id}), 200
@@ -310,11 +310,11 @@ def get_check_ins():
 
             checkin_events.setdefault(y, {}).setdefault(m, {})[d] = {}
 
-            if c.get("sleep_quality") is not None:
-                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep_quality"])
+            if c.get("sleep") is not None:
+                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep"])
 
-            if c.get("energy_level") is not None:
-                checkin_events[y][m][d]["energy"] = describe_energy(c["energy_level"])
+            if c.get("energy") is not None:
+                checkin_events[y][m][d]["energy"] = describe_energy(c["energy"])
 
         return jsonify(checkin_events), 200
 

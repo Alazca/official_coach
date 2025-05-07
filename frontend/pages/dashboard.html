@@ -164,9 +164,175 @@
         </div>
       </aside>
     </div>
+
+    <!-- Check-In Modal -->
+    <div
+      id="checkinModal"
+      class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
+    >
+      <div
+        class="bg-gray-800 text-white rounded-xl p-6 w-full max-w-md space-y-4 relative"
+      >
+        <button
+          id="closeModal"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none"
+        >
+          &times;
+        </button>
+        <h2 class="text-2xl font-bold">Daily Check-In</h2>
+        <form id="checkinForm" class="space-y-4">
+          <input type="hidden" id="checkinDate" name="check_in_date" />
+
+          <!-- Weight Field -->
+          <div>
+            <label for="weight" class="block font-semibold">Weight (lbs)</label>
+            <input
+              type="number"
+              id="weight"
+              name="weight"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              placeholder="185"
+              min="1"
+              step="1"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="workout" class="block font-semibold">Workout</label>
+            <input
+              type="text"
+              id="workout"
+              name="workout"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              placeholder="e.g. Full Body Strength, Cardio"
+            />
+          </div>
+
+          <div>
+            <label for="nutrition" class="block font-semibold"
+              >Nutrition (cal)</label
+            >
+            <input
+              type="number"
+              id="nutrition"
+              name="nutrition"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              placeholder="2000"
+            />
+          </div>
+
+          <!-- Sleep Quality (1-10 scale) -->
+          <div>
+            <label for="sleep" class="block font-semibold"
+              >Sleep Quality (1-10)</label
+            >
+            <select
+              id="sleep"
+              name="sleep"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              required
+            >
+              <option value="1">1 - Very Poor</option>
+              <option value="2">2 - Poor</option>
+              <option value="3">3 - Below Average</option>
+              <option value="4">4 - Slightly Below Average</option>
+              <option value="5" selected>5 - Average</option>
+              <option value="6">6 - Slightly Above Average</option>
+              <option value="7">7 - Good</option>
+              <option value="8">8 - Very Good</option>
+              <option value="9">9 - Excellent</option>
+              <option value="10">10 - Perfect</option>
+            </select>
+          </div>
+
+          <!-- Energy Level (1-10 scale) -->
+          <div>
+            <label for="energy" class="block font-semibold"
+              >Energy Level (1-10)</label
+            >
+            <select
+              id="energy"
+              name="energy"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              required
+            >
+              <option value="1">1 - Exhausted</option>
+              <option value="2">2 - Very Low</option>
+              <option value="3">3 - Low</option>
+              <option value="4">4 - Somewhat Low</option>
+              <option value="5" selected>5 - Average</option>
+              <option value="6">6 - Somewhat High</option>
+              <option value="7">7 - Good</option>
+              <option value="8">8 - Very Good</option>
+              <option value="9">9 - Excellent</option>
+              <option value="10">10 - Maximum</option>
+            </select>
+          </div>
+
+          <!-- Stress Level (1-10 scale) -->
+          <div>
+            <label for="stress" class="block font-semibold"
+              >Stress Level (1-10)</label
+            >
+            <select
+              id="stress"
+              name="stress"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              required
+            >
+              <option value="1">1 - None</option>
+              <option value="2">2 - Minimal</option>
+              <option value="3">3 - Very Low</option>
+              <option value="4">4 - Low</option>
+              <option value="5" selected>5 - Average</option>
+              <option value="6">6 - Somewhat High</option>
+              <option value="7">7 - High</option>
+              <option value="8">8 - Very High</option>
+              <option value="9">9 - Severe</option>
+              <option value="10">10 - Extreme</option>
+            </select>
+          </div>
+
+          <!-- Soreness Level (1-10 scale) -->
+          <div>
+            <label for="soreness" class="block font-semibold"
+              >Soreness Level (1-10)</label
+            >
+            <select
+              id="soreness"
+              name="soreness"
+              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              required
+            >
+              <option value="1">1 - None</option>
+              <option value="2">2 - Barely Noticeable</option>
+              <option value="3">3 - Mild</option>
+              <option value="4">4 - Noticeable</option>
+              <option value="5" selected>5 - Moderate</option>
+              <option value="6">6 - Somewhat Strong</option>
+              <option value="7">7 - Strong</option>
+              <option value="8">8 - Very Strong</option>
+              <option value="9">9 - Severe</option>
+              <option value="10">10 - Extreme</option>
+            </select>
+          </div>
+
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 px-4 py-3 rounded-lg font-bold transition shadow-lg hover:shadow-red-600/50 active:scale-95"
+            >
+              Submit Check-In
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
     <!-- JS Link -->
     <script src="../js/credentials.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/dashboard.js"></script>
+    <script src="../js/checkin-modal.js"></script>
   </body>
 </html>
