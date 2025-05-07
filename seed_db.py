@@ -171,7 +171,7 @@ def main():
         goal_id = insert_goal(conn, goal_type)
 
         email = f"Test@example.com"
-        pwd_hash = ""
+        pwd_hash = "scrypt:32768:8:1$wGM0ZETGcN2qUCkw$f79629590d0d3eef8e87d22b66d7bf4aec18402ab3ffcc01242bac3dcb78e8602b441550d7b97cf5312e5c23aa6205386c2d9dc7930ba1ac51b88cc6eff9c900"
         name = f"TestUser{random.randint(1000,9999)}"
         gender = random.choice(["Male", "Female", "Other"])
         dob = (

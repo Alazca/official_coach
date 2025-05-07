@@ -25,6 +25,7 @@ from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity,
+    get_jwt,
 )
 
 from dotenv import load_dotenv
@@ -229,7 +230,9 @@ def login_user():
         )
 
         return (
-            jsonify({"message": "Login successful", "access_token": access_token}),
+            jsonify(
+                {"message": "Login successful", "access_token": access_token}
+            ),  # <-- underscore instead of space
             200,
         )
     else:
@@ -263,10 +266,58 @@ def check_in():
 @app.route("/api/check-ins", methods=["GET"])
 @jwt_required()
 def get_check_ins():
+    def describe_sleep(score):
+        if score >= 9:
+            return "Excellent"
+        elif score >= 7:
+            return "Good"
+        elif score >= 5:
+            return "Fair"
+        else:
+            return "Poor"
+
+    def describe_energy(score):
+        if score >= 9:
+            return "Very High"
+        elif score >= 7:
+            return "High"
+        elif score >= 5:
+            return "Low"
+        else:
+            return "Very Low"
+
     try:
         user_id = get_jwt_identity()
-        checkins = get_all_checkins(user_id)
-        return jsonify(checkins), 200
+        year = request.args.get("year", type=int)
+        month = request.args.get("month", type=int)
+
+        if year is None or month is None:
+            return jsonify({"error": "Missing year or month"}), 400
+
+        all_checkins = get_all_checkins(user_id)
+        filtered = []
+
+        for c in all_checkins:
+            checkin_date = datetime.strptime(c["check_in_date"], "%Y-%m-%d")
+            if checkin_date.year == year and checkin_date.month == month:
+                filtered.append(c)
+
+        checkin_events = {}
+
+        for c in filtered:
+            date = datetime.strptime(c["check_in_date"], "%Y-%m-%d")
+            y, m, d = date.year, date.month - 1, date.day
+
+            checkin_events.setdefault(y, {}).setdefault(m, {})[d] = {}
+
+            if c.get("sleep_quality") is not None:
+                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep_quality"])
+
+            if c.get("energy_level") is not None:
+                checkin_events[y][m][d]["energy"] = describe_energy(c["energy_level"])
+
+        return jsonify(checkin_events), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -280,6 +331,9 @@ def get_goals():
         return jsonify(goals), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+from datetime import datetime
 
 
 @app.route("/api/workouts", methods=["GET"])
@@ -342,16 +396,7 @@ def strength_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        # Get API key from environment variable
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            print("OpenAI API key not found in environment variables")
-            return jsonify({"error": "OpenAI API key not configured"}), 500
-
-        print(
-            f"Using OpenAI API key: {api_key[:8]}..."
-        )  # Log first 8 chars for debugging
-        client = openai.OpenAI(api_key=api_key)
+        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -367,7 +412,6 @@ def strength_coach_chat():
         ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
-        print(f"Error in strength coach chat: {str(e)}")  # Add logging
         return jsonify({"error": str(e)}), 500
 
 
@@ -379,13 +423,7 @@ def nutrition_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        # Get API key from environment variable
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            print("OpenAI API key not found in environment variables")
-            return jsonify({"error": "OpenAI API key not configured"}), 500
-
-        client = openai.OpenAI(api_key=api_key)
+        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -401,7 +439,6 @@ def nutrition_coach_chat():
         ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
-        print(f"Error in nutrition coach chat: {str(e)}")  # Add logging
         return jsonify({"error": str(e)}), 500
 
 
@@ -413,40 +450,38 @@ def food_search():
         if not query:
             return jsonify({"error": "No search query provided."}), 400
 
-        # Get API key from environment variable
-        api_key = os.getenv("FOODDATA_API_KEY")
-        if not api_key:
-            return jsonify({"error": "FoodData API key not configured"}), 500
+        api_key = current_app.config.get["FOODDATA_API_KEY"]
+        search_url = (
+            f"https://api.nal.usda.gov/fdc/v1/foods/search" f"?api_key={api_key}"
+        )
 
-        search_url = f"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={api_key}"
-        payload = {"query": query, "pageSize": 5}
+        payload = {"query": query, "pageSize": 1}
         response = requests.post(search_url, json=payload)
         if response.status_code != 200:
             return jsonify({"error": "Failed to fetch data from USDA API."}), 500
         results = response.json()
         if not results.get("foods"):
             return jsonify({"error": "No foods found."}), 404
-        foods = []
-        for food in results.get("foods", []):
-            food_info = {
-                "description": food.get("description"),
-                "brand": food.get("brandOwner"),
-                "calories": None,
-                "protein": None,
-                "carbs": None,
-                "fat": None,
-            }
-            for nutrient in food.get("foodNutrients", []):
-                if nutrient.get("nutrientName") == "Energy":
-                    food_info["calories"] = nutrient.get("value")
-                elif nutrient.get("nutrientName") == "Protein":
-                    food_info["protein"] = nutrient.get("value")
-                elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
-                    food_info["carbs"] = nutrient.get("value")
-                elif nutrient.get("nutrientName") == "Total lipid (fat)":
-                    food_info["fat"] = nutrient.get("value")
-            foods.append(food_info)
-        return jsonify({"foods": foods})
+        food = results["foods"][0]
+        # Extract basic info
+        food_info = {
+            "description": food.get("description"),
+            "brand": food.get("brandOwner"),
+            "calories": None,
+            "protein": None,
+            "carbs": None,
+            "fat": None,
+        }
+        for nutrient in food.get("foodNutrients", []):
+            if nutrient.get("nutrientName") == "Energy":
+                food_info["calories"] = nutrient.get("value")
+            elif nutrient.get("nutrientName") == "Protein":
+                food_info["protein"] = nutrient.get("value")
+            elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
+                food_info["carbs"] = nutrient.get("value")
+            elif nutrient.get("nutrientName") == "Total lipid (fat)":
+                food_info["fat"] = nutrient.get("value")
+        return jsonify(food_info)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -459,13 +494,7 @@ def general_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        api_key = app.config["OPENAI_API_KEY"]
-        if not api_key:
-            print("OpenAI API key not found in environment variables")
-            return jsonify({"error": "OpenAI API key not configured"}), 500
-
-        client = openai.OpenAI(api_key=api_key)
-
+        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -478,8 +507,7 @@ def general_coach_chat():
             max_tokens=300,
             temperature=0.7,
         )
-        ai_message = response.choices[0].message.content
-
+        ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
