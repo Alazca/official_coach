@@ -16,27 +16,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Send to backend
     try {
-      const res = await fetch("/api/ai-coach-chat", {
+      const res = await fetch("/api/nutrition-coach-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: userMsg,
-          coach_type: "nutrition", // Specify this is for nutrition coaching
+          message: userMsg
         }),
       });
       const data = await res.json();
+      
       // Display AI reply
       const aiDiv = document.createElement("div");
       aiDiv.className =
         "self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]";
-      aiDiv.textContent = data.reply;
+      aiDiv.textContent = data.response || data.error || "No response received";
       chatWindow.appendChild(aiDiv);
       chatWindow.scrollTop = chatWindow.scrollHeight;
     } catch (err) {
+      console.error("Error:", err);
       const errDiv = document.createElement("div");
       errDiv.className =
         "self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]";
-      errDiv.textContent = "Error contacting AI coach.";
+      errDiv.textContent = "Error contacting AI coach. Please try again.";
       chatWindow.appendChild(errDiv);
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
@@ -52,16 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Quick prompt buttons for nutrition-related questions
   const quickPrompts = {
-    Macros:
-      "What are the recommended macronutrient ratios for strength training?",
-    "Pre-Workout": "What should I eat before a workout?",
-    "Post-Workout": "What are the best post-workout meals?",
-    Supplements: "What supplements are recommended for strength training?",
-    Hydration: "How much water should I drink during workouts?",
-    "Meal Timing": "When should I eat in relation to my workouts?",
+    "Breakfast Ideas": "Can you give me some healthy breakfast ideas for muscle gain?",
+    "Lunch Ideas": "What are some nutritious lunch options for someone trying to build muscle?",
+    "Dinner Ideas": "Suggest some high-protein dinner meals for athletes.",
+    "High Protein": "What are some high-protein foods I can include in my diet?",
+    "Low Carb": "Can you recommend some low-carb meal options?",
+    "Vegetarian": "What are good vegetarian meals for strength training?",
   };
 
-  document.querySelectorAll("button").forEach((btn) => {
+  // Attach event listeners only to quick prompt buttons in Meal Recommendations and Special Diets
+  document.querySelectorAll('.bg-gray-700').forEach((btn) => {
     const prompt = quickPrompts[btn.textContent.trim()];
     if (prompt) {
       btn.addEventListener("click", async (e) => {

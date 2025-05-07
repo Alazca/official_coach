@@ -4,6 +4,10 @@ import json
 import os
 import sqlite3
 import openai
+import sys
+
+# Add the project root directory to sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import (
     Flask,
@@ -141,7 +145,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("You’ve been logged out. See you next time!", "info")
+    flash("You've been logged out. See you next time!", "info")
     return redirect(url_for("login"))
 
 
@@ -184,7 +188,15 @@ def get_workout():
 def register():
     try:
         data = request.get_json()
+        print("Incoming registration data:", data)  # Debugging line
+
         user_data = UserRegistration(**data)
+        
+        # Check if user already exists
+        existing_user = user_exists(user_data.email)
+        if existing_user and not isinstance(existing_user, Exception):
+            return jsonify({"error": "An account with this email already exists. Please use a different email or login."}), 400
+
         password_hash = generate_password_hash(user_data.password)
         user_id = register_user(
             user_data.email,
@@ -201,13 +213,18 @@ def register():
             return jsonify({"message": f"Successfully registered user {user_id}"}), 200
 
         if isinstance(user_id, str):
-            return jsonify({"Database error": f"{user_id}"}), 400
+            if "UNIQUE constraint" in user_id:
+                return jsonify({"error": "An account with this email already exists. Please use a different email or login."}), 400
+            return jsonify({"error": f"Registration failed: {user_id}"}), 400
 
     except ValueError as ve:
-        return jsonify({"Validation error": f"{str(ve)}"}), 400
+        print("Validation error:", ve)  # Debugging line
+        return jsonify({"error": f"{str(ve)}"}), 400
 
     except Exception as e:
-        return jsonify({"Unexpected error": str(e)}), 500
+        print("Unexpected error:", e)  # Debugging line
+        return jsonify({"error": "An unexpected error occurred. Please try again."}), 500
+    
     return jsonify({"error": "Unknown error occurred"}), 500
 
 
@@ -313,7 +330,14 @@ def strength_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
+
+        print(f"Using OpenAI API key: {api_key[:8]}...")  # Log first 8 chars for debugging
+        client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -329,6 +353,7 @@ def strength_coach_chat():
         ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
+        print(f"Error in strength coach chat: {str(e)}")  # Add logging
         return jsonify({"error": str(e)}), 500
 
 
@@ -340,7 +365,13 @@ def nutrition_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
+
+        client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -356,6 +387,7 @@ def nutrition_coach_chat():
         ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
+        print(f"Error in nutrition coach chat: {str(e)}")  # Add logging
         return jsonify({"error": str(e)}), 500
 
 
@@ -367,38 +399,40 @@ def food_search():
         if not query:
             return jsonify({"error": "No search query provided."}), 400
 
-        api_key = current_app.config.get["FOODDATA_API_KEY"]
-        search_url = (
-            f"https://api.nal.usda.gov/fdc/v1/foods/search" f"?api_key={api_key}"
-        )
+        # Get API key from environment variable
+        api_key = os.getenv("FOODDATA_API_KEY")
+        if not api_key:
+            return jsonify({"error": "FoodData API key not configured"}), 500
 
-        payload = {"query": query, "pageSize": 1}
+        search_url = f"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={api_key}"
+        payload = {"query": query, "pageSize": 5}
         response = requests.post(search_url, json=payload)
         if response.status_code != 200:
             return jsonify({"error": "Failed to fetch data from USDA API."}), 500
         results = response.json()
         if not results.get("foods"):
             return jsonify({"error": "No foods found."}), 404
-        food = results["foods"][0]
-        # Extract basic info
-        food_info = {
-            "description": food.get("description"),
-            "brand": food.get("brandOwner"),
-            "calories": None,
-            "protein": None,
-            "carbs": None,
-            "fat": None,
-        }
-        for nutrient in food.get("foodNutrients", []):
-            if nutrient.get("nutrientName") == "Energy":
-                food_info["calories"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Protein":
-                food_info["protein"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
-                food_info["carbs"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Total lipid (fat)":
-                food_info["fat"] = nutrient.get("value")
-        return jsonify(food_info)
+        foods = []
+        for food in results.get("foods", []):
+            food_info = {
+                "description": food.get("description"),
+                "brand": food.get("brandOwner"),
+                "calories": None,
+                "protein": None,
+                "carbs": None,
+                "fat": None,
+            }
+            for nutrient in food.get("foodNutrients", []):
+                if nutrient.get("nutrientName") == "Energy":
+                    food_info["calories"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Protein":
+                    food_info["protein"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
+                    food_info["carbs"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Total lipid (fat)":
+                    food_info["fat"] = nutrient.get("value")
+            foods.append(food_info)
+        return jsonify({"foods": foods})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -411,7 +445,13 @@ def general_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
+
+        client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -427,6 +467,7 @@ def general_coach_chat():
         ai_message = response.choices[0].message.content.strip()
         return jsonify({"response": ai_message})
     except Exception as e:
+        print(f"Error in general coach chat: {str(e)}")  # Add logging
         return jsonify({"error": str(e)}), 500
 
 
