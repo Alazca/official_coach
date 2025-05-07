@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import requests
 import json
 import os
@@ -141,9 +141,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.clear()
-    flash("You’ve been logged out. See you next time!", "info")
-    return redirect(url_for("login"))
+    return redirect("/")
 
 
 @app.route("/frontpage")
@@ -320,6 +318,7 @@ def get_workouts():
             }
 
         return jsonify(events), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -500,7 +499,7 @@ def log_workout():
             "workout_date": data["workout_date"],
             "notes": data.get("notes", ""),
             "duration": data.get("duration", None),
-            "user_id": user_id,  # Temporary hardcoded user until JWT is re-enabled
+            "user_id": user_id,
         }
 
         conn = create_conn()
