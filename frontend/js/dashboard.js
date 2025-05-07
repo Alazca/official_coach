@@ -3,10 +3,15 @@
  * Handles dashboard initialization, chart rendering, and UI interactions
  */
 
-// Check if logged in, redirect if not
-if (!Credentials.isAuthenticated()) {
-  window.location.href = "/";
-}
+// Check if logged in, redirect if not - with a small delay to ensure token is available
+document.addEventListener("DOMContentLoaded", () => {
+  // Add a small delay to check authentication to allow for token processing
+  setTimeout(() => {
+    if (!Credentials.isAuthenticated()) {
+      window.location.href = "../index.html";
+    }
+  }, 500); // 500ms delay gives time for token to be properly set
+});
 
 // Global variables
 let currentDate = new Date();

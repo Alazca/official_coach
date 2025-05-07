@@ -7,7 +7,7 @@ const CoachSignup = (() => {
   const config = {
     apiEndpoint: "/api/register",
     formId: "signupForm",
-    redirectPath: "../../index.html",
+    redirectPath: "/../index.html",
   };
 
   /**
