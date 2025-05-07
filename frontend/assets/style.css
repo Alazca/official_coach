@@ -26,13 +26,18 @@
     padding: 1.25rem;
 }
 
-.bar-button, .save-log {
+.bar-button, .save-log, .send-button, #saveWorkoutBtn {
     color: var(--bg-alt);
     background-color: var(--primary);
     border-color: var(--primary);
 }
-.bar-button:hover {
+.bar-button:hover, .send-button:hover, #saveWorkoutBtn:hover {
     background-color: var(--primary-dark);
+}
+
+.self-end {
+    background-color: var(--primary);
+    color: var(--surface);
 }
 
 .logout, #todayBtn {
@@ -43,6 +48,24 @@
     background-color: var(--button);
     color: var(--bg-alt);
 }
+
+#chatWindow, #chatInput, .prompt-button:hover, input, textarea{
+    background-color: var(--surface);
+    color: var(--text);
+}
+.prompt-button, .chat-bubble, .self-start, #timeRange, .goals {
+    background-color: var(--bg-light);
+    color: var(--text);
+}
+.running {
+    background-color: var(--bg-light);
+    border: 2px solid var(--primary);
+}
+#foodLoggerResults {
+    background-color: var(--bg-light);
+    color: var(--text-secondary);
+}
+
 
 .light-button {
     background-color: var(--bg-light);
@@ -68,7 +91,7 @@
 }
 
 label {
-    color: var(--primary);
+    color: var(--primary-dark);
 }
 
 .remove-food, .add-food-item {
@@ -82,10 +105,11 @@ label {
     border: 2px solid var(--border);
     padding: 1.5rem;
 }
-.side-bar {
+.side-bar, .chart-container {
     background-color: var(--bg-light);
     border: 2px solid var(--border);
 }
+
 .pb {
     padding-bottom: 1.5rem;
 }
