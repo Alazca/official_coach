@@ -215,7 +215,6 @@ def register():
 
         if isinstance(user_id, str):
             return jsonify({"Database error": f"{user_id}"}), 405
-            return jsonify({"message": f"Successfully registered user {user_id}"}), 200
 
         if isinstance(user_id, str):
             return jsonify({"Database error": f"{user_id}"}), 405
@@ -247,9 +246,7 @@ def login_user():
         )
 
         return (
-            jsonify(
-                {"message": "Login successful", "access_token": access_token}
-            ),  # <-- underscore instead of space
+            jsonify({"message": "Login successful", "access_token": access_token}),
             200,
         )
     else:
