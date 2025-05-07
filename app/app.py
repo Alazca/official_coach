@@ -396,7 +396,14 @@ def strength_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
+
+        client = openai.OpenAI(api_key=api_key)
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -423,7 +430,13 @@ def nutrition_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
+
+        client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -450,38 +463,42 @@ def food_search():
         if not query:
             return jsonify({"error": "No search query provided."}), 400
 
-        api_key = current_app.config.get["FOODDATA_API_KEY"]
-        search_url = (
-            f"https://api.nal.usda.gov/fdc/v1/foods/search" f"?api_key={api_key}"
-        )
+        # Get API key from environment variable
+        api_key = os.getenv("FOODDATA_API_KEY")
+        if not api_key:
+            return jsonify({"error": "FoodData API key not configured"}), 500
 
-        payload = {"query": query, "pageSize": 1}
+        search_url = f"https://api.nal.usda.gov/fdc/v1/foods/search?api_key={api_key}"
+        payload = {"query": query, "pageSize": 5}
         response = requests.post(search_url, json=payload)
+
         if response.status_code != 200:
             return jsonify({"error": "Failed to fetch data from USDA API."}), 500
         results = response.json()
         if not results.get("foods"):
             return jsonify({"error": "No foods found."}), 404
-        food = results["foods"][0]
-        # Extract basic info
-        food_info = {
-            "description": food.get("description"),
-            "brand": food.get("brandOwner"),
-            "calories": None,
-            "protein": None,
-            "carbs": None,
-            "fat": None,
-        }
-        for nutrient in food.get("foodNutrients", []):
-            if nutrient.get("nutrientName") == "Energy":
-                food_info["calories"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Protein":
-                food_info["protein"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
-                food_info["carbs"] = nutrient.get("value")
-            elif nutrient.get("nutrientName") == "Total lipid (fat)":
-                food_info["fat"] = nutrient.get("value")
-        return jsonify(food_info)
+        foods = []
+        for food in results.get("foods", []):
+            food_info = {
+                "description": food.get("description"),
+                "brand": food.get("brandOwner"),
+                "calories": None,
+                "protein": None,
+                "carbs": None,
+                "fat": None,
+            }
+            for nutrient in food.get("foodNutrients", []):
+                if nutrient.get("nutrientName") == "Energy":
+                    food_info["calories"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Protein":
+                    food_info["protein"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
+                    food_info["carbs"] = nutrient.get("value")
+                elif nutrient.get("nutrientName") == "Total lipid (fat)":
+                    food_info["fat"] = nutrient.get("value")
+            foods.append(food_info)
+        return jsonify({"foods": foods})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -493,8 +510,14 @@ def general_coach_chat():
         user_message = data.get("message", "")
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("OpenAI API key not found in environment variables")
+            return jsonify({"error": "OpenAI API key not configured"}), 500
 
-        client = openai.OpenAI(api_key=app.config["OPENAI_API_KEY"])
+        client = openai.OpenAI(api_key=api_key)
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[

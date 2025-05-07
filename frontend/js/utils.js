@@ -64,11 +64,19 @@ const CoachUtils = (() => {
           onError(error);
         }
 
-        // Show error message
-        showNotification(
-          error.message || "An error occurred. Please try again.",
-          "error",
-        );
+        // Show error message - handle both validation and general errors
+        let errorMessage = "An error occurred. Please try again.";
+        if (error["Validation error"]) {
+          errorMessage = error["Validation error"];
+        } else if (error["Database error"]) {
+          errorMessage = error["Database error"];
+        } else if (error.error) {
+          errorMessage = error.error;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        showNotification(errorMessage, "error");
 
         // Remove loading indicator
         document.body.removeChild(loadingIndicator);
