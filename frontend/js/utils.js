@@ -223,4 +223,3 @@ const CoachUtils = (() => {
 
 // Add to window for global access
 window.CoachUtils = CoachUtils;
-
