@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("closeModal").onclick = () => {
     document.getElementById("dayModal").classList.add("hidden");
   };
+
   window.addEventListener("click", (e) => {
     const modal = document.getElementById("dayModal");
     if (e.target === modal) modal.classList.add("hidden");
