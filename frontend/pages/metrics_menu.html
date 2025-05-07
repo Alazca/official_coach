@@ -16,6 +16,9 @@
         height: 300px;
         width: 100%;
         margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       /* Responsive chart sizing */
@@ -36,16 +39,16 @@
       }
     </style>
   </head>
-  <body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+  <body>
     <nav
-      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+      class="navbar w-full flex justify-between items-center px-6 py-4"
     >
-      <h1 class="text-4xl font-bold text-white"><a href="/dashboard">COACH</a></h1>
-      <h1 class="text-2xl font-bold text-white">Data Dashboard</h1>
+      <h1 class="text-4xl font-bold"><a href="/dashboard">COACH</a></h1>
+      <h1 class="text-2xl font-bold">Data Dashboard</h1>
       <div class="flex gap-4">
         <button
           onclick="window.location.href='/dashboard'"
-          class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg"
+          class="bar-button px-6 py-2 rounded-lg shadow-lg transition"
         >
           Home
         </button>
@@ -54,11 +57,11 @@
 
     <div class="max-w-7xl mx-auto p-6">
       <!-- Filters -->
-      <div class="mb-8 bg-gray-800 p-4 rounded-lg border border-red-800">
+      <div class="gentextbg mb-8 rounded-lg border">
         <div class="flex gap-4">
           <select
             id="timeRange"
-            class="bg-gray-700 text-white px-4 py-2 rounded-lg"
+            class="px-4 py-2 rounded-lg"
           >
             <option value="7">Last 7 Days</option>
             <option value="30">Last 30 Days</option>
@@ -66,7 +69,7 @@
           </select>
           <button
             id="updateCharts"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            class="send-button px-4 py-2 rounded-lg shadow-lg transition"
           >
             Update Charts
           </button>
@@ -76,86 +79,91 @@
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Workout Volume Chart -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Workout Volume Trends</h3>
-          <div class="chart-container">
+          <div class="chart-container rounded-lg p-2">
             <canvas id="volumeChart"></canvas>
           </div>
         </div>
 
         <!-- Nutrition Chart -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Calorie & Macro Tracking</h3>
-          <div class="chart-container">
+          <div class="chart-container rounded-lg p-2">
             <canvas id="nutritionChart"></canvas>
           </div>
         </div>
 
-        <!-- Body Metrics -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <!-- Body Metrics (WIP) -->
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Body Metrics</h3>
-          <div class="chart-container">
-            <canvas id="weightChart"></canvas>
+          <div class="chart-container rounded-lg p-2">
+            <img src="../assets/comingsoon.png" alt="Coming Soon" class="w-5/12 opacity-80"/>
+            <!-- <canvas id="weightChart"></canvas> -->
           </div>
         </div>
 
-        <!-- Exercise Distribution -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <!-- Exercise Distribution (WIP) -->
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Exercise Distribution</h3>
-          <div class="chart-container">
-            <canvas id="exerciseChart"></canvas>
+          <div class="chart-container rounded-lg p-2">
+            <img src="../assets/comingsoon.png" alt="Coming Soon" class="w-5/12 opacity-80"/>
+            <!-- <canvas id="exerciseChart"></canvas> -->
           </div>
         </div>
 
-        <!-- Running Distance Chart -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <!-- Running Distance Chart (WIP) -->
+        <div class="gentextbg p-6 rounded-lg border border-red-800">
           <h3 class="text-xl font-bold mb-4">Running Distance Over Time</h3>
-          <div class="chart-container">
-            <canvas id="distanceChart"></canvas>
+          <div class="chart-container rounded-lg p-2">
+            <img src="../assets/comingsoon.png" alt="Coming Soon" class="w-5/12 opacity-80"/>
+            <!-- <canvas id="distanceChart"></canvas> -->
           </div>
         </div>
 
-        <!-- Running Pace Chart -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <!-- Running Pace Chart (WIP) -->
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Average Pace Trend</h3>
-          <div class="chart-container">
-            <canvas id="paceChart"></canvas>
+          <div class="chart-container rounded-lg p-2">
+            <img src="../assets/comingsoon.png" alt="Coming Soon" class="w-5/12 opacity-80"/>
+            <!-- <canvas id="paceChart"></canvas> -->
           </div>
         </div>
 
-        <!-- Heart Rate Chart -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <!-- Heart Rate Chart (WIP) -->
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Heart Rate Zones</h3>
-          <div class="chart-container">
-            <canvas id="heartRateChart"></canvas>
+          <div class="chart-container rounded-lg p-2">
+            <img src="../assets/comingsoon.png" alt="Coming Soon" class="w-5/12 opacity-80"/>
+            <!-- <canvas id="heartRateChart"></canvas> -->
           </div>
         </div>
 
         <!-- Running Stats -->
-        <div class="bg-gray-800 p-6 rounded-lg border border-red-800">
+        <div class="gentextbg p-6 rounded-lg">
           <h3 class="text-xl font-bold mb-4">Running Statistics</h3>
           <div class="grid grid-cols-2 gap-4">
-            <div class="text-center p-4 bg-gray-700 rounded-lg">
-              <h4 class="text-sm text-gray-400">Total Distance</h4>
-              <div id="totalDistance" class="text-2xl font-bold text-red-500">
+            <div class="running text-center p-4 rounded-lg">
+              <h4 class="text-sm">Total Distance</h4>
+              <div id="totalDistance" class="text-2xl font-bold text-red-400">
                 0 km
               </div>
             </div>
-            <div class="text-center p-4 bg-gray-700 rounded-lg">
-              <h4 class="text-sm text-gray-400">Average Pace</h4>
-              <div id="avgPace" class="text-2xl font-bold text-red-500">
+            <div class="running text-center p-4 rounded-lg">
+              <h4 class="text-sm">Average Pace</h4>
+              <div id="avgPace" class="text-2xl font-bold text-red-400">
                 0:00 /km
               </div>
             </div>
-            <div class="text-center p-4 bg-gray-700 rounded-lg">
-              <h4 class="text-sm text-gray-400">Total Time</h4>
-              <div id="totalTime" class="text-2xl font-bold text-red-500">
+            <div class="running text-center p-4 rounded-lg">
+              <h4 class="text-sm">Total Time</h4>
+              <div id="totalTime" class="text-2xl font-bold text-red-400">
                 0 hrs
               </div>
             </div>
-            <div class="text-center p-4 bg-gray-700 rounded-lg">
-              <h4 class="text-sm text-gray-400">Avg Heart Rate</h4>
-              <div id="avgHeartRate" class="text-2xl font-bold text-red-500">
+            <div class="running text-center p-4 rounded-lg">
+              <h4 class="text-sm">Avg Heart Rate</h4>
+              <div id="avgHeartRate" class="text-2xl font-bold text-red-400">
                 0 bpm
               </div>
             </div>
@@ -165,25 +173,25 @@
 
       <!-- Stats Summary -->
       <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-          <h4 class="text-sm text-gray-400">Total Volume</h4>
-          <div id="totalVolume" class="text-2xl font-bold text-red-500">
+        <div class="goals p-4 rounded-lg">
+          <h4 class="text-sm text-black">Total Volume</h4>
+          <div id="totalVolume" class="text-2xl font-bold text-red-400">
             0 kg
           </div>
         </div>
-        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-          <h4 class="text-sm text-gray-400">Avg. Daily Calories</h4>
-          <div id="avgCalories" class="text-2xl font-bold text-red-500">0</div>
+        <div class="goals p-4 rounded-lg">
+          <h4 class="text-sm text-black">Avg. Daily Calories</h4>
+          <div id="avgCalories" class="text-2xl font-bold text-red-400">0</div>
         </div>
-        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-          <h4 class="text-sm text-gray-400">Weight Change</h4>
-          <div id="weightChange" class="text-2xl font-bold text-red-500">
+        <div class="goals p-4 rounded-lg">
+          <h4 class="text-sm text-black">Weight Change</h4>
+          <div id="weightChange" class="text-2xl font-bold text-red-400">
             0 kg
           </div>
         </div>
-        <div class="bg-gray-800 p-4 rounded-lg border border-red-800">
-          <h4 class="text-sm text-gray-400">Workouts Completed</h4>
-          <div id="workoutCount" class="text-2xl font-bold text-red-500">0</div>
+        <div class="goals p-4 rounded-lg">
+          <h4 class="text-sm text-black">Workouts Completed</h4>
+          <div id="workoutCount" class="text-2xl font-bold text-red-400">0</div>
         </div>
       </div>
     </div>

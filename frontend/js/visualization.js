@@ -52,25 +52,25 @@ const DataVisualizationModule = (() => {
           plugins: {
             legend: {
               labels: {
-                color: "#f3f4f6",
+                color: "#2c2d25",
               },
             },
           },
           scales: {
             x: {
               grid: {
-                color: "rgba(75, 85, 99, 0.3)",
+                color: "rgba(30, 30, 30, 0.57)",
               },
               ticks: {
-                color: "#9ca3af",
+                color: "#717780",
               },
             },
             y: {
               grid: {
-                color: "rgba(75, 85, 99, 0.3)",
+                color: "rgba(30, 30, 30, 0.57)",
               },
               ticks: {
-                color: "#9ca3af",
+                color: "#717780",
               },
             },
           },
@@ -110,25 +110,25 @@ const DataVisualizationModule = (() => {
           plugins: {
             legend: {
               labels: {
-                color: "#f3f4f6",
+                color: "#2c2d25",
               },
             },
           },
           scales: {
             x: {
               grid: {
-                color: "rgba(75, 85, 99, 0.3)",
+                color: "rgba(30, 30, 30, 0.57)",
               },
               ticks: {
-                color: "#9ca3af",
+                color: "#717780",
               },
             },
             y: {
               grid: {
-                color: "rgba(75, 85, 99, 0.3)",
+                color: "rgba(30, 30, 30, 0.57)",
               },
               ticks: {
-                color: "#9ca3af",
+                color: "#717780",
               },
             },
           },
