@@ -3,95 +3,54 @@
  * Handles dashboard initialization, chart rendering, and UI interactions
  */
 
+// Check if logged in, redirect if not
+if (!Credentials.isAuthenticated()) {
+  window.location.href = "/";
+}
+
 // Global variables
 let currentDate = new Date();
 let events = {};
 
-// Load demo events data (in a real app, this would come from an API)
-function loadDemoEvents() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
+// Functionality for logout button
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  Credentials.clearToken(); // Clears JWT from localStorage
+  window.location.href = "/"; // Redirect to front page
+});
 
-  // Format is: events[year][month][day] = {workout, nutrition, sleep, energy}
-  events = {
-    [year]: {
-      [month]: {
-        [today.getDate()]: {
-          workout: "Full Body Strength",
-          nutrition: "2,300 kcal",
-          sleep: "8h",
-          energy: "High",
-          readiness: 95,
-        },
-        [today.getDate() - 1]: {
-          workout: "Rest Day",
-          nutrition: "2,100 kcal",
-          sleep: "7h",
-          energy: "Medium",
-          readiness: 80,
-        },
-        [today.getDate() - 2]: {
-          workout: "HIIT Cardio",
-          nutrition: "2,400 kcal",
-          sleep: "6.5h",
-          energy: "Medium",
-          readiness: 75,
-        },
-        [today.getDate() - 4]: {
-          workout: "Lower Body",
-          nutrition: "2,250 kcal",
-          sleep: "7.5h",
-          energy: "Good",
-          readiness: 85,
-        },
-        [today.getDate() + 1]: {
-          workout: "Upper Body",
-          nutrition: "2,350 kcal",
-          sleep: "Scheduled",
-          energy: "Projected: Good",
-          readiness: 90,
-          isScheduled: true,
-        },
-        [today.getDate() + 3]: {
-          workout: "Scheduled: Cardio",
-          nutrition: "Target: 2,200 kcal",
-          sleep: "Target: 8h",
-          energy: "Projected: High",
-          readiness: 85,
-          isScheduled: true,
-        },
+// Load actual event data
+async function loadEventsForMonth(year, month) {
+  try {
+    const token = Credentials.getToken();
+    const res = await fetch(`/api/workouts?year=${year}&month=${month + 1}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    },
-  };
+    });
 
-  // Add additional events in a different month
-  const nextMonth = (month + 1) % 12;
-  const yearOfNextMonth = month === 11 ? year + 1 : year;
-  if (!events[yearOfNextMonth]) events[yearOfNextMonth] = {};
-  events[yearOfNextMonth][nextMonth] = {
-    5: {
-      workout: "Scheduled: Recovery",
-      nutrition: "Target: 2,100 kcal",
-      sleep: "Target: 9h",
-      energy: "Projected: High",
-      readiness: 90,
-      isScheduled: true,
-    },
-    15: {
-      workout: "Scheduled: Full Body",
-      nutrition: "Target: 2,300 kcal",
-      sleep: "Target: 8h",
-      energy: "Projected: Good",
-      readiness: 85,
-      isScheduled: true,
-    },
-  };
+    const data = await res.json();
+    console.log("Loaded event data:", data);
+
+    if (res.ok) {
+      events = data;
+    } else {
+      console.error("Error loading events:", data.error);
+      events = {};
+    }
+  } catch (err) {
+    console.error("Network error:", err);
+    events = {};
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Load demo events
-  loadDemoEvents();
+  // Calendar: Load events for the month
+  loadEventsForMonth(currentDate.getFullYear(), currentDate.getMonth()).then(
+    () => {
+      renderCalendar(currentDate);
+      updateSidebar(new Date());
+    },
+  );
 
   // Set up month/year pickers and render calendar
   setupMonthYearPickers();
@@ -101,17 +60,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // Previous/Next month handlers
   document.getElementById("prevMonth").onclick = () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar(currentDate);
+    loadEventsForMonth(currentDate.getFullYear(), currentDate.getMonth()).then(
+      () => {
+        renderCalendar(currentDate);
+      },
+    );
   };
 
   document.getElementById("nextMonth").onclick = () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar(currentDate);
+    loadEventsForMonth(currentDate.getFullYear(), currentDate.getMonth()).then(
+      () => {
+        renderCalendar(currentDate);
+      },
+    );
   };
 
   document.getElementById("todayBtn").onclick = () => {
     currentDate = new Date();
-    renderCalendar(currentDate);
+    loadEventsForMonth(currentDate.getFullYear(), currentDate.getMonth()).then(
+      () => {
+        renderCalendar(currentDate);
+      },
+    );
     updateSidebar(currentDate);
   };
 
@@ -141,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("closeModal").onclick = () => {
     document.getElementById("dayModal").classList.add("hidden");
   };
-
   window.addEventListener("click", (e) => {
     const modal = document.getElementById("dayModal");
     if (e.target === modal) modal.classList.add("hidden");

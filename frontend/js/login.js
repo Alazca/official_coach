@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Changed to match your backend response format
       Credentials.saveToken(data.access_token);
 
       // Redirect to your protected page
