@@ -1,11 +1,15 @@
 :root {
-    --primary: #ef4444;
-    --primary-dark: #dc2626;
-    --background: #111827;
-    --surface: #1f2937;
-    --border: #991b1b;
-    --text: #f3f4f6;
+    --primary: #5b5c45;
+    --primary-dark: #2c2d25;
+    --bg-alt: #FFFFFF;
+    --background: #d6c5aa;
+    --bg-light: #f5ece0;
+    --surface: #fffbf7;
+    --border: #726c67;
+    --text: #000000;
     --text-secondary: #9ca3af;
+    --button: #955d41;  
+    --light-button: #f1bba0;
 }
 
 /* Reset styles */
@@ -15,10 +19,99 @@
     box-sizing: border-box;
 }
 
+.navbar {
+    color: var(--primary);
+    background-color: var(--bg-light);
+    border-bottom: 2px solid var(--border);
+    padding: 1.25rem;
+}
+
+.bar-button, .save-log, .send-button, #saveWorkoutBtn {
+    color: var(--bg-alt);
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+.bar-button:hover, .send-button:hover, #saveWorkoutBtn:hover {
+    background-color: var(--primary-dark);
+}
+
+.self-end {
+    background-color: var(--primary);
+    color: var(--surface);
+}
+
+.logout, #todayBtn {
+    background-color: linear-gradient(to bottom right, var(--button), var(--light-button));
+    color: var(--primary);
+}
+.logout:hover, #todayBtn:hover {
+    background-color: var(--button);
+    color: var(--bg-alt);
+}
+
+#chatWindow, #chatInput, .prompt-button, input, textarea {
+    background-color: var(--surface);
+    color: var(--text);
+}
+.prompt-button:hover {
+    background-color: var(--bg-light);
+    color: var(--text);
+}
+.chat-bubble, .self-start {
+    background-color: var(--bg-light);
+    color: var(--text);
+}
+
+.light-button {
+    background-color: var(--bg-light);
+    color: var(--text);
+    border: 1.5px solid var(--primary);
+}
+.light-button:hover {
+    color: var(--light-button);
+}
+
+.dropdown {
+    color: var(--text);
+    background-color: var(--background);
+    border: 1px solid var(--border);
+}
+
+.calendar-cell {
+    background-color: var(--bg-light);
+    border: 1px solid var(--primary);
+}
+.calendar-cell:hover {
+    border: 1.5px solid var(--border);
+}
+
+label {
+    color: var(--primary-dark);
+}
+
+.remove-food, .add-food-item {
+    background-color: var(--bg-alt);
+    color: var(--primary);
+}
+
+.gentextbg {
+    background-color: var(--background);
+    color: var(--text);
+    border: 2px solid var(--border);
+    padding: 1.5rem;
+}
+.side-bar {
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+}
+.pb {
+    padding-bottom: 1.5rem;
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: var(--surface);
+    color: var(--text);
 }
 
 header {
@@ -131,7 +224,7 @@ button {
 }
 
 button:hover {
-    background-color: #555; /* Slightly lighter gray for hover */
+    background-color: transparent;
     transform: scale(1.05); /* Gentle zoom effect */
 }
 

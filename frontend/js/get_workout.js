@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   typeButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       typeButtons.forEach((b) =>
-        b.classList.remove("ring", "ring-red-500", "ring-offset-2"),
+        b.classList.remove("ring", "ring-[var(--button)]", "ring-offset-2"),
       );
-      btn.classList.add("ring", "ring-red-500", "ring-offset-2");
+      btn.classList.add("ring", "ring-[var(--button)]", "ring-offset-2");
       selectedWorkoutType = btn.getAttribute("data-workout-type");
     });
   });
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("workoutNotes").value = "";
         selectedWorkoutType = null;
         typeButtons.forEach((b) =>
-          b.classList.remove("ring", "ring-red-500", "ring-offset-2"),
+          b.classList.remove("ring", "ring-[var(--button)]", "ring-offset-2"),
         );
       } else {
         alert("Failed to save workout: " + (result.error || "Unknown error"));

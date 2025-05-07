@@ -5,40 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Strength & Conditioning Hub - COACH</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/style.css" />
   </head>
-  <body class="bg-gray-900 text-white min-h-screen">
-    <header
-      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+  <body class="min-h-screen">
+    <nav
+      class="navbar w-full flex justify-between items-center px-6 py-4"
     >
-      <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
+      <h1 class="text-4xl font-bold" onclick="window.location.href='/dashboard'">COACH</h1>
+      <h1 class="text-2xl font-bold">Strength & Conditioning Hub</h1>
       <div class="flex gap-4 items-center">
-        <a
-          href="/dashboard"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+        <button
+          onclick="window.location.href='/dashboard'"
+          class="bar-button px-4 py-2 rounded-lg transition"
         >
           Back to Dashboard
-        </a>
+        </button>
       </div>
-    </header>
+    </nav>
 
     <main class="container mx-auto px-4 py-8">
-      <h2 class="text-3xl font-bold text-white mb-8">
-        Strength & Conditioning Hub
-      </h2>
-
       <!-- Chat Card -->
-      <div class="bg-gray-800 border border-red-800 rounded-xl p-6 mb-8">
+      <div class="gentextbg rounded-xl p-6 mb-8">
         <h3 class="text-xl font-bold mb-2">Chat with Your AI Strength Coach</h3>
-        <p class="text-gray-300 mb-4">
+        <p class="text-[var(--bg-alt)] mb-4">
           Ask questions about exercises, form, or get personalized workout
           recommendations.
         </p>
         <div
           id="chatWindow"
-          class="bg-gray-700 rounded-lg p-4 h-48 overflow-y-auto mb-4 flex flex-col gap-2"
+          class="rounded-lg p-4 h-48 overflow-y-auto mb-4 flex flex-col gap-2"
         >
           <div
-            class="self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]"
+            class="chat-bubble px-4 py-2 rounded-lg max-w-[80%]"
           >
             Hello! I'm your AI Strength Coach. How can I help you today?
           </div>
@@ -48,12 +46,12 @@
             id="chatInput"
             type="text"
             placeholder="Ask about exercises, form, or get recommendations..."
-            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none"
+            class="flex-1 rounded-lg px-4 py-2 focus:outline-none"
             autocomplete="off"
           />
           <button
             type="submit"
-            class="bg-red-700 hover:bg-red-800 text-white font-bold px-6 py-2 rounded-lg transition"
+            class="send-button font-bold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_6px_rgba(91,92,69,0.5)] active:scale-95 mt-4"
           >
             Send
           </button>
@@ -66,48 +64,48 @@
         class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10"
       >
         <!-- Quick Workouts -->
-        <div class="bg-gray-800 border border-red-800 rounded-xl p-6">
+        <div class="gentextbg rounded-xl p-6">
           <h4 class="text-lg font-bold mb-4">Quick Workouts</h4>
           <div class="flex flex-col gap-3">
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Beginner Workout
             </button>
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Intermediate Workout
             </button>
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Advanced Workout
             </button>
           </div>
         </div>
         <!-- Focus Areas -->
-        <div class="bg-gray-800 border border-red-800 rounded-xl p-6">
+        <div class="gentextbg rounded-xl p-6">
           <h4 class="text-lg font-bold mb-4">Focus Areas</h4>
           <div class="flex flex-col gap-3">
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Upper Body
             </button>
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Lower Body
             </button>
             <button
               type="button"
-              class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition"
+              class="prompt-button px-4 py-2 rounded-lg transition"
             >
               Core
             </button>
@@ -116,7 +114,7 @@
       </div>
 
       <!-- WORKOUT LOGGING FORM -->
-      <div class="bg-gray-800 border border-red-800 rounded-xl p-6">
+      <div class="gentextbg rounded-xl p-6">
         <h4 class="text-lg font-bold mb-4">Log Your Workout</h4>
 
         <!-- Workout Type Selections -->
@@ -124,28 +122,28 @@
           <button
             type="button"
             data-workout-type="Strength"
-            class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            class="workout-type-btn prompt-button p-4 rounded-lg transition-all duration-300 hover:scale-105"
           >
             Strength
           </button>
           <button
             type="button"
             data-workout-type="Cardio"
-            class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            class="workout-type-btn prompt-button p-4 rounded-lg transition-all duration-300 hover:scale-105"
           >
             Cardio
           </button>
           <button
             type="button"
             data-workout-type="Mobility"
-            class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            class="workout-type-btn prompt-button p-4 rounded-lg transition-all duration-300 hover:scale-105"
           >
             Mobility
           </button>
           <button
             type="button"
             data-workout-type="Recovery"
-            class="workout-type-btn bg-gray-800 hover:bg-gray-700 text-white p-4 rounded-lg border border-red-800 transition-all duration-300 hover:scale-105"
+            class="workout-type-btn prompt-button p-4 rounded-lg transition-all duration-300 hover:scale-105"
           >
             Recovery
           </button>
@@ -158,13 +156,13 @@
         <div class="mb-4">
           <label
             for="workoutDate"
-            class="block text-sm font-medium text-gray-300 mb-1"
+            class="block text-sm font-medium mb-1"
             >Workout Date</label
           >
           <input
             type="date"
             id="workoutDate"
-            class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            class="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
           />
         </div>
 
@@ -172,13 +170,13 @@
         <div class="mb-4">
           <label
             for="workoutDuration"
-            class="block text-sm font-medium text-gray-300 mb-1"
+            class="block text-sm font-medium mb-1"
             >Duration (minutes)</label
           >
           <input
             type="number"
             id="workoutDuration"
-            class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            class="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
             min="1"
             max="300"
           />
@@ -188,12 +186,12 @@
         <div class="mb-4">
           <label
             for="workoutNotes"
-            class="block text-sm font-medium text-gray-300 mb-1"
+            class="block text-sm font-medium mb-1"
             >Notes</label
           >
           <textarea
             id="workoutNotes"
-            class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            class="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
             rows="3"
           ></textarea>
         </div>
@@ -201,7 +199,7 @@
         <!-- Submit button -->
         <button
           id="saveWorkoutBtn"
-          class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white px-6 py-3 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 mt-4"
+          class="w-full px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_6px_rgba(91,92,69,0.5)] active:scale-95 mt-4"
         >
           Save Workout
         </button>
