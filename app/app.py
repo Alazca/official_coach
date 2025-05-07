@@ -459,7 +459,7 @@ def general_coach_chat():
         if not user_message:
             return jsonify({"error": "No message provided."}), 400
 
-        api_key = current_app.config.get["OPENAI_API_KEY"]
+        api_key = app.config["OPENAI_API_KEY"]
         if not api_key:
             print("OpenAI API key not found in environment variables")
             return jsonify({"error": "OpenAI API key not configured"}), 500
