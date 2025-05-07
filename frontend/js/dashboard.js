@@ -160,7 +160,7 @@ function setupMonthYearPickers() {
   months.forEach((name, index) => {
     const li = document.createElement("li");
     li.textContent = name;
-    li.className = "px-4 py-2 hover:bg-red-700 cursor-pointer";
+    li.className = "px-4 py-2 hover:bg-[var(--bg-light)] cursor-pointer";
     li.onclick = () => {
       currentDate.setMonth(index);
       renderCalendar(currentDate);
@@ -183,7 +183,7 @@ function setupMonthYearPickers() {
   for (let y = thisYear - 10; y <= thisYear + 10; y++) {
     const li = document.createElement("li");
     li.textContent = y;
-    li.className = "px-4 py-2 hover:bg-red-700 cursor-pointer";
+    li.className = "px-4 py-2 hover:bg-[var(--bg-light)] cursor-pointer";
     li.onclick = () => {
       currentDate.setFullYear(y);
       renderCalendar(currentDate);
@@ -244,7 +244,7 @@ function renderCalendar(date) {
 // Create an empty cell for days before/after the month
 function createEmptyCell() {
   const div = document.createElement("div");
-  div.className = "bg-gray-900 border border-gray-700";
+  div.className = "calendar-cell";
   return div;
 }
 
@@ -254,24 +254,24 @@ function createDayCell(day, isToday, hasEvent, date) {
 
   // Base classes for the day cell
   let className = `
-    relative bg-gray-900 border border-gray-700 p-2 text-sm
+    relative calendar-cell p-2 text-sm
     transition-all duration-300 ease-in-out
-    hover:scale-125 hover:z-30 hover:bg-gray-800
-    hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]
+    hover:scale-125 hover:z-30 hover:bg-[var(--background)]
+    hover:shadow-[0_0_20px_rgba(91, 92, 69, 0.5)]
     rounded-lg cursor-pointer flex flex-col justify-between
   `;
 
   // Add special styling for today
   if (isToday) {
-    className += ` border-red-600 border-2`;
+    className += `text-[var(--text)] bg-[var(--button)]`;
   }
 
   div.className = className;
 
   // Basic content showing the day number
   div.innerHTML = `
-    <div class="${isToday ? "text-red-500" : "text-gray-400"} font-semibold text-base">${day}</div>
-    <div class="text-xs text-gray-500">${hasEvent ? "Click to view" : ""}</div>
+    <div class="${isToday ? "text-[var(--text)]" : "text-[var(--button)]"} font-semibold text-base">${day}</div>
+    <div class="text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
   `;
 
   // Add event indicator if the day has events
@@ -296,9 +296,9 @@ function createDayCell(day, isToday, hasEvent, date) {
 
     // Highlight selected day
     document.querySelectorAll("#calendar-grid div").forEach((cell) => {
-      cell.classList.remove("bg-gray-800", "border-red-800");
+      cell.classList.remove("bg-[var(--background)]", "border-[var(--primary)]");
     });
-    div.classList.add("bg-gray-800", "border-red-800");
+    div.classList.add("bg-[var(--background)]", "border-[var(--primary)]");
 
     // Show modal with day details
     const modal = document.getElementById("dayModal");
@@ -335,8 +335,8 @@ function createDayCell(day, isToday, hasEvent, date) {
 
   div.addEventListener("mouseleave", () => {
     div.innerHTML = `
-      <div class="${isToday ? "text-red-500" : "text-gray-400"} font-semibold text-base">${day}</div>
-      <div class="text-xs text-gray-500">${hasEvent ? "Click to view" : ""}</div>
+      <div class="${isToday ? "text-[var(--button)]" : "text-[var(--border)]"} font-semibold text-base">${day}</div>
+      <div class="text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
     `;
 
     // Add event indicator back after mouse leaves
@@ -377,8 +377,8 @@ function updateSidebar(date) {
 
     // Update Strength & Conditioning section
     strengthSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Strength & Conditioning</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">${formattedDate}</span>
         <span class="block mb-1">Workout: ${eventData.workout}</span>
         <span class="block">Readiness: ${eventData.readiness}%</span>
@@ -387,8 +387,8 @@ function updateSidebar(date) {
 
     // Update Nutrition section
     nutritionSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Nutrition</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">Calories: ${eventData.nutrition}</span>
         <span class="block">Hydration: 3.2L</span>
       </p>
@@ -407,14 +407,14 @@ function updateSidebar(date) {
     }
 
     coachSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-      <p class="mt-2 text-gray-300 text-sm">"${coachMessage}"</p>
+      <h3 class="side-header text-lg font-bold">Head Coach</h3>
+      <p class="mt-2 text-sm">"${coachMessage}"</p>
     `;
   } else {
     // No data for this date
     strengthSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Strength & Conditioning</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">${formattedDate}</span>
         <span class="block mb-1">No workout data</span>
         <span class="block">Add a workout to track your progress</span>
@@ -422,16 +422,16 @@ function updateSidebar(date) {
     `;
 
     nutritionSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Nutrition</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">No nutrition data</span>
         <span class="block">Log your meals to track calories</span>
       </p>
     `;
 
     coachSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-      <p class="mt-2 text-gray-300 text-sm">"Select a date with data or add new activity to see your personalized advice."</p>
+      <h3 class="text-[var(--primary)] text-lg font-bold">Head Coach</h3>
+      <p class="mt-2 text-sm">"Select a date with data or add new activity to see your personalized advice."</p>
     `;
   }
 }

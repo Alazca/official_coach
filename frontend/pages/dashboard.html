@@ -15,72 +15,73 @@
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white h-screen flex flex-col">
+  <body class="h-screen flex flex-col">
     <!-- Navigation Header -->
-    <header
-      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
+    <nav
+      class="navbar w-full flex justify-between items-center px-6 py-4"
     >
-      <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
+      <h1 class="text-4xl font-bold" onclick="window.location.href='/dashboard'">COACH</h1>
+      <h1 class="text-2xl font-bold"> Dashboard </h1>
       <div class="flex gap-4 items-center flex-wrap">
         <button
           onclick="window.location.href='/strength-conditioning-hub'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Get Workout
         </button>
         <button
           onclick="window.location.href='/nutrition-hub'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Log Food
         </button>
         <button
           onclick="window.location.href='/metrics-menu'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Metrics
         </button>
         <button
           onclick="window.location.href='/logout'"
-          class="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 font-semibold"
+          class="logout px-4 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_10px_rgba(91, 92, 69, 0.5)] active:scale-95 font-semibold"
         >
           Log Out
         </button>
       </div>
-    </header>
+    </nav>
     <!-- Main Dashboard -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-auto">
       <!-- Calendar Panel -->
       <main class="w-3/4 p-6 overflow-auto">
         <div
-          class="bg-gray-800 rounded-xl border border-red-800 p-4 h-full flex flex-col"
+          class="gentextbg rounded-xl p-4 h-full flex flex-col overflow-auto"
         >
           <!-- Calendar Header: Arrows + Month/Year + Today -->
           <div class="flex justify-center items-center gap-4 mb-4">
             <!-- Left Arrow -->
             <div
-              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
+              class="light-button flex items-center rounded-lg px-4 py-2"
             >
               <button
                 id="prevMonth"
-                class="text-xl font-bold hover:text-red-400"
+                class="text-xl font-bold"
               >
                 &lt;
               </button>
             </div>
             <!-- Month + Year -->
             <div
-              class="flex items-center gap-4 bg-black border border-red-800 rounded-lg px-6 py-2"
+              class="light-button flex items-center gap-4 rounded-lg px-6 py-2"
             >
               <!-- Month Picker -->
               <div class="relative">
                 <button
                   id="monthBtn"
-                  class="text-white font-bold hover:underline"
+                  class="font-bold transition-transform hover:scale-110 hover:text-[var(--button)]"
                 ></button>
                 <div
                   id="monthDropdown"
-                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10"
+                  class="dropdown absolute left-0 mt-2 rounded-lg shadow dropdown-menu z-10"
                 >
                   <ul></ul>
                 </div>
@@ -89,11 +90,11 @@
               <div class="relative">
                 <button
                   id="yearBtn"
-                  class="text-white font-bold hover:underline"
+                  class="font-bold transition-transform hover:scale-110 hover:text-[var(--button)]"
                 ></button>
                 <div
                   id="yearDropdown"
-                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto"
+                  class="dropdown absolute left-0 mt-2 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto"
                 >
                   <ul></ul>
                 </div>
@@ -101,11 +102,11 @@
             </div>
             <!-- Right Arrow -->
             <div
-              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
+              class="light-button flex items-center rounded-lg px-4 py-2"
             >
               <button
                 id="nextMonth"
-                class="text-xl font-bold hover:text-red-400"
+                class="text-xl font-bold"
               >
                 &gt;
               </button>
@@ -113,14 +114,14 @@
             <!-- Today Button -->
             <button
               id="todayBtn"
-              class="ml-4 text-sm bg-red-700 hover:bg-red-800 px-4 py-2 rounded-md shadow"
+              class="ml-4 text-sm px-4 py-2 rounded-md transition-all duration-300 shadow-lg hover:shadow-[0_4px_10px_rgba(91, 92, 69, 0.5)] active:scale-95 font-semibold"
             >
               Today
             </button>
           </div>
           <!-- Weekday Labels -->
           <div
-            class="grid grid-cols-7 text-center text-gray-400 font-semibold text-sm mb-1"
+            class="grid grid-cols-7 text-center text-[var(--primary)] font-semibold text-sm mb-1"
           >
             <div>Sun</div>
             <div>Mon</div>
@@ -134,31 +135,31 @@
           <div id="calendar-grid" class="grid grid-cols-7 gap-px flex-1"></div>
         </div>
       </main>
-      <!-- Sidebar -->
+      <!-- Sidebar (css on text is implemented in the dashboard.js file)-->
       <aside class="w-1/4 p-4 flex flex-col gap-4 overflow-y-auto">
         <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+          class="side-bar p-4 rounded-xl flex-1 min-h-[150px]"
         >
-          <h3 class="text-lg font-bold text-red-400">
+          <h3>
             Strength & Conditioning
           </h3>
-          <p class="mt-2 text-gray-300 text-sm">
+          <p>
             Squat Volume Up<br />Recovery: Moderate
           </p>
         </div>
         <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+          class="side-bar p-4 rounded-xl flex-1 min-h-[150px]"
         >
-          <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-          <p class="mt-2 text-gray-300 text-sm">
+          <h3>Nutrition</h3>
+          <p>
             Calories: 2,300 kcal<br />Hydration: 3.2L
           </p>
         </div>
         <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
+          class="side-bar p-4 rounded-xl flex-1 min-h-[150px]"
         >
-          <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-          <p class="mt-2 text-gray-300 text-sm">
+          <h3>Head Coach</h3>
+          <p>
             "You're trending up! Focus on consistency."
           </p>
         </div>
