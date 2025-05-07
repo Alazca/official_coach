@@ -25,7 +25,6 @@ from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity,
-    get_jwt,
 )
 
 from dotenv import load_dotenv
@@ -493,12 +492,14 @@ def log_workout():
         data = request.get_json()
         print("Received workout data:", data)
 
+        user_id = get_jwt_identity()
+
         workout_data = {
             "workout_type": data["workout_type"],
             "workout_date": data["workout_date"],
             "notes": data.get("notes", ""),
             "duration": data.get("duration", None),
-            "user_id": 1,  # Temporary hardcoded user until JWT is re-enabled
+            "user_id": user_id,  # Temporary hardcoded user until JWT is re-enabled
         }
 
         conn = create_conn()

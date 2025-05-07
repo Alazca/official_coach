@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Changed to match your backend response format
-      Credentials.saveToken(data.accessToken);
+      Credentials.saveToken(data.access_token);
 
       // Redirect to your protected page
       window.location.href = "/dashboard";

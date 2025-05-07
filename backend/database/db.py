@@ -938,7 +938,6 @@ def insert_workout(conn, workout_data):
     cursor = conn.cursor()
 
     try:
-        # Prepare query with named placeholders for readability
         query = """
             INSERT INTO workouts (workout_type, workout_date, notes, duration, user_id)
             VALUES (:workout_type, :workout_date, :notes, :duration, :user_id)

@@ -33,10 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
+      const token = Credentialsl.getToken();
       const response = await fetch("/api/workout/log", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(workoutData),
       });
