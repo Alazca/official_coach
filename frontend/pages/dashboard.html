@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../assets/style.css" />
     <style>
+      /* Maintaining dropdown menu styles */
       .dropdown-menu {
         display: none;
       }
@@ -15,72 +16,64 @@
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white h-screen flex flex-col">
+  <body class="h-screen flex flex-col">
     <!-- Navigation Header -->
-    <header
-      class="w-full flex justify-between items-center px-6 py-4 bg-black border-b border-red-800"
-    >
-      <h1 class="text-2xl font-bold tracking-wide">COACH</h1>
+    <nav class="navbar w-full flex justify-between items-center px-6 py-4">
+      <h1 class="text-4xl font-bold">COACH</h1>
+      <h1 class="text-2xl font-bold">Dashboard</h1>
       <div class="flex gap-4 items-center flex-wrap">
         <button
           onclick="window.location.href='/strength-conditioning-hub'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Get Workout
         </button>
         <button
           onclick="window.location.href='/nutrition-hub'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Log Food
         </button>
         <button
           onclick="window.location.href='/metrics-menu'"
-          class="bg-gray-800 px-4 py-2 rounded-lg border border-red-800 hover:bg-gray-700 transition"
+          class="bar-button px-4 py-2 rounded-lg shadow-lg transition"
         >
           Metrics
         </button>
         <button
           id="logoutBtn"
-          class="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 shadow-lg hover:shadow-red-600/50 active:scale-95 font-semibold"
+          class="logout px-4 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_10px_rgba(91, 92, 69, 0.5)] active:scale-95 font-semibold"
         >
           Log Out
         </button>
       </div>
-    </header>
+    </nav>
     <!-- Main Dashboard -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-auto">
       <!-- Calendar Panel -->
       <main class="w-3/4 p-6 overflow-auto">
         <div
-          class="bg-gray-800 rounded-xl border border-red-800 p-4 h-full flex flex-col"
+          class="gentextbg rounded-xl p-4 h-full flex flex-col overflow-auto"
         >
           <!-- Calendar Header: Arrows + Month/Year + Today -->
           <div class="flex justify-center items-center gap-4 mb-4">
             <!-- Left Arrow -->
-            <div
-              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
-            >
-              <button
-                id="prevMonth"
-                class="text-xl font-bold hover:text-red-400"
-              >
-                &lt;
-              </button>
+            <div class="light-button flex items-center rounded-lg px-4 py-2">
+              <button id="prevMonth" class="text-xl font-bold">&lt;</button>
             </div>
             <!-- Month + Year -->
             <div
-              class="flex items-center gap-4 bg-black border border-red-800 rounded-lg px-6 py-2"
+              class="light-button flex items-center gap-4 rounded-lg px-6 py-2"
             >
               <!-- Month Picker -->
               <div class="relative">
                 <button
                   id="monthBtn"
-                  class="text-white font-bold hover:underline"
+                  class="font-bold transition-transform hover:scale-110 hover:text-[var(--button)]"
                 ></button>
                 <div
                   id="monthDropdown"
-                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10"
+                  class="dropdown absolute left-0 mt-2 rounded-lg shadow dropdown-menu z-10"
                 >
                   <ul></ul>
                 </div>
@@ -89,38 +82,31 @@
               <div class="relative">
                 <button
                   id="yearBtn"
-                  class="text-white font-bold hover:underline"
+                  class="font-bold transition-transform hover:scale-110 hover:text-[var(--button)]"
                 ></button>
                 <div
                   id="yearDropdown"
-                  class="absolute left-0 mt-2 bg-gray-800 border border-red-800 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto"
+                  class="dropdown absolute left-0 mt-2 rounded-lg shadow dropdown-menu z-10 max-h-48 overflow-y-auto"
                 >
                   <ul></ul>
                 </div>
               </div>
             </div>
             <!-- Right Arrow -->
-            <div
-              class="flex items-center bg-black border border-red-800 rounded-lg px-4 py-2"
-            >
-              <button
-                id="nextMonth"
-                class="text-xl font-bold hover:text-red-400"
-              >
-                &gt;
-              </button>
+            <div class="light-button flex items-center rounded-lg px-4 py-2">
+              <button id="nextMonth" class="text-xl font-bold">&gt;</button>
             </div>
             <!-- Today Button -->
             <button
               id="todayBtn"
-              class="ml-4 text-sm bg-red-700 hover:bg-red-800 px-4 py-2 rounded-md shadow"
+              class="ml-4 text-sm px-4 py-2 rounded-md transition-all duration-300 shadow-lg hover:shadow-[0_4px_10px_rgba(91, 92, 69, 0.5)] active:scale-95 font-semibold"
             >
               Today
             </button>
           </div>
           <!-- Weekday Labels -->
           <div
-            class="grid grid-cols-7 text-center text-gray-400 font-semibold text-sm mb-1"
+            class="grid grid-cols-7 text-center text-[var(--primary)] font-semibold text-sm mb-1"
           >
             <div>Sun</div>
             <div>Mon</div>
@@ -136,29 +122,17 @@
       </main>
       <!-- Sidebar -->
       <aside class="w-1/4 p-4 flex flex-col gap-4 overflow-y-auto">
-        <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
-        >
-          <h3 class="text-lg font-bold text-red-400">
-            Strength & Conditioning
-          </h3>
-          <p class="mt-2 text-gray-300 text-sm">
-            Squat Volume Up<br />Recovery: Moderate
-          </p>
+        <div class="side-bar p-4 rounded-xl flex-1 min-h-[150px]">
+          <h3 class="text-lg font-bold">Strength & Conditioning</h3>
+          <p class="mt-2 text-sm">Squat Volume Up<br />Recovery: Moderate</p>
         </div>
-        <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
-        >
-          <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-          <p class="mt-2 text-gray-300 text-sm">
-            Calories: 2,300 kcal<br />Hydration: 3.2L
-          </p>
+        <div class="side-bar p-4 rounded-xl flex-1 min-h-[150px]">
+          <h3 class="text-lg font-bold">Nutrition</h3>
+          <p class="mt-2 text-sm">Calories: 2,300 kcal<br />Hydration: 3.2L</p>
         </div>
-        <div
-          class="bg-gray-800 p-4 rounded-xl border border-red-800 flex-1 min-h-[150px]"
-        >
-          <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-          <p class="mt-2 text-gray-300 text-sm">
+        <div class="side-bar p-4 rounded-xl flex-1 min-h-[150px]">
+          <h3 class="text-lg font-bold">Head Coach</h3>
+          <p class="mt-2 text-sm">
             "You're trending up! Focus on consistency."
           </p>
         </div>
@@ -171,11 +145,11 @@
       class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
     >
       <div
-        class="bg-gray-800 text-white rounded-xl p-6 w-full max-w-md space-y-4 relative"
+        class="gentextbg text-[var(--text)] rounded-xl p-6 w-full max-w-md space-y-4 relative"
       >
         <button
           id="closeModal"
-          class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none"
+          class="absolute top-4 right-4 text-[var(--secondary)] hover:text-[var(--text)] text-2xl leading-none"
         >
           &times;
         </button>
@@ -190,7 +164,7 @@
               type="number"
               id="weight"
               name="weight"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="185"
               min="1"
               step="1"
@@ -204,7 +178,7 @@
               type="text"
               id="workout"
               name="workout"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="e.g. Full Body Strength, Cardio"
             />
           </div>
@@ -217,7 +191,7 @@
               type="number"
               id="nutrition"
               name="nutrition"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="2000"
             />
           </div>
@@ -230,7 +204,7 @@
             <select
               id="sleep"
               name="sleep"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               required
             >
               <option value="1">1 - Very Poor</option>
@@ -254,7 +228,7 @@
             <select
               id="energy"
               name="energy"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               required
             >
               <option value="1">1 - Exhausted</option>
@@ -278,7 +252,7 @@
             <select
               id="stress"
               name="stress"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               required
             >
               <option value="1">1 - None</option>
@@ -302,7 +276,7 @@
             <select
               id="soreness"
               name="soreness"
-              class="w-full mt-1 px-3 py-2 bg-gray-900 rounded-lg border border-red-800 focus:outline-none focus:border-red-600"
+              class="w-full mt-1 px-3 py-2 light-button rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               required
             >
               <option value="1">1 - None</option>
@@ -321,7 +295,7 @@
           <div class="pt-2">
             <button
               type="submit"
-              class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 px-4 py-3 rounded-lg font-bold transition shadow-lg hover:shadow-red-600/50 active:scale-95"
+              class="w-full bar-button px-4 py-3 rounded-lg font-bold transition shadow-lg hover:shadow-[0_4px_10px_rgba(91, 92, 69, 0.5)] active:scale-95"
             >
               Submit Check-In
             </button>
