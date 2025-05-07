@@ -22,23 +22,50 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 async function loadEventsForMonth(year, month) {
   try {
     const token = Credentials.getToken();
-    const res = await fetch(`/api/workouts?year=${year}&month=${month + 1}`, {
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    });
 
-    const data = await res.json();
-    console.log("Loaded event data:", data);
+    const [workoutRes, checkinRes] = await Promise.all([
+      fetch(`/api/workouts?year=${year}&month=${month + 1}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      fetch(`/api/check-ins?year=${year}&month=${month + 1}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    ]);
 
-    if (res.ok) {
-      events = data;
-    } else {
-      console.error("Error loading events:", data.error);
+    const [workoutData, checkinData] = await Promise.all([
+      workoutRes.json(),
+      checkinRes.json(),
+    ]);
+
+    if (!workoutRes.ok || !checkinRes.ok) {
+      console.error("Error loading events:", workoutData.error || checkinData.error);
       events = {};
+      return;
+    }
+
+    // 🧠 Merge logic
+    events = {};
+
+    const mergeSource = [workoutData, checkinData];
+    for (const source of mergeSource) {
+      for (const yearKey in source) {
+        if (!events[yearKey]) events[yearKey] = {};
+        for (const monthKey in source[yearKey]) {
+          if (!events[yearKey][monthKey]) events[yearKey][monthKey] = {};
+          for (const dayKey in source[yearKey][monthKey]) {
+            if (!events[yearKey][monthKey][dayKey])
+              events[yearKey][monthKey][dayKey] = {};
+
+            Object.assign(
+              events[yearKey][monthKey][dayKey],
+              source[yearKey][monthKey][dayKey]
+            );
+          }
+        }
+      }
     }
   } catch (err) {
-    console.error("Network error:", err);
+    console.error("Network error loading events:", err);
     events = {};
   }
 }
@@ -286,13 +313,18 @@ function createDayCell(day, isToday, hasEvent, date) {
 
   // Hover effect to show a preview of the day's data
   div.addEventListener("mouseenter", () => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    const eventData = events[year]?.[month]?.[day];
+
     if (hasEvent) {
       const eventData = events[date.getFullYear()][date.getMonth()][day];
       div.innerHTML = `
         <div class="${isToday ? "text-red-500" : "text-white"} font-bold text-lg mb-1">${day}</div>
-        <div class="text-xs text-gray-300">💤 ${eventData.sleep}</div>
-        <div class="text-xs text-gray-300">⚡ ${eventData.energy}</div>
-        <div class="text-xs text-gray-300">🏋️ ${eventData.workout}</div>
+        <div class="text-xs text-gray-300">💤 ${eventData.sleep || "Not logged"}</div>
+        <div class="text-xs text-gray-300">⚡ ${eventData.energy || "Not logged"}</div>
+        <div class="text-xs text-gray-300">🏋️ ${eventData.workout || "Not logged"}</div>
       `;
     }
   });
@@ -344,8 +376,8 @@ function updateSidebar(date) {
       <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
       <p class="mt-2 text-gray-300 text-sm">
         <span class="block mb-1">${formattedDate}</span>
-        <span class="block mb-1">Workout: ${eventData.workout}</span>
-        <span class="block">Readiness: ${eventData.readiness}%</span>
+        <span class="block mb-1">Workout: ${eventData.workout || "Not logged"}</span>
+        <span class="block">Readiness: ${eventData.readiness || "Unavailable"}</span>
       </p>
     `;
 
