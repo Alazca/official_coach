@@ -19,9 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/strength-coach-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMsg,
-        }),
+        body: JSON.stringify({ message: userMsg }),
       });
       const data = await res.json();
 
@@ -43,7 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  chatForm.addEventListener("submit", async function (e) {
+  // Handle form-submitted messages
+  chatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const userMsg = chatInput.value.trim();
     if (!userMsg) return;
@@ -51,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await sendMessageToAI(userMsg);
   });
 
-  // Quick prompt buttons for all visible buttons
+  // Quick prompts mapping
   const quickPrompts = {
     "Beginner Workout":
       "Can you give me a beginner full-body strength workout?",
@@ -70,13 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
     Equipment: "What equipment do I need for a home gym?",
   };
 
-  document.querySelectorAll("button").forEach((btn) => {
+  // Attach to only the buttons inside #quick-prompts
+  document.querySelectorAll("#quick-prompts button").forEach((btn) => {
     const prompt = quickPrompts[btn.textContent.trim()];
-    if (prompt) {
-      btn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        await sendMessageToAI(prompt);
-      });
-    }
+    if (!prompt) return;
+    btn.addEventListener("click", () => {
+      sendMessageToAI(prompt);
+    });
   });
 });
