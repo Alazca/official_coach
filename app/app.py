@@ -198,7 +198,23 @@ def register():
             user_data.goal.value,
         )
         if isinstance(user_id, int):
-            return jsonify({"message": f"Successfully registered user {user_id}"}), 200
+            # ← Generate JWT here
+            access_token = create_access_token(
+                identity=str(user_id),
+                additional_claims={"email": user_data.email, "role": "user"},
+            )
+            return (
+                jsonify(
+                    {
+                        "message": f"Successfully registered user {user_id}",
+                        "access_token": access_token,
+                    }
+                ),
+                200,
+            )
+
+        if isinstance(user_id, str):
+            return jsonify({"Database error": f"{user_id}"}), 405
 
         if isinstance(user_id, str):
             return jsonify({"Database error": f"{user_id}"}), 405
@@ -230,9 +246,7 @@ def login_user():
         )
 
         return (
-            jsonify(
-                {"message": "Login successful", "access_token": access_token}
-            ),  # <-- underscore instead of space
+            jsonify({"message": "Login successful", "access_token": access_token}),
             200,
         )
     else:
@@ -310,11 +324,11 @@ def get_check_ins():
 
             checkin_events.setdefault(y, {}).setdefault(m, {})[d] = {}
 
-            if c.get("sleep") is not None:
-                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep"])
+            if c.get("sleep_quality") is not None:
+                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep_quality"])
 
-            if c.get("energy") is not None:
-                checkin_events[y][m][d]["energy"] = describe_energy(c["energy"])
+            if c.get("energy_level") is not None:
+                checkin_events[y][m][d]["energy"] = describe_energy(c["energy_level"])
 
         return jsonify(checkin_events), 200
 
@@ -365,9 +379,6 @@ def get_workouts():
 
             events.setdefault(y, {}).setdefault(m, {})[d] = {
                 "workout": w["workout_type"],
-                "nutrition": "N/A",
-                "sleep": "N/A",
-                "energy": "N/A",
                 "readiness": 85,
             }
 

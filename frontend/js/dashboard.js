@@ -3,10 +3,15 @@
  * Handles dashboard initialization, chart rendering, and UI interactions
  */
 
-// Check if logged in, redirect if not
-if (!Credentials.isAuthenticated()) {
-  window.location.href = "/";
-}
+// Check if logged in, redirect if not - with a small delay to ensure token is available
+document.addEventListener("DOMContentLoaded", () => {
+  // Add a small delay to check authentication to allow for token processing
+  setTimeout(() => {
+    if (!Credentials.isAuthenticated()) {
+      window.location.href = "../index.html";
+    }
+  }, 500); // 500ms delay gives time for token to be properly set
+});
 
 // Global variables
 let currentDate = new Date();
@@ -67,6 +72,7 @@ async function loadEventsForMonth(year, month) {
         }
       }
     }
+    console.log("Merged events:", events);
   } catch (err) {
     console.error("Network error loading events:", err);
     events = {};
@@ -245,7 +251,7 @@ function renderCalendar(date) {
 // Create an empty cell for days before/after the month
 function createEmptyCell() {
   const div = document.createElement("div");
-  div.className = "bg-gray-900 border border-gray-700";
+  div.className = "calendar-cell";
   return div;
 }
 
@@ -253,106 +259,139 @@ function createEmptyCell() {
 function createDayCell(day, isToday, hasEvent, date) {
   const div = document.createElement("div");
 
-  // Base classes for the day cell
-  let className = `
-    relative bg-gray-900 border border-gray-700 p-2 text-sm
+  // Add base classes
+  div.className = `
+    relative calendar-cell p-2 text-sm
     transition-all duration-300 ease-in-out
-    hover:scale-125 hover:z-30 hover:bg-gray-800
-    hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]
     rounded-lg cursor-pointer flex flex-col justify-between
+    hover:scale-105 hover:z-30 hover:shadow-[0_0_20px_rgba(91,92,69,0.3)]
   `;
 
-  // Add special styling for today
+  // Mark as today
   if (isToday) {
-    className += ` border-red-600 border-2`;
+    div.classList.add(
+      "bg-[var(--button)]",
+      "text-[var(--bg-alt)]",
+      "border",
+      "border-[var(--primary)]",
+    );
+    div.dataset.today = "true"; // used to retain styling after click
+  } else {
+    div.classList.add("bg-[var(--bg-light)]", "text-[var(--button)]"); // fallback bg and text
   }
 
-  div.className = className;
-
-  // Basic content showing the day number
   div.innerHTML = `
-    <div class="${isToday ? "text-red-500" : "text-gray-400"} font-semibold text-base">${day}</div>
-    <div class="text-xs text-gray-500">${hasEvent ? "Click to view" : ""}</div>
+    <div class="day-number font-semibold text-base">${day}</div>
+    <div class="click-hint text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
   `;
 
-  // Add event indicator if the day has events
+  if (isToday && hasEvent) {
+    div.querySelector(".click-hint").classList.add("text-white");
+  }
+
+  // Indicator
   if (hasEvent) {
     const eventData = events[date.getFullYear()][date.getMonth()][day];
     const indicator = document.createElement("div");
-    indicator.className =
-      "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
+    indicator.className = eventData.isScheduled
+      ? "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500"
+      : "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
     div.appendChild(indicator);
-
-    // If it's a scheduled future event, add a different indicator
-    if (eventData.isScheduled) {
-      indicator.className =
-        "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500";
-    }
   }
 
-  // Click event to show day details in sidebar
+  // Click to show modal and highlight
   div.addEventListener("click", () => {
-    const selectedDate = new Date(date);
-    updateSidebar(selectedDate);
+    updateSidebar(date);
 
-    // Highlight selected day
-    document.querySelectorAll("#calendar-grid div").forEach((cell) => {
-      cell.classList.remove("bg-gray-800", "border-red-800");
-    });
-    div.classList.add("bg-gray-800", "border-red-800");
+    // Clean up preview if it exists
+    const existingPreview = div.querySelector(".event-preview");
+    if (existingPreview) existingPreview.remove();
 
-    // Show modal with day details
+    // Hide the click hint (if it's still there)
+    const hint = div.querySelector(".click-hint");
+    if (hint) hint.style.display = "none";
+
+    document
+      .querySelectorAll("#calendar-grid .calendar-cell")
+      .forEach((cell) => {
+        cell.classList.remove(
+          "bg-[var(--background)]",
+          "border-[var(--primary)]",
+          "text-[var(--text)]",
+        );
+        if (cell.dataset.today === "true") {
+          cell.classList.add("bg-[var(--button)]", "text-[var(--bg-alt)]");
+        } else {
+          cell.classList.add("bg-[var(--bg-light)]", "text-[var(--button)]");
+        }
+      });
+
+    div.classList.remove("bg-[var(--bg-light)]", "text-[var(--button)]");
+    div.classList.add(
+      "bg-[var(--background)]",
+      "border",
+      "border-[var(--primary)]",
+      "text-[var(--text)]",
+    );
+
+    // Show modal
     const modal = document.getElementById("dayModal");
     const modalContent = document.getElementById("modalContent");
-
-    if (hasEvent) {
-      const d = date.getDate();
-      const eventData = events[date.getFullYear()][date.getMonth()][d];
-      modalContent.innerHTML = `
+    const d = date.getDate();
+    const eventData = hasEvent
+      ? events[date.getFullYear()][date.getMonth()][d]
+      : null;
+    modalContent.innerHTML = eventData
+      ? `
         <p><strong>Workout:</strong> ${eventData.workout}</p>
         <p><strong>Nutrition:</strong> ${eventData.nutrition}</p>
         <p><strong>Sleep:</strong> ${eventData.sleep}</p>
         <p><strong>Energy:</strong> ${eventData.energy}</p>
         <p><strong>Readiness:</strong> ${eventData.readiness}%</p>
-      `;
-    } else {
-      modalContent.innerHTML = `<p>No data available for this day.</p>`;
-    }
+      `
+      : `<p>No data available for this day.</p>`;
     modal.classList.remove("hidden");
   });
 
-  // Hover effect to show a preview of the day's data
+  // Hover preview
   div.addEventListener("mouseenter", () => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    const eventData = events[year]?.[month]?.[day];
-
     if (hasEvent) {
-      const eventData = events[date.getFullYear()][date.getMonth()][day];
-      div.innerHTML = `
-        <div class="${isToday ? "text-red-500" : "text-white"} font-bold text-lg mb-1">${day}</div>
-        <div class="text-xs text-gray-300">💤 ${eventData.sleep || "Not logged"}</div>
-        <div class="text-xs text-gray-300">⚡ ${eventData.energy || "Not logged"}</div>
-        <div class="text-xs text-gray-300">🏋️ ${eventData.workout || "Not logged"}</div>
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const dayNum = date.getDate();
+      const eventData = events[year]?.[month]?.[dayNum];
+
+      if (!eventData) return; // Exit early if no data
+
+
+      const hint = div.querySelector(".click-hint");
+      if (hint) hint.style.display = "none";
+
+      const preview = document.createElement("div");
+      preview.className = `event-preview mt-1 text-xs font-semibold`;
+
+      // Check if it's today by class or dataset
+      const isToday = div.classList.contains("bg-[var(--button)]");
+
+      // Set text color based on background
+      preview.classList.add(isToday ? "text-white" : "text-gray-500");
+
+      preview.innerHTML = `
+        💤 ${eventData.sleep || "N/A"}<br>
+        ⚡ ${eventData.energy || "N/A"}<br>
+        🏋️ ${eventData.workout || "Not logged"}
       `;
+      div.appendChild(preview);
     }
   });
 
   div.addEventListener("mouseleave", () => {
-    div.innerHTML = `
-      <div class="${isToday ? "text-red-500" : "text-gray-400"} font-semibold text-base">${day}</div>
-      <div class="text-xs text-gray-500">${hasEvent ? "Click to view" : ""}</div>
-    `;
+    const preview = div.querySelector(".event-preview");
+    if (preview) preview.remove();
 
-    // Add event indicator back after mouse leaves
-    if (hasEvent) {
-      const eventData = events[date.getFullYear()][date.getMonth()][day];
-      const indicator = document.createElement("div");
-      indicator.className = eventData.isScheduled
-        ? "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500"
-        : "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
-      div.appendChild(indicator);
+    const hint = div.querySelector(".click-hint");
+    if (hint && !div.classList.contains("selected")) {
+      hint.style.display = "block";
     }
   });
 
@@ -383,18 +422,18 @@ function updateSidebar(date) {
 
     // Update Strength & Conditioning section
     strengthSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Strength & Conditioning</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">${formattedDate}</span>
-        <span class="block mb-1">Workout: ${eventData.workout || "Not logged"}</span>
-        <span class="block">Readiness: ${eventData.readiness || "Unavailable"}</span>
+        <span class="block mb-1">Workout: ${eventData.workout}</span>
+        <span class="block">Readiness: ${eventData.readiness}%</span>
       </p>
     `;
 
     // Update Nutrition section
     nutritionSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Nutrition</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">Calories: ${eventData.nutrition}</span>
         <span class="block">Hydration: 3.2L</span>
       </p>
@@ -413,14 +452,14 @@ function updateSidebar(date) {
     }
 
     coachSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-      <p class="mt-2 text-gray-300 text-sm">"${coachMessage}"</p>
+      <h3 class="side-header text-lg font-bold">Head Coach</h3>
+      <p class="mt-2 text-sm">"${coachMessage}"</p>
     `;
   } else {
     // No data for this date
     strengthSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Strength & Conditioning</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Strength & Conditioning</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">${formattedDate}</span>
         <span class="block mb-1">No workout data</span>
         <span class="block">Add a workout to track your progress</span>
@@ -428,16 +467,16 @@ function updateSidebar(date) {
     `;
 
     nutritionSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Nutrition</h3>
-      <p class="mt-2 text-gray-300 text-sm">
+      <h3 class="side-header text-lg font-bold">Nutrition</h3>
+      <p class="mt-2 text-sm">
         <span class="block mb-1">No nutrition data</span>
         <span class="block">Log your meals to track calories</span>
       </p>
     `;
 
     coachSection.innerHTML = `
-      <h3 class="text-lg font-bold text-red-400">Head Coach</h3>
-      <p class="mt-2 text-gray-300 text-sm">"Select a date with data or add new activity to see your personalized advice."</p>
+      <h3 class="text-[var(--primary)] text-lg font-bold">Head Coach</h3>
+      <p class="mt-2 text-sm">"Select a date with data or add new activity to see your personalized advice."</p>
     `;
   }
 }
