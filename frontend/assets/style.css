@@ -31,6 +31,9 @@
     background-color: var(--primary);
     border-color: var(--primary);
 }
+.bar-button:hover {
+    background-color: var(--primary-dark);
+}
 
 .logout, #todayBtn {
     background-color: linear-gradient(to bottom right, var(--button), var(--light-button));
