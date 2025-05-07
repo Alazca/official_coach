@@ -72,6 +72,7 @@ async function loadEventsForMonth(year, month) {
         }
       }
     }
+    console.log("Merged events:", events);
   } catch (err) {
     console.error("Network error loading events:", err);
     events = {};
@@ -355,13 +356,19 @@ function createDayCell(day, isToday, hasEvent, date) {
   // Hover preview
   div.addEventListener("mouseenter", () => {
     if (hasEvent) {
-      const eventData = events[date.getFullYear()][date.getMonth()][day];
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const dayNum = date.getDate();
+      const eventData = events[year]?.[month]?.[dayNum];
+
+      if (!eventData) return; // Exit early if no data
+
 
       const hint = div.querySelector(".click-hint");
       if (hint) hint.style.display = "none";
 
       const preview = document.createElement("div");
-      preview.className = `event-preview mt-1 text-xs font-semibold ${div.classList.contains("bg-[var(--button)]") ? "text-white" : "text-gray-500"}`;
+      preview.className = `event-preview mt-1 text-xs font-semibold`;
 
       // Check if it's today by class or dataset
       const isToday = div.classList.contains("bg-[var(--button)]");
@@ -370,9 +377,9 @@ function createDayCell(day, isToday, hasEvent, date) {
       preview.classList.add(isToday ? "text-white" : "text-gray-500");
 
       preview.innerHTML = `
-        💤 ${eventData.sleep}<br>
-        ⚡ ${eventData.energy}<br>
-        🏋️ ${eventData.workout}
+        💤 ${eventData.sleep || "N/A"}<br>
+        ⚡ ${eventData.energy || "N/A"}<br>
+        🏋️ ${eventData.workout || "Not logged"}
       `;
       div.appendChild(preview);
     }

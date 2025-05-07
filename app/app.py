@@ -324,11 +324,11 @@ def get_check_ins():
 
             checkin_events.setdefault(y, {}).setdefault(m, {})[d] = {}
 
-            if c.get("sleep") is not None:
-                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep"])
+            if c.get("sleep_quality") is not None:
+                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep_quality"])
 
-            if c.get("energy") is not None:
-                checkin_events[y][m][d]["energy"] = describe_energy(c["energy"])
+            if c.get("energy_level") is not None:
+                checkin_events[y][m][d]["energy"] = describe_energy(c["energy_level"])
 
         return jsonify(checkin_events), 200
 
@@ -379,9 +379,6 @@ def get_workouts():
 
             events.setdefault(y, {}).setdefault(m, {})[d] = {
                 "workout": w["workout_type"],
-                "nutrition": "N/A",
-                "sleep": "N/A",
-                "energy": "N/A",
                 "readiness": 85,
             }
 
