@@ -260,17 +260,64 @@ def check_in():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/api/check-ins", methods=["GET"])
 @jwt_required()
 def get_check_ins():
+    def describe_sleep(score):
+        if score >= 9:
+            return "Excellent"
+        elif score >= 7:
+            return "Good"
+        elif score >= 5:
+            return "Fair"
+        else:
+            return "Poor"
+
+    def describe_energy(score):
+        if score >= 9:
+            return "Very High"
+        elif score >= 7:
+            return "High"
+        elif score >= 5:
+            return "Low"
+        else:
+            return "Very Low"
+
     try:
         user_id = get_jwt_identity()
-        checkins = get_all_checkins(user_id)
-        return jsonify(checkins), 200
+        year = request.args.get("year", type=int)
+        month = request.args.get("month", type=int)
+
+        if year is None or month is None:
+            return jsonify({"error": "Missing year or month"}), 400
+
+        all_checkins = get_all_checkins(user_id)
+        filtered = []
+
+        for c in all_checkins:
+            checkin_date = datetime.strptime(c["check_in_date"], "%Y-%m-%d")
+            if checkin_date.year == year and checkin_date.month == month:
+                filtered.append(c)
+
+        checkin_events = {}
+
+        for c in filtered:
+            date = datetime.strptime(c["check_in_date"], "%Y-%m-%d")
+            y, m, d = date.year, date.month - 1, date.day
+
+            checkin_events.setdefault(y, {}).setdefault(m, {})[d] = {}
+
+            if c.get("sleep_quality") is not None:
+                checkin_events[y][m][d]["sleep"] = describe_sleep(c["sleep_quality"])
+
+            if c.get("energy_level") is not None:
+                checkin_events[y][m][d]["energy"] = describe_energy(c["energy_level"])
+
+        return jsonify(checkin_events), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+    
 
 @app.route("/api/goals", methods=["GET"])
 @jwt_required()
