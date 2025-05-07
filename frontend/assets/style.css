@@ -49,18 +49,19 @@
     color: var(--bg-alt);
 }
 
-#chatWindow, #chatInput, .prompt-button, input, textarea {
+#chatWindow, #chatInput, .prompt-button, input, textarea, .goals {
     background-color: var(--surface);
     color: var(--text);
 }
-.prompt-button:hover {
+.prompt-button:hover, .chat-bubble, .self-start {
     background-color: var(--bg-light);
     color: var(--text);
 }
-.chat-bubble, .self-start {
-    background-color: var(--bg-light);
-    color: var(--text);
+#foodLoggerResults {
+    background-color: var(--surface);
+    color: var(--text-secondary);
 }
+
 
 .light-button {
     background-color: var(--bg-light);

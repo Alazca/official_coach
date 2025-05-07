@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Display user message
     const userDiv = document.createElement("div");
     userDiv.className =
-      "self-end bg-red-700 text-white px-4 py-2 rounded-lg max-w-[80%]";
+      "self-end px-4 py-2 rounded-lg max-w-[80%]";
     userDiv.textContent = userMsg;
     chatWindow.appendChild(userDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Display AI reply
       const aiDiv = document.createElement("div");
       aiDiv.className =
-        "self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]";
+        "self-start px-4 py-2 rounded-lg max-w-[80%]";
       aiDiv.textContent = data.response || data.error || "No response received";
       chatWindow.appendChild(aiDiv);
       chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error:", err);
       const errDiv = document.createElement("div");
       errDiv.className =
-        "self-start bg-gray-600 text-white px-4 py-2 rounded-lg max-w-[80%]";
+        "self-start px-4 py-2 rounded-lg max-w-[80%]";
       errDiv.textContent = "Error contacting AI coach. Please try again.";
       chatWindow.appendChild(errDiv);
       chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Attach event listeners only to quick prompt buttons in Meal Recommendations and Special Diets
-  document.querySelectorAll(".bg-gray-700").forEach((btn) => {
+  document.querySelectorAll(".prompt-button").forEach((btn) => {
     const prompt = quickPrompts[btn.textContent.trim()];
     if (prompt) {
       btn.addEventListener("click", async (e) => {
