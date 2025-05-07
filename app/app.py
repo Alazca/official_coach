@@ -479,7 +479,8 @@ def general_coach_chat():
             max_tokens=300,
             temperature=0.7,
         )
-        ai_message = response.choices[0].message.content.strip()
+        ai_message = response.choices[0].message.content
+
         return jsonify({"response": ai_message})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
