@@ -222,7 +222,7 @@ def login_user():
     if isinstance(data, Exception):
         return jsonify({"error": f"{str(data)}"}), 400
     if not data:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"error": "User already exists"}), 404
 
     if check_password_hash(data["password_hash"], password):
         additional_claims = {"email": data["email"], "role": "user"}
@@ -232,7 +232,7 @@ def login_user():
         )
 
         return (
-            jsonify({"message": "Login successful", "access token": access_token}),
+            jsonify({"message": "Login successful", "access_token": access_token}),
             200,
         )
     else:
@@ -290,8 +290,37 @@ def get_goals():
 def get_workouts():
     try:
         user_id = get_jwt_identity()
-        history = get_workout_history(user_id)
-        return jsonify(history), 200
+        year = request.args.get("year", type=int)
+        month = request.args.get("month", type=int)
+
+        if year is None or month is None:
+            return jsonify({"error": "Missing year or month parameter"}), 400
+
+        # Get all workouts for this user
+        all_workouts = get_workout_history(user_id)
+
+        # Filter workouts by year and month
+        filtered = []
+        for w in all_workouts:
+            workout_date = datetime.strptime(w["workout_date"], "%Y-%m-%d")
+            if workout_date.year == year and workout_date.month == month:
+                filtered.append(w)
+
+        # Build nested structure for calendar: events[year][month][day] = {...}
+        events = {}
+        for w in filtered:
+            workout_date = datetime.strptime(w["workout_date"], "%Y-%m-%d")
+            y, m, d = workout_date.year, workout_date.month - 1, workout_date.day
+
+            events.setdefault(y, {}).setdefault(m, {})[d] = {
+                "workout": w["workout_type"],
+                "nutrition": "N/A",
+                "sleep": "N/A",
+                "energy": "N/A",
+                "readiness": 85,
+            }
+
+        return jsonify(events), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -458,6 +487,7 @@ def general_coach_chat():
 
 
 @app.route("/api/workout/log", methods=["POST"])
+@jwt_required()
 def log_workout():
     try:
         data = request.get_json()
