@@ -252,106 +252,126 @@ function createEmptyCell() {
 function createDayCell(day, isToday, hasEvent, date) {
   const div = document.createElement("div");
 
-  // Base classes for the day cell
-  let className = `
+  // Add base classes
+  div.className = `
     relative calendar-cell p-2 text-sm
     transition-all duration-300 ease-in-out
-    hover:scale-125 hover:z-30 hover:bg-[var(--background)]
-    hover:shadow-[0_0_20px_rgba(91, 92, 69, 0.5)]
     rounded-lg cursor-pointer flex flex-col justify-between
+    hover:scale-105 hover:z-30 hover:shadow-[0_0_20px_rgba(91,92,69,0.3)]
   `;
 
-  // Add special styling for today
+  // Mark as today
   if (isToday) {
-    className += `text-[var(--text)] bg-[var(--button)]`;
+    div.classList.add("bg-[var(--button)]", "text-[var(--bg-alt)]", "border", "border-[var(--primary)]");
+    div.dataset.today = "true"; // used to retain styling after click
+  } else {
+    div.classList.add("bg-[var(--bg-light)]", "text-[var(--button)]"); // fallback bg and text
   }
 
-  div.className = className;
 
-  // Basic content showing the day number
   div.innerHTML = `
-    <div class="${isToday ? "text-[var(--text)]" : "text-[var(--button)]"} font-semibold text-base">${day}</div>
-    <div class="text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
+    <div class="day-number font-semibold text-base">${day}</div>
+    <div class="click-hint text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
   `;
 
-  // Add event indicator if the day has events
+  if (isToday && hasEvent) {
+    div.querySelector(".click-hint").classList.add("text-white");
+  }
+  
+
+
+  // Indicator
   if (hasEvent) {
     const eventData = events[date.getFullYear()][date.getMonth()][day];
     const indicator = document.createElement("div");
-    indicator.className =
-      "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
+    indicator.className = eventData.isScheduled
+      ? "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500"
+      : "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
     div.appendChild(indicator);
-
-    // If it's a scheduled future event, add a different indicator
-    if (eventData.isScheduled) {
-      indicator.className =
-        "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500";
-    }
   }
 
-  // Click event to show day details in sidebar
+  // Click to show modal and highlight
   div.addEventListener("click", () => {
-    const selectedDate = new Date(date);
-    updateSidebar(selectedDate);
+    updateSidebar(date);
 
-    // Highlight selected day
-    document.querySelectorAll("#calendar-grid div").forEach((cell) => {
-      cell.classList.remove("bg-[var(--background)]", "border-[var(--primary)]");
+    // Clean up preview if it exists
+    const existingPreview = div.querySelector(".event-preview");
+    if (existingPreview) existingPreview.remove();
+
+    // Hide the click hint (if it's still there)
+    const hint = div.querySelector(".click-hint");
+    if (hint) hint.style.display = "none";
+
+    document.querySelectorAll("#calendar-grid .calendar-cell").forEach((cell) => {
+      cell.classList.remove("bg-[var(--background)]", "border-[var(--primary)]", "text-[var(--text)]");
+      if (cell.dataset.today === "true") {
+        cell.classList.add("bg-[var(--button)]", "text-[var(--bg-alt)]");
+      } else {
+        cell.classList.add("bg-[var(--bg-light)]", "text-[var(--button)]");
+      }
     });
-    div.classList.add("bg-[var(--background)]", "border-[var(--primary)]");
 
-    // Show modal with day details
+    div.classList.remove("bg-[var(--bg-light)]", "text-[var(--button)]");
+    div.classList.add("bg-[var(--background)]", "border", "border-[var(--primary)]", "text-[var(--text)]");
+
+    // Show modal
     const modal = document.getElementById("dayModal");
     const modalContent = document.getElementById("modalContent");
-
-    if (hasEvent) {
-      const d = date.getDate();
-      const eventData = events[date.getFullYear()][date.getMonth()][d];
-      modalContent.innerHTML = `
+    const d = date.getDate();
+    const eventData = hasEvent ? events[date.getFullYear()][date.getMonth()][d] : null;
+    modalContent.innerHTML = eventData
+      ? `
         <p><strong>Workout:</strong> ${eventData.workout}</p>
         <p><strong>Nutrition:</strong> ${eventData.nutrition}</p>
         <p><strong>Sleep:</strong> ${eventData.sleep}</p>
         <p><strong>Energy:</strong> ${eventData.energy}</p>
         <p><strong>Readiness:</strong> ${eventData.readiness}%</p>
-      `;
-    } else {
-      modalContent.innerHTML = `<p>No data available for this day.</p>`;
-    }
+      `
+      : `<p>No data available for this day.</p>`;
     modal.classList.remove("hidden");
   });
 
-  // Hover effect to show a preview of the day's data
+  // Hover preview
   div.addEventListener("mouseenter", () => {
     if (hasEvent) {
       const eventData = events[date.getFullYear()][date.getMonth()][day];
-      div.innerHTML = `
-        <div class="${isToday ? "text-red-500" : "text-white"} font-bold text-lg mb-1">${day}</div>
-        <div class="text-xs text-gray-300">💤 ${eventData.sleep}</div>
-        <div class="text-xs text-gray-300">⚡ ${eventData.energy}</div>
-        <div class="text-xs text-gray-300">🏋️ ${eventData.workout}</div>
+
+      const hint = div.querySelector(".click-hint");
+      if (hint) hint.style.display = "none";
+
+      const preview = document.createElement("div");
+      preview.className = `event-preview mt-1 text-xs font-semibold ${div.classList.contains("bg-[var(--button)]") ? "text-white" : "text-gray-500"}`;
+
+      // Check if it's today by class or dataset
+      const isToday = div.classList.contains("bg-[var(--button)]");
+
+      // Set text color based on background
+      preview.classList.add(isToday ? "text-white" : "text-gray-500");
+
+      preview.innerHTML = `
+        💤 ${eventData.sleep}<br>
+        ⚡ ${eventData.energy}<br>
+        🏋️ ${eventData.workout}
       `;
+      div.appendChild(preview);
+      
     }
   });
 
   div.addEventListener("mouseleave", () => {
-    div.innerHTML = `
-      <div class="${isToday ? "text-[var(--button)]" : "text-[var(--border)]"} font-semibold text-base">${day}</div>
-      <div class="text-xs text-[var(--text-secondary)]">${hasEvent ? "Click to view" : ""}</div>
-    `;
-
-    // Add event indicator back after mouse leaves
-    if (hasEvent) {
-      const eventData = events[date.getFullYear()][date.getMonth()][day];
-      const indicator = document.createElement("div");
-      indicator.className = eventData.isScheduled
-        ? "absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500"
-        : "absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500";
-      div.appendChild(indicator);
+    const preview = div.querySelector(".event-preview");
+    if (preview) preview.remove();
+  
+    const hint = div.querySelector(".click-hint");
+    if (hint && !div.classList.contains("selected")) {
+      hint.style.display = "block";
     }
   });
+  
 
   return div;
 }
+
 
 // Update the sidebar with the selected date's information
 function updateSidebar(date) {

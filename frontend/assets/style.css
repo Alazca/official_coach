@@ -203,7 +203,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--border);
+    background-color: var(--primary-dark);
     transform: scale(1.05); /* Gentle zoom effect */
 }
 
